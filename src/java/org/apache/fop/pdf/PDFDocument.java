@@ -69,12 +69,6 @@ public class PDFDocument {
 
     private static final Integer LOCATION_PLACEHOLDER = new Integer(0);
 
-    /** Integer constant to represent PDF 1.3 */
-    public static final int PDF_VERSION_1_3 = 3;
-
-    /** Integer constant to represent PDF 1.4 */
-    public static final int PDF_VERSION_1_4 = 4;
-
     /** the encoding to use when converting strings to PDF commands */
     public static final String ENCODING = "ISO-8859-1";
 
@@ -100,7 +94,7 @@ public class PDFDocument {
     private List objects = new LinkedList();
 
     /** Indicates what PDF version is active */
-    private int pdfVersion = PDF_VERSION_1_4;
+    private PDFVersion pdfVersion;
 
     /** Indicates which PDF profiles are active (PDF/A, PDF/X etc.) */
     private PDFProfile pdfProfile = new PDFProfile(this);
@@ -199,10 +193,35 @@ public class PDFDocument {
      * @param prod the name of the producer of this pdf document
      */
     public PDFDocument(String prod) {
+        this ( PDFVersion.V_1_4, prod );
+    }
 
+    /**
+     * Creates an empty PDF document.
+     *
+     * The constructor creates a /Root and /Pages object to
+     * track the document but does not write these objects until
+     * the trailer is written. Note that the object ID of the
+     * pages object is determined now, and the xref table is
+     * updated later. This allows Pages to refer to their
+     * Parent before we write it out.
+     *
+     * @version pdf format version (i.e., one of PDF_VERSION_1.{3,4,7})
+     * @param prod the name of the producer of this pdf document
+     */
+    public PDFDocument(PDFVersion version, String prod) {
+
+        // Set format version
+        if ( version != null ) {
+            this.pdfVersion = version;
+        } else {
+            throw new NullPointerException ( "bad version" );
+        }
+
+        // Create PDF object factory.
         this.factory = new PDFFactory(this);
 
-        /* create the /Root, /Info and /Resources objects */
+        /* Create the /Root, /Info and /Resources objects */
         this.pages = getFactory().makePages();
 
         // Create the Root object
@@ -216,23 +235,15 @@ public class PDFDocument {
     }
 
     /**
-     * @return the integer representing the active PDF version
-     *          (one of PDFDocument.PDF_VERSION_*)
+     * @return the active PDF version (one of PDFVersion.V*)
      */
-    public int getPDFVersion() {
+    public PDFVersion getPDFVersion() {
         return this.pdfVersion;
     }
 
     /** @return the String representing the active PDF version */
     public String getPDFVersionString() {
-        switch (getPDFVersion()) {
-        case PDF_VERSION_1_3:
-            return "1.3";
-        case PDF_VERSION_1_4:
-            return "1.4";
-        default:
-            throw new IllegalStateException("Unsupported PDF version selected");
-        }
+        return pdfVersion.getName();
     }
 
     /** @return the PDF profile currently active. */

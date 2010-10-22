@@ -179,12 +179,10 @@ public class PDFProfile {
     /** Checks if the right PDF version is set. */
     public void verifyPDFVersion() {
         final String err = "PDF version must be 1.4 for {0}";
-        if (getPDFAMode().isPDFA1LevelB()
-                && getDocument().getPDFVersion() != PDFDocument.PDF_VERSION_1_4) {
+        if ( ! getDocument().getPDFVersion().supportsMode ( getPDFAMode() ) ) {
             throw new PDFConformanceException(format(err, getPDFAMode()));
         }
-        if (getPDFXMode() == PDFXMode.PDFX_3_2003
-                && getDocument().getPDFVersion() != PDFDocument.PDF_VERSION_1_4) {
+        if ( ! getDocument().getPDFVersion().supportsMode ( getPDFXMode() ) ) {
             throw new PDFConformanceException(format(err, getPDFXMode()));
         }
     }

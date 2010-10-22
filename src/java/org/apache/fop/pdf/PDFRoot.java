@@ -201,7 +201,7 @@ public class PDFRoot extends PDFDictionary {
      * @since PDF 1.4
      */
     public void setMetadata(PDFMetadata meta) {
-        if (getDocumentSafely().getPDFVersion() >= PDFDocument.PDF_VERSION_1_4) {
+        if (getDocumentSafely().getPDFVersion().floatValue() >= 1.4F) {
             put("Metadata", meta.makeReference());
         }
     }
@@ -231,7 +231,7 @@ public class PDFRoot extends PDFDictionary {
      * @since PDF 1.4
      */
     public void addOutputIntent(PDFOutputIntent outputIntent) {
-        if (getDocumentSafely().getPDFVersion() >= PDFDocument.PDF_VERSION_1_4) {
+        if (getDocumentSafely().getPDFVersion().floatValue() >= 1.4F) {
             PDFArray outputIntents = getOutputIntents();
             if (outputIntents == null) {
                 outputIntents = new PDFArray(this);

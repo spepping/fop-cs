@@ -30,6 +30,7 @@ import org.apache.fop.apps.FOUserAgent;
 import org.apache.fop.pdf.PDFAMode;
 import org.apache.fop.pdf.PDFEncryptionParams;
 import org.apache.fop.pdf.PDFFilterList;
+import org.apache.fop.pdf.PDFVersion;
 import org.apache.fop.pdf.PDFXMode;
 import org.apache.fop.render.PrintRendererConfigurator;
 import org.apache.fop.render.Renderer;
@@ -70,7 +71,15 @@ public class PDFRendererConfigurator extends PrintRendererConfigurator {
             LogUtil.handleException(log, e, false);
         }
 
-        String s = cfg.getChild(PDFConfigurationConstants.PDF_A_MODE, true).getValue(null);
+        String s = cfg.getChild(PDFConfigurationConstants.PDF_VERSION, true).getValue(null);
+        if (s != null) {
+            try {
+                pdfUtil.setVersion(PDFVersion.valueOf(s));
+            } catch ( IllegalArgumentException e ) {
+                LogUtil.handleException(log, e, false);
+            }
+        }
+        s = cfg.getChild(PDFConfigurationConstants.PDF_A_MODE, true).getValue(null);
         if (s != null) {
             pdfUtil.setAMode(PDFAMode.valueOf(s));
         }

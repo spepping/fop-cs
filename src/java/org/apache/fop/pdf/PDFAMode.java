@@ -62,6 +62,24 @@ public final class PDFAMode {
     }
 
     /**
+     * Determine if this mode is supported by specified version.
+     * @param version a PDF version object
+     * @return true if specified version supports this mode
+     */
+    public boolean supportedByVersion ( PDFVersion version ) {
+        float v = version.floatValue();
+        if ( this == DISABLED ) {
+            return true;
+        } else if ( this == PDFA_1A ) {
+            return v >= 1.4F;
+        } else if ( this == PDFA_1B ) {
+            return v >= 1.4F;
+        } else {
+            return false;
+        }
+    }
+
+    /**
      * Returns the mode enum object given a String.
      * @param s the string
      * @return the PDFAMode enum object (DISABLED will be returned if no match is found)

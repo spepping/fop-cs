@@ -62,6 +62,7 @@ import org.apache.fop.pdf.PDFOutputIntent;
 import org.apache.fop.pdf.PDFPageLabels;
 import org.apache.fop.pdf.PDFReference;
 import org.apache.fop.pdf.PDFText;
+import org.apache.fop.pdf.PDFVersion;
 import org.apache.fop.pdf.PDFXMode;
 import org.apache.fop.render.pdf.extensions.PDFEmbeddedFileExtensionAttachment;
 import org.apache.fop.util.ColorProfileUtil;
@@ -79,6 +80,9 @@ class PDFRenderingUtil implements PDFConfigurationConstants {
 
     /** the PDF Document being created */
     protected PDFDocument pdfDoc;
+
+    /** version of PDF specification to use when creating document */
+    protected PDFVersion pdfVersion = PDFVersion.V_1_4;
 
     /** the PDF/A mode (Default: disabled) */
     protected PDFAMode pdfAMode = PDFAMode.DISABLED;
@@ -192,6 +196,14 @@ class PDFRenderingUtil implements PDFConfigurationConstants {
 
     public FOUserAgent getUserAgent() {
         return this.userAgent;
+    }
+
+    /**
+     * Sets the PDF version.
+     * @param version a PDF version
+     */
+    public void setVersion(PDFVersion version) {
+        this.pdfVersion = version;
     }
 
     /**
@@ -375,7 +387,7 @@ class PDFRenderingUtil implements PDFConfigurationConstants {
         if (this.pdfDoc != null) {
             throw new IllegalStateException("PDFDocument already set up");
         }
-        this.pdfDoc = new PDFDocument(
+        this.pdfDoc = new PDFDocument( pdfVersion,
                 userAgent.getProducer() != null ? userAgent.getProducer() : "");
         updateInfo();
         updatePDFProfiles();
