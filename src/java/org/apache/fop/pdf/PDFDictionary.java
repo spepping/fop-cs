@@ -22,6 +22,7 @@ package org.apache.fop.pdf;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.Writer;
+
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -48,7 +49,6 @@ public class PDFDictionary extends PDFObject {
      * Create a new dictionary object.
      */
     public PDFDictionary() {
-        super();
     }
 
     /**
@@ -89,6 +89,30 @@ public class PDFDictionary extends PDFObject {
         this.entries.put(name, new Integer(value));
     }
 
+    /**
+     * Puts a new name/value pair.
+     * @param name the name
+     * @param value the value
+     */
+    public void put(String name, double value) {
+        if (!entries.containsKey(name)) {
+            this.order.add(name);
+        }
+        this.entries.put(name, new Double(value));
+    }
+
+    /**
+     * Puts a new name/value pair.
+     * @param name the name
+     * @param value the value
+     */
+    public void put(String name, boolean value) {
+        if (!entries.containsKey(name)) {
+            this.order.add(name);
+        }
+        this.entries.put(name, value ? Boolean.TRUE : Boolean.FALSE);
+    }
+      
     /**
      * Returns the value given a name.
      * @param name the name of the value
@@ -144,6 +168,44 @@ public class PDFDictionary extends PDFObject {
             writer.write('\n');
         }
         writer.write(">>\n");
+    }
+
+    /**
+     * Augment this dictionary with entries in specified dictionary,
+     * replacing or combining entries as required.
+     * @param d dictionary to be merged into this dictionary
+     * @param combiner if null, then replace like named entries, otherwise combine entries
+     * using specified combiner
+     */
+    public void augment ( PDFDictionary d, Combiner combiner ) {
+        assert d != null;
+        assert d.order != null;
+        for ( Iterator it = d.order.iterator(); it.hasNext();) {
+            String n = (String) it.next();
+            Object vNew = d.get(n);
+            if ( entries.containsKey ( n ) ) {
+                Object vOld = entries.get ( n );
+                if ( combiner != null ) {
+                    vNew = combiner.combine ( n, vOld, vNew );
+                }
+            }
+            put ( n, vNew );
+        }
+
+    }
+
+    /**
+     * An interface for combining dictionary entries, used when augmenting a dictionary.
+     */
+    public interface Combiner {
+        /**
+         * Combine entry values.
+         * @param name of entry
+         * @param value1 first value (existing value)
+         * @param value2 second value (combining value)
+         * @return combined value
+         */
+        Object combine ( String name, Object value1, Object value2 );
     }
 
 }

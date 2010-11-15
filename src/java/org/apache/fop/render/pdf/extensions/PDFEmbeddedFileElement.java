@@ -21,24 +21,46 @@ package org.apache.fop.render.pdf.extensions;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-
-import org.xml.sax.Attributes;
-import org.xml.sax.Locator;
+import java.util.Map;
 
 import org.apache.fop.apps.FOPException;
 import org.apache.fop.datatypes.URISpecification;
 import org.apache.fop.fo.Constants;
+import org.apache.fop.fo.ElementMapping;
 import org.apache.fop.fo.FONode;
 import org.apache.fop.fo.PropertyList;
 import org.apache.fop.fo.extensions.ExtensionAttachment;
+import org.apache.fop.util.XMLUtil;
+
+import org.xml.sax.Attributes;
+import org.xml.sax.Locator;
+import org.xml.sax.helpers.AttributesImpl;
 
 /**
  * Extension element for pdf:embedded-file.
  */
-public class PDFEmbeddedFileElement extends AbstractPDFExtensionElement {
+public class PDFEmbeddedFileElement extends FONode {
 
     /** name of element */
-    protected static final String ELEMENT = "embedded-file";
+    public static final String ELEMENT = "embedded-file";
+    /** name of file to be embedded */
+    private static final String ATT_FILENAME = "filename";
+    /** source of file to be embedded (URI) */
+    private static final String ATT_SRC = "src";
+    /** a description of the file to be embedded */
+    private static final String ATT_DESC = "desc";
+
+    /** Extension attachment. */
+    protected ExtensionAttachment attachment;
+
+    /** description attribute (optional) */
+    private String desc;
+
+    /** source name attribute */
+    private String src;
+
+    /** filename attribute */
+    private String filename;
 
     /**
      * Main constructor
@@ -46,6 +68,48 @@ public class PDFEmbeddedFileElement extends AbstractPDFExtensionElement {
      */
     protected PDFEmbeddedFileElement(FONode parent) {
         super(parent);
+    }
+
+    /** {@inheritDoc} */
+    public void processNode(String elementName, Locator locator,
+                            Attributes attlist, PropertyList propertyList)
+                                throws FOPException {
+        // process optional desc (description) attribute
+        String desc = attlist.getValue(ATT_DESC);
+        if ( desc != null ) {
+            this.desc = desc;
+        } else {
+            // description is optional
+        }
+        // process mandatory src (source) attribute
+        String src = attlist.getValue(ATT_SRC);
+        if ( src != null ) {
+            this.src = URISpecification.getURL(src);
+        } else {
+            missingAttributeError(ATT_SRC);
+        }
+        // process optional filename attribute
+        String filename = attlist.getValue(ATT_FILENAME);
+        if ( ( filename == null ) || ( filename.length() == 0 ) ) {
+            try {
+                URI uri = new URI(src);
+                String path = uri.getPath();
+                int idx = path.lastIndexOf('/');
+                if (idx > 0) {
+                    filename = path.substring(idx + 1);
+                } else {
+                    filename = path;
+                }
+            } catch (URISyntaxException e) {
+                throw new FOPException ( e.getMessage() );
+            }
+        }
+        // file name must have been specified or inferred
+        if ( filename != null ) {
+            this.filename = filename;
+        } else {
+            missingAttributeError(ATT_FILENAME);
+        }
     }
 
     /** {@inheritDoc} */
@@ -58,40 +122,8 @@ public class PDFEmbeddedFileElement extends AbstractPDFExtensionElement {
     }
 
     /** {@inheritDoc} */
-    public void processNode(String elementName, Locator locator,
-                            Attributes attlist, PropertyList propertyList)
-                                throws FOPException {
-        PDFEmbeddedFileExtensionAttachment embeddedFile
-            = (PDFEmbeddedFileExtensionAttachment)getExtensionAttachment();
-        String desc = attlist.getValue("description");
-        if (desc != null && desc.length() > 0) {
-            embeddedFile.setDesc(desc);
-        }
-        String src = attlist.getValue("src");
-        src = URISpecification.getURL(src);
-        if (src != null && src.length() > 0) {
-            embeddedFile.setSrc(src);
-        } else {
-            missingPropertyError("src");
-        }
-        String filename = attlist.getValue("filename");
-        if (filename == null || filename.length() == 0) {
-            try {
-                URI uri = new URI(src);
-                String path = uri.getPath();
-                int idx = path.lastIndexOf('/');
-                if (idx > 0) {
-                    filename = path.substring(idx + 1);
-                } else {
-                    filename = path;
-                }
-                embeddedFile.setFilename(filename);
-            } catch (URISyntaxException e) {
-                //Filename could not be deduced from URI
-                missingPropertyError("name");
-            }
-        }
-        embeddedFile.setFilename(filename);
+    protected void endOfNode() throws FOPException {
+        super.endOfNode();
     }
 
     /** {@inheritDoc} */
@@ -100,7 +132,70 @@ public class PDFEmbeddedFileElement extends AbstractPDFExtensionElement {
     }
 
     /** {@inheritDoc} */
-    protected ExtensionAttachment instantiateExtensionAttachment() {
-        return new PDFEmbeddedFileExtensionAttachment();
+    public String getNormalNamespacePrefix() {
+        return PDFElementMapping.NAMESPACE_PREFIX;
     }
+
+    /** {@inheritDoc} */
+    public String getNamespaceURI() {
+        return PDFElementMapping.NAMESPACE;
+    }
+
+    /** {@inheritDoc} */
+    public ExtensionAttachment getExtensionAttachment() {
+        if ( attachment == null ) {
+            attachment = instantiateExtensionAttachment();
+        }
+        return attachment;
+    }
+
+    /** {@inheritDoc} */
+    protected ExtensionAttachment instantiateExtensionAttachment() {
+        return new Attachment();
+    }
+
+    /** extension attachcment correponding to pdf:embedded-file */
+    public class Attachment extends PDFExtensionAttachment {
+        /** {@inheritDoc} */
+        public String getLocalName() {
+            return PDFEmbeddedFileElement.this.getLocalName();
+        }
+        /** {@inheritDoc} */
+        protected Attributes getAttributes() {
+            AttributesImpl atts = new AttributesImpl();
+            if (desc != null && desc.length() > 0) {
+                XMLUtil.addAttribute ( atts, ATT_DESC, desc );
+            }
+            if (src != null && src.length() > 0) {
+                XMLUtil.addAttribute ( atts, ATT_SRC, src );
+            }
+            if (filename != null && filename.length() > 0) {
+                XMLUtil.addAttribute ( atts, ATT_FILENAME, filename );
+            }
+            return atts;
+        }
+        /** @return the file description */
+        public String getDescription() {
+            return desc;
+        }
+        /** @return the source URI */
+        public String getSource() {
+            return src;
+        }
+        /** @return the file name */
+        public String getFilename() {
+            return filename;
+        }
+    }
+
+    static void addMappings ( Map map ) {
+        map.put ( ELEMENT, new Maker() );
+    }
+
+    static class Maker extends ElementMapping.Maker {
+        public FONode make(FONode parent) {
+            return new PDFEmbeddedFileElement(parent);
+        }
+    }
+
 }

@@ -52,10 +52,18 @@ public class ExtensionElementMapping extends ElementMapping {
     }
 
     /**
-     * Constructor.
+     * Default Constructor.
      */
     public ExtensionElementMapping() {
-        namespaceURI = URI;
+        this ( URI );
+    }
+
+    /**
+     * Explicit Constructor.
+     * @param namespaceURI the namespace uri to use
+     */
+    public ExtensionElementMapping ( String namespaceURI ) {
+        super ( namespaceURI );
     }
 
     /**

@@ -26,6 +26,10 @@ public final class PDFVersion {
     public static final PDFVersion V_1_3 = new PDFVersion("1.3");
     /** PDF 1.4 */
     public static final PDFVersion V_1_4 = new PDFVersion("1.4");
+    /** PDF 1.5 */
+    public static final PDFVersion V_1_5 = new PDFVersion("1.5");
+    /** PDF 1.6 */
+    public static final PDFVersion V_1_6 = new PDFVersion("1.6");
     /** PDF 1.7 */
     public static final PDFVersion V_1_7 = new PDFVersion("1.7");
 
@@ -78,10 +82,15 @@ public final class PDFVersion {
             return V_1_3;
         } else if (V_1_4.getName().equals(s)) {
             return V_1_4;
+        } else if (V_1_5.getName().equals(s)) {
+            return V_1_5;
+        } else if (V_1_6.getName().equals(s)) {
+            return V_1_6;
         } else if (V_1_7.getName().equals(s)) {
             return V_1_7;
         } else {
-            throw new IllegalArgumentException ( "unknown or unsupported PDF format version: " + s );
+            throw new IllegalArgumentException
+                ( "unknown or unsupported PDF format version: " + s );
         }
     }
 

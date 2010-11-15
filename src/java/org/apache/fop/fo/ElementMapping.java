@@ -42,7 +42,22 @@ public abstract class ElementMapping {
     //Please don't change that to java.util.Map as that can break extensions.
 
     /** The namespace for the ElementMapping */
-    protected String namespaceURI = null;
+    protected String namespaceURI;
+
+    /**
+     * Default constructor.
+     */
+    public ElementMapping() {
+        this ( null );
+    }
+
+    /**
+     * Explicit constructor.
+     * @param namespaceURI the namespace uri to use
+     */
+    public ElementMapping ( String namespaceURI ) {
+        this.namespaceURI = namespaceURI;
+    }
 
     /**
      * Returns a HashMap of maker objects for this element mapping

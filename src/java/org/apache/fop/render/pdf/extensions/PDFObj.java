@@ -19,26 +19,28 @@
 
 package org.apache.fop.render.pdf.extensions;
 
-// FOP
+import java.util.Map;
+
+import org.apache.fop.fo.ElementMapping;
 import org.apache.fop.fo.FONode;
-import org.apache.fop.fo.extensions.ExtensionAttachment;
+import org.apache.fop.fo.XMLObj;
+
+import org.xml.sax.Attributes;
+import org.xml.sax.Locator;
+import org.xml.sax.SAXException;
 
 /**
- * Base class for the PDF-specific extension elements.
+ * Instantiable class for PDF extension elements which are modeled as XML objects, namely, all pdf:*
+ * except for pdf:embedded-file, and which each such object may express a common 'key' attribute.
  */
-public abstract class AbstractPDFExtensionElement extends FONode {
-
-    /**Extension attachment. */
-    protected PDFExtensionAttachment attachment;
+public class PDFObj extends XMLObj {
 
     /**
-     * Default constructor
-     *
+     * Explicit constructor.
      * @param parent parent of this node
-     * @see org.apache.fop.fo.FONode#FONode(FONode)
      */
-    public AbstractPDFExtensionElement(FONode parent) {
-        super(parent);
+    public PDFObj ( FONode parent ) {
+        super ( parent );
     }
 
     /** {@inheritDoc} */
@@ -48,26 +50,18 @@ public abstract class AbstractPDFExtensionElement extends FONode {
 
     /** {@inheritDoc} */
     public String getNormalNamespacePrefix() {
-        return "pdf";
+        return PDFElementMapping.NAMESPACE_PREFIX;
     }
 
-    /**
-     * Returns the extension attachment.
-     * @return the extension attachment if one is created by the extension element, null otherwise.
-     * @see org.apache.fop.fo.FONode#getExtensionAttachment()
-     */
-    public ExtensionAttachment getExtensionAttachment() {
-        if (attachment == null) {
-            this.attachment = (PDFExtensionAttachment)instantiateExtensionAttachment();
+    static void addMappings ( Map map ) {
+        map.put ( ElementMapping.DEFAULT, new Maker() );
+    }
+
+    static class Maker extends ElementMapping.Maker {
+        public FONode make(FONode parent) {
+            return new PDFObj(parent);
         }
-        return this.attachment;
     }
-
-    /**
-     * Instantiates extension attachment object.
-     * @return extension attachment
-     */
-    protected abstract ExtensionAttachment instantiateExtensionAttachment();
 
 }
 

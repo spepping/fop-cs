@@ -34,6 +34,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import org.apache.fop.fo.Constants;
+import org.apache.fop.fo.extensions.ExtensionAttachment;
+import org.apache.fop.fo.extensions.FilterPageExtensionAttachment;
 import org.apache.fop.fo.pagination.SimplePageMaster;
 
 /**
@@ -100,7 +102,8 @@ public class PageViewport extends AreaTreeObject implements Resolvable, Cloneabl
     public PageViewport(SimplePageMaster spm, int pageNumber, String pageStr,
             boolean blank, boolean spanAll) {
         this.simplePageMasterName = spm.getMasterName();
-        setExtensionAttachments(spm.getExtensionAttachments());
+        setExtensionAttachments
+            ( filterExtensionAttachments ( spm.getExtensionAttachments(), spm, pageNumber ) );
         setForeignAttributes(spm.getForeignAttributes());
         this.blank = blank;
         int pageWidth = spm.getPageWidth().getValue();
@@ -658,6 +661,28 @@ public class PageViewport extends AreaTreeObject implements Resolvable, Cloneabl
      */
     public RegionReference getRegionReference(int id) {
         return getPage().getRegionViewport(id).getRegionReference();
+    }
+
+    private static List filterExtensionAttachments
+        ( List attachments, SimplePageMaster spm, int pageNumber ) {
+        if ( attachments == null ) {
+            return null;
+        } else {
+            List al = new ArrayList();
+            for ( Iterator it = attachments.iterator(); it.hasNext();) {
+                ExtensionAttachment ea = (ExtensionAttachment) it.next();
+                if ( ea instanceof FilterPageExtensionAttachment ) {
+                    FilterPageExtensionAttachment fp = (FilterPageExtensionAttachment) ea;
+                    if ( fp.filter ( spm, pageNumber ) ) {
+                        ea = null;
+                    }
+                }
+                if ( ea != null ) {
+                    al.add ( ea );
+                }
+            }
+            return al;
+        }
     }
 
 }

@@ -576,6 +576,17 @@ public abstract class FONode implements Cloneable {
     }
 
     /**
+     * Helper function to throw an error caused by missing mandatory attribute (on
+     * extension element, in which case it is not called a 'property').
+     * @param attributeName the name of the missing attribute.
+     * @throws ValidationException the validation error provoked by the method call
+     */
+    protected void missingAttributeError(String attributeName)
+                throws ValidationException {
+        getFOValidationEventProducer().missingAttribute(this, getName(), attributeName, locator);
+    }
+
+    /**
      * Helper function to return "Error(line#/column#)" string for
      * above exception messages
      *

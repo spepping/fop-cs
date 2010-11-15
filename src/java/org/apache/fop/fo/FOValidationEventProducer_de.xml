@@ -19,5 +19,6 @@
 <catalogue xml:lang="de">
   <message key="locator">[ (Siehe Position {loc})| (Siehe {#gatherContextInfo})| (Keine Kontextinformationen verfügbar)]</message>
   <message key="tooManyNodes">In "{elementName}" darf nur ein einziges "{offendingNode}" vorkommen!{{locator}}</message>
-  <message key="missingProperty">Dem Element "{elementName}" fehlt ein verlangtes Property "{propertyName}"!{{locator}}</message>
+  <message key="missingProperty">Dem Element "{elementName}" fehlt ein verlangtes Eigenschaft "{propertyName}"!{{locator}}</message>
+  <message key="missingAttribute">Dem Element "{elementName}" fehlt ein verlangtes Attribut "{attributeName}"!{{locator}}</message>
 </catalogue>

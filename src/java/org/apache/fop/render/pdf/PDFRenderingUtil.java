@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
+import java.util.Iterator;
 import java.util.Map;
 
 import javax.xml.transform.Source;
@@ -56,15 +57,22 @@ import org.apache.fop.pdf.PDFICCBasedColorSpace;
 import org.apache.fop.pdf.PDFICCStream;
 import org.apache.fop.pdf.PDFInfo;
 import org.apache.fop.pdf.PDFMetadata;
+import org.apache.fop.pdf.PDFName;
 import org.apache.fop.pdf.PDFNames;
 import org.apache.fop.pdf.PDFNumsArray;
 import org.apache.fop.pdf.PDFOutputIntent;
+import org.apache.fop.pdf.PDFPage;
 import org.apache.fop.pdf.PDFPageLabels;
 import org.apache.fop.pdf.PDFReference;
+import org.apache.fop.pdf.PDFRoot;
 import org.apache.fop.pdf.PDFText;
 import org.apache.fop.pdf.PDFVersion;
 import org.apache.fop.pdf.PDFXMode;
-import org.apache.fop.render.pdf.extensions.PDFEmbeddedFileExtensionAttachment;
+import org.apache.fop.render.pdf.extensions.PDFCatalogElement;
+import org.apache.fop.render.pdf.extensions.PDFElement;
+import org.apache.fop.render.pdf.extensions.PDFEmbeddedFileElement;
+import org.apache.fop.render.pdf.extensions.PDFExtensionAttachment;
+import org.apache.fop.render.pdf.extensions.PDFPageElement;
 import org.apache.fop.util.ColorProfileUtil;
 
 /**
@@ -440,7 +448,7 @@ class PDFRenderingUtil implements PDFConfigurationConstants {
      * @param embeddedFile the object representing the embedded file to be added
      * @throws IOException if an I/O error occurs
      */
-    public void addEmbeddedFile(PDFEmbeddedFileExtensionAttachment embeddedFile)
+    public void addEmbeddedFile(PDFEmbeddedFileElement.Attachment embeddedFile)
             throws IOException {
         this.pdfDoc.getProfile().verifyEmbeddedFilesAllowed();
         PDFNames names = this.pdfDoc.getRoot().getNames();
@@ -453,10 +461,10 @@ class PDFRenderingUtil implements PDFConfigurationConstants {
         //Create embedded file
         PDFEmbeddedFile file = new PDFEmbeddedFile();
         this.pdfDoc.registerObject(file);
-        Source src = getUserAgent().resolveURI(embeddedFile.getSrc());
+        Source src = getUserAgent().resolveURI(embeddedFile.getSource());
         InputStream in = ImageUtil.getInputStream(src);
         if (in == null) {
-            throw new FileNotFoundException(embeddedFile.getSrc());
+            throw new FileNotFoundException(embeddedFile.getSource());
         }
         try {
             OutputStream out = file.getBufferOutputStream();
@@ -469,8 +477,8 @@ class PDFRenderingUtil implements PDFConfigurationConstants {
         String filename = PDFText.toPDFString(embeddedFile.getFilename(), '_');
         PDFFileSpec fileSpec = new PDFFileSpec(filename);
         fileSpec.setEmbeddedFile(dict);
-        if (embeddedFile.getDesc() != null) {
-            fileSpec.setDescription(embeddedFile.getDesc());
+        if (embeddedFile.getDescription() != null) {
+            fileSpec.setDescription(embeddedFile.getDescription());
         }
         this.pdfDoc.registerObject(fileSpec);
 
@@ -492,6 +500,26 @@ class PDFRenderingUtil implements PDFConfigurationConstants {
         String name = PDFText.toPDFString(filename);
         nameArray.add(name);
         nameArray.add(new PDFReference(fileSpec));
+    }
+
+    /**
+     * Render PDF extension.
+     * @param root catalog object
+     * @param page current page object being constructed, or null if none
+     */
+    public void renderPDFExtension( PDFExtensionAttachment extension, PDFRoot root, PDFPage page ) {
+        PDFElement e = extension.getElement();
+        if ( e instanceof PDFCatalogElement ) {
+            PDFCatalogElement c = (PDFCatalogElement) e;
+            c.augmentRoot ( root );
+        } else if ( e instanceof PDFPageElement ) {
+            PDFPageElement p = (PDFPageElement) e;
+            if ( page != null ) {
+                if ( p.matchesPageIndex ( page.getPageIndex() ) ) {
+                    p.augmentPage ( page );
+                }
+            }
+        } 
     }
 
 }

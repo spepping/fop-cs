@@ -23,6 +23,10 @@ import org.apache.xmlgraphics.util.XMLizable;
 
 import org.apache.fop.fo.extensions.ExtensionAttachment;
 
+import org.xml.sax.Attributes;
+import org.xml.sax.ContentHandler;
+import org.xml.sax.SAXException;
+
 /**
  * This is the pass-through value object for the PDF extension.
  */
@@ -35,7 +39,6 @@ public abstract class PDFExtensionAttachment implements ExtensionAttachment, XML
      * Default constructor.
      */
     public PDFExtensionAttachment() {
-        //nop
     }
 
     /**
@@ -60,6 +63,34 @@ public abstract class PDFExtensionAttachment implements ExtensionAttachment, XML
         return getType();
     }
 
-    /** @return element */
-    protected abstract String getElement();
+    /** @return associated pdf extension element */
+    public PDFElement getElement() {
+        return null;
+    }
+
+    /** @return local name of xml element */
+    protected abstract String getLocalName();
+
+    /** @return xml attributes */
+    protected Attributes getAttributes() {
+        return null;
+    }
+
+    /**
+     * Output content to SAX handler.
+     * @param handler SAX content handler
+     * @throws SAXException in case of an uncaught SAX exception
+     */
+    protected void toSAXContent ( ContentHandler handler ) throws SAXException {
+    }
+
+    /** {@inheritDoc} */
+    public void toSAX ( ContentHandler handler ) throws SAXException {
+        String ln = getLocalName();
+        String qn = PDFElementMapping.NAMESPACE_PREFIX + ":" + ln;
+        handler.startElement(CATEGORY, ln, qn, getAttributes());
+        toSAXContent ( handler );
+        handler.endElement(CATEGORY, ln, qn);
+    }
+
 }

@@ -116,6 +116,19 @@ public interface FOValidationEventProducer extends EventProducer {
             Locator loc) throws ValidationException;
 
     /**
+     * An element is missing a required attribute. This is used with extension elements
+     * which do not refer to an attribute as a 'property'.
+     * @param source the event source
+     * @param elementName the name of the context node
+     * @param attributeName the name of the missing attribute
+     * @param loc the location of the error or null
+     * @throws ValidationException the validation error provoked by the method call
+     * @event.severity FATAL
+     */
+    void missingAttribute(Object source, String elementName, String attributeName,
+            Locator loc) throws ValidationException;
+
+    /**
      * An id was used twice in a document.
      * @param source the event source
      * @param elementName the name of the context node

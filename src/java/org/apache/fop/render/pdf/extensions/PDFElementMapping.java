@@ -30,6 +30,9 @@ public class PDFElementMapping extends ElementMapping {
     /** Namespace for the extension */
     public static final String NAMESPACE = "http://xmlgraphics.apache.org/fop/extensions/pdf";
 
+    /** Default prefix for this extension namespace */
+    public static final String NAMESPACE_PREFIX = "pdf";
+
     /** Main constructor */
     public PDFElementMapping() {
         this.namespaceURI = NAMESPACE;
@@ -39,13 +42,10 @@ public class PDFElementMapping extends ElementMapping {
     protected void initialize() {
         if (foObjs == null) {
             foObjs = new java.util.HashMap();
-            foObjs.put(PDFEmbeddedFileElement.ELEMENT, new PDFEmbeddedFileMaker());
+            PDFEmbeddedFileElement.addMappings ( foObjs );
+            PDFElement.addMappings ( foObjs );
+            PDFObj.addMappings ( foObjs );
         }
     }
 
-    static class PDFEmbeddedFileMaker extends ElementMapping.Maker {
-        public FONode make(FONode parent) {
-            return new PDFEmbeddedFileElement(parent);
-        }
-    }
 }

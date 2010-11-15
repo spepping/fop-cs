@@ -29,8 +29,7 @@ import org.apache.fop.fo.PropertyList;
 import org.apache.fop.fo.extensions.ExtensionAttachment;
 
 /**
- * This class extends the org.apache.fop.extensions.ExtensionObj class. The
- * object faciliates extraction of elements from formatted objects based on
+ * This class faciliates extraction of elements from formatted objects based on
  * the static list as defined in the AFPElementMapping implementation.
  * <p/>
  */

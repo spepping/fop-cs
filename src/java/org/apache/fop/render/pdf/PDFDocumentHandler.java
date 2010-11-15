@@ -51,7 +51,8 @@ import org.apache.fop.render.intermediate.IFDocumentHandlerConfigurator;
 import org.apache.fop.render.intermediate.IFDocumentNavigationHandler;
 import org.apache.fop.render.intermediate.IFException;
 import org.apache.fop.render.intermediate.IFPainter;
-import org.apache.fop.render.pdf.extensions.PDFEmbeddedFileExtensionAttachment;
+import org.apache.fop.render.pdf.extensions.PDFEmbeddedFileElement;
+import org.apache.fop.render.pdf.extensions.PDFExtensionAttachment;
 import org.apache.fop.util.XMLUtil;
 
 /**
@@ -293,14 +294,18 @@ public class PDFDocumentHandler extends AbstractBinaryWritingIFDocumentHandler {
         } else if (extension instanceof Metadata) {
             XMPMetadata wrapper = new XMPMetadata(((Metadata)extension));
             pdfUtil.renderXMPMetadata(wrapper);
-        } else if (extension instanceof PDFEmbeddedFileExtensionAttachment) {
-            PDFEmbeddedFileExtensionAttachment embeddedFile
-                = (PDFEmbeddedFileExtensionAttachment)extension;
+        } else if (extension instanceof PDFEmbeddedFileElement.Attachment) {
+            PDFEmbeddedFileElement.Attachment embeddedFile
+                = (PDFEmbeddedFileElement.Attachment) extension;
             try {
                 pdfUtil.addEmbeddedFile(embeddedFile);
             } catch (IOException ioe) {
-                throw new IFException("Error adding embedded file: " + embeddedFile.getSrc(), ioe);
+                throw new IFException
+                    ("Error adding embedded file: " + embeddedFile.getSource(), ioe);
             }
+        } else if (extension instanceof PDFExtensionAttachment) {
+            pdfUtil.renderPDFExtension
+                ( (PDFExtensionAttachment) extension, pdfDoc.getRoot(), currentPage );
         } else {
             log.debug("Don't know how to handle extension object. Ignoring: "
                     + extension + " (" + extension.getClass().getName() + ")");

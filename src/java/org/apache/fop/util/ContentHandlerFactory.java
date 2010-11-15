@@ -68,8 +68,9 @@ public interface ContentHandlerFactory {
         /**
          * Notifies the listener when the object is fully built.
          * @param obj the newly built object
+         * @throws SAXException if notification handler throws a SAX exception
          */
-        void notifyObjectBuilt(Object obj);
+        void notifyObjectBuilt(Object obj) throws SAXException;
 
     }
 

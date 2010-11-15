@@ -206,7 +206,7 @@ public class PDFDocument {
      * updated later. This allows Pages to refer to their
      * Parent before we write it out.
      *
-     * @version pdf format version (i.e., one of PDF_VERSION_1.{3,4,7})
+     * @param version pdf format version (i.e., one of PDF_VERSION_1.{3,4,7})
      * @param prod the name of the producer of this pdf document
      */
     public PDFDocument(PDFVersion version, String prod) {

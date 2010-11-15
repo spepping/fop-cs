@@ -30,6 +30,7 @@ import org.w3c.dom.Element;
 
 import org.xml.sax.Attributes;
 import org.xml.sax.Locator;
+import org.xml.sax.SAXException;
 
 import org.apache.fop.apps.FOPException;
 import org.apache.fop.datatypes.Length;
@@ -124,12 +125,13 @@ public abstract class XMLObj extends FONode implements ObjectBuiltListener {
      * @param parent the parent element of the element that is being added
      */
     public void addElement(Document doc, Element parent) {
-        this.doc = doc;
-        element = doc.createElementNS(getNamespaceURI(), name);
-
-        setAttributes(element, attr);
-        attr = null;
-        parent.appendChild(element);
+        if ( ( doc != null ) && ( parent != null ) ) {
+            this.doc = doc;
+            element = doc.createElementNS(getNamespaceURI(), name);
+            setAttributes(element, attr);
+            attr = null;
+            parent.appendChild(element);
+        }
     }
 
     private static void setAttributes(Element element, Attributes attr) {
@@ -155,9 +157,9 @@ public abstract class XMLObj extends FONode implements ObjectBuiltListener {
      * Add the top-level element to the DOM document
      *
      * @param doc DOM document
-     * @param svgRoot non-XSL-FO element to be added as the root of this document
+     * @param root non-XSL-FO element to be added as the root of this document
      */
-    public void buildTopLevel(Document doc, Element svgRoot) {
+    public void buildTopLevel(Document doc, Element root) {
         // build up the info for the top level element
         setAttributes(element, attr);
     }
@@ -169,7 +171,6 @@ public abstract class XMLObj extends FONode implements ObjectBuiltListener {
      */
     public Document createBasicDocument() {
         doc = null;
-
         element = null;
         try {
             DocumentBuilderFactory fact = DocumentBuilderFactory.newInstance();
@@ -177,7 +178,6 @@ public abstract class XMLObj extends FONode implements ObjectBuiltListener {
             doc = fact.newDocumentBuilder().newDocument();
             Element el = doc.createElementNS(getNamespaceURI(), name);
             doc.appendChild(el);
-
             element = doc.getDocumentElement();
             buildTopLevel(doc, element);
             if (!element.hasAttributeNS(
@@ -185,7 +185,6 @@ public abstract class XMLObj extends FONode implements ObjectBuiltListener {
                 element.setAttributeNS(XMLConstants.XMLNS_NAMESPACE_URI, XMLConstants.XMLNS_PREFIX,
                                 getNamespaceURI());
             }
-
         } catch (Exception e) {
             //TODO this is ugly because there may be subsequent failures like NPEs
             log.error("Error while trying to instantiate a DOM Document", e);
@@ -209,13 +208,15 @@ public abstract class XMLObj extends FONode implements ObjectBuiltListener {
     protected void characters(char[] data, int start, int length,
                                  PropertyList pList, Locator locator) throws FOPException {
         super.characters(data, start, length, pList, locator);
-        String str = new String(data, start, length);
-        org.w3c.dom.Text text = doc.createTextNode(str);
-        element.appendChild(text);
+        if ( doc != null ) {
+            String str = new String(data, start, length);
+            org.w3c.dom.Text text = doc.createTextNode(str);
+            element.appendChild(text);
+        }
     }
 
     /** {@inheritDoc} */
-    public void notifyObjectBuilt(Object obj) {
+    public void notifyObjectBuilt(Object obj) throws SAXException {
         this.doc = (Document)obj;
         this.element = this.doc.getDocumentElement();
     }
