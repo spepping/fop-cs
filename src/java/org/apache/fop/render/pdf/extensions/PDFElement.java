@@ -50,7 +50,7 @@ import org.w3c.dom.Document;
 public abstract class PDFElement extends PDFObj {
 
     /** transformer factory singleton */
-    private static TransformerFactory transformerFactory;
+    private static volatile TransformerFactory transformerFactory;
 
     /** dictionary */
     private PDFDictionary dictionary;
@@ -117,7 +117,7 @@ public abstract class PDFElement extends PDFObj {
         Result tr = new SAXResult ( handler );
         try {
             TransformerFactory f = getTransformerFactory();
-            Transformer t = transformerFactory.newTransformer();
+            Transformer t = f.newTransformer();
             t.transform ( ts, tr );
         } catch ( TransformerException e ) {
             throw new SAXException ( "transformation failed: " + e.getMessage() );
@@ -126,7 +126,11 @@ public abstract class PDFElement extends PDFObj {
 
     private TransformerFactory getTransformerFactory() {
         if ( transformerFactory == null ) {
-            transformerFactory = SAXTransformerFactory.newInstance();
+            synchronized ( PDFElement.class ) {
+                if ( transformerFactory == null ) {
+                    transformerFactory = SAXTransformerFactory.newInstance();
+                }
+            }
         }
         return transformerFactory;
     }

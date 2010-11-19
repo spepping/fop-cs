@@ -169,7 +169,7 @@ public class PDFPageElement extends PDFElement {
         }
     }
 
-    private class PageCombiner implements PDFDictionary.Combiner {
+    private static class PageCombiner implements PDFDictionary.Combiner {
         /** {@inheritDoc} */
         public Object combine ( String name, Object vCur, Object vNew ) {
             if ( name.equals ( "Type" ) ) {

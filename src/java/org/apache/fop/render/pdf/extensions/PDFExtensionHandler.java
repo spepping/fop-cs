@@ -69,6 +69,7 @@ public class PDFExtensionHandler extends DefaultHandler
 
     /** {@inheritDoc} */
     public void endElement(String uri, String localName, String qName) throws SAXException {
+        /*
         if (PDFExtensionAttachment.CATEGORY.equals(uri)) {
             if (PDFEmbeddedFileElement.ELEMENT.equals(localName)) {
                 String name = lastAttributes.getValue("name");
@@ -77,6 +78,7 @@ public class PDFExtensionHandler extends DefaultHandler
                 // this.returnedObject = new PDFEmbeddedFileExtensionAttachment(name, src, desc);
             }
         }
+        */
     }
 
     /** {@inheritDoc} */

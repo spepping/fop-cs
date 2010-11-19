@@ -96,19 +96,14 @@ public class PDFEmbeddedFileElement extends FONode {
                 String path = uri.getPath();
                 int idx = path.lastIndexOf('/');
                 if (idx > 0) {
-                    filename = path.substring(idx + 1);
-                } else {
-                    filename = path;
+                    path = path.substring(idx + 1);
                 }
+                this.filename = path;
             } catch (URISyntaxException e) {
                 throw new FOPException ( e.getMessage() );
             }
-        }
-        // file name must have been specified or inferred
-        if ( filename != null ) {
-            this.filename = filename;
         } else {
-            missingAttributeError(ATT_FILENAME);
+            this.filename = filename;
         }
     }
 

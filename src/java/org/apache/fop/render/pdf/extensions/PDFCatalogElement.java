@@ -64,7 +64,7 @@ public class PDFCatalogElement extends PDFElement {
         }
     }
 
-    private class CatalogCombiner implements PDFDictionary.Combiner {
+    private static class CatalogCombiner implements PDFDictionary.Combiner {
         /** {@inheritDoc} */
         public Object combine ( String name, Object vCur, Object vNew ) {
             if ( name.equals ( "Type" ) ) {

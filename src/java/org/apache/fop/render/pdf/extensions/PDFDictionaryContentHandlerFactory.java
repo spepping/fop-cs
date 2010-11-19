@@ -75,7 +75,7 @@ public class PDFDictionaryContentHandlerFactory implements ContentHandlerFactory
     private static class DocumentHandler extends DelegatingContentHandler implements ContentHandlerFactory.ObjectSource {
 
         /** transformer factory singleton */
-        private static SAXTransformerFactory transformerFactory;
+        private static volatile SAXTransformerFactory transformerFactory;
 
         /** listener to receive object (document) built notification */
         private ObjectBuiltListener listener;
@@ -100,18 +100,27 @@ public class PDFDictionaryContentHandlerFactory implements ContentHandlerFactory
         }
 
         private void initializeDelegate() throws SAXException {
-            if ( transformerFactory == null ) {
-                transformerFactory = (SAXTransformerFactory) SAXTransformerFactory.newInstance();
-            }
             if ( handler == null ) {
                 try {
-                    handler = transformerFactory.newTransformerHandler();
+                    SAXTransformerFactory f = getTransformerFactory();
+                    handler = f.newTransformerHandler();
                     handler.setResult ( new DOMResult ( doc ) );
                 } catch ( TransformerConfigurationException e ) {
                     throw new SAXException ( "can't create transformer handler: " + e.getMessage() );
                 }
             }
             setDelegateContentHandler ( handler );
+        }
+
+        private SAXTransformerFactory getTransformerFactory() {
+            if ( transformerFactory == null ) {
+                synchronized ( DocumentHandler.class )  {
+                    if ( transformerFactory == null ) {
+                        transformerFactory = (SAXTransformerFactory) SAXTransformerFactory.newInstance();
+                    }
+                }
+            }
+            return transformerFactory;
         }
 
         /** {@inheritDoc} */
@@ -190,7 +199,9 @@ public class PDFDictionaryContentHandlerFactory implements ContentHandlerFactory
 
         /** {@inheritDoc} */
         public void startElement ( String uri, String localName, String qName, Attributes atts ) throws SAXException {
-            if ( ( uri != null ) && uri.equals ( PDFElementMapping.NAMESPACE ) ) {
+            if ( uri == null ) {
+                throw new SAXException ( "element '" + localName + "' in null namespace not supported in this context" );
+            } else if ( uri.equals ( PDFElementMapping.NAMESPACE ) ) {
                 String k = atts.getValue ( ATT_KEY );
                 if ( isEntryType ( localName ) && ( ( k == null ) || ( k.length() == 0 ) ) ) {
                     throw new SAXException ( "missing or empty '" + ATT_KEY + "' attribute" );
@@ -289,7 +300,7 @@ public class PDFDictionaryContentHandlerFactory implements ContentHandlerFactory
                 Double v = Double.valueOf ( content );
                 double d = v.doubleValue();
                 double f = Math.floor ( d );
-                if ( ( f == d ) && ( ( f >= (double) Integer.MIN_VALUE ) || ( f <= (double) Integer.MAX_VALUE ) ) ) {
+                if ( ( Math.abs ( d - f ) < Double.MIN_VALUE ) && ( ( f >= (double) Integer.MIN_VALUE ) || ( f <= (double) Integer.MAX_VALUE ) ) ) {
                     return Integer.valueOf ( (int) f );
                 } else {
                     return v;
