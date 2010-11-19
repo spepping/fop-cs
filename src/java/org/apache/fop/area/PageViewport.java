@@ -89,7 +89,7 @@ public class PageViewport extends AreaTreeObject implements Resolvable, Cloneabl
     /**
      * logging instance
      */
-    protected static Log log = LogFactory.getLog(PageViewport.class);
+    protected static final Log log = LogFactory.getLog(PageViewport.class);
 
     /**
      * Create a page viewport.
