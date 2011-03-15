@@ -41,7 +41,7 @@ public class PDFElementMapping extends ElementMapping {
     /** {@inheritDoc} */
     protected void initialize() {
         if (foObjs == null) {
-            foObjs = new java.util.HashMap();
+            foObjs = new java.util.HashMap<String, Maker>();
             PDFEmbeddedFileElement.addMappings ( foObjs );
             PDFElement.addMappings ( foObjs );
             PDFObj.addMappings ( foObjs );

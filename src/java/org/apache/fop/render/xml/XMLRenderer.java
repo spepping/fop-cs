@@ -21,6 +21,7 @@ package org.apache.fop.render.xml;
 
 // Java
 import java.awt.Color;
+import java.awt.Rectangle;
 import java.awt.geom.Rectangle2D;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -122,6 +123,7 @@ public class XMLRenderer extends AbstractXMLRenderer {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void setUserAgent(FOUserAgent agent) {
         super.setUserAgent(agent);
 
@@ -143,6 +145,7 @@ public class XMLRenderer extends AbstractXMLRenderer {
     }
 
     /** {@inheritDoc} */
+    @Override
     public void setupFontInfo(FontInfo inFontInfo) throws FOPException {
         if (mimic != null) {
             mimic.setupFontInfo(inFontInfo);
@@ -214,7 +217,7 @@ public class XMLRenderer extends AbstractXMLRenderer {
                     //TODO Remove the following line (makes changes in the test checks necessary)
                     addAttribute(name, bkg.toString());
                     if (bkg.getColor() != null) {
-                        addAttribute("bkg-color", bkg.getColor().toString());
+                        addAttribute("bkg-color", ColorUtil.colorToString(bkg.getColor()));
                     }
                     if (bkg.getURL() != null) {
                         addAttribute("bkg-img", bkg.getURL());
@@ -277,6 +280,7 @@ public class XMLRenderer extends AbstractXMLRenderer {
     }
 
     /** {@inheritDoc} */
+    @Override
     public void processOffDocumentItem(OffDocumentItem oDI) {
         if (oDI instanceof BookmarkData) {
             renderBookmarkTree((BookmarkData) oDI);
@@ -298,6 +302,7 @@ public class XMLRenderer extends AbstractXMLRenderer {
      * Renders a BookmarkTree object
      * @param bookmarkRoot the BookmarkData object representing the top of the tree
      */
+    @Override
     protected void renderBookmarkTree(BookmarkData bookmarkRoot) {
         if (bookmarkRoot.getWhenToProcess() == OffDocumentItem.END_OF_DOC) {
             endPageSequence();
@@ -346,6 +351,7 @@ public class XMLRenderer extends AbstractXMLRenderer {
     }
 
     /** {@inheritDoc} */
+    @Override
     public void startRenderer(OutputStream outputStream)
                 throws IOException {
         log.debug("Rendering areas to Area Tree XML");
@@ -377,6 +383,7 @@ public class XMLRenderer extends AbstractXMLRenderer {
     }
 
     /** {@inheritDoc} */
+    @Override
     public void stopRenderer() throws IOException {
         endPageSequence();
         endElement("areaTree");
@@ -392,6 +399,7 @@ public class XMLRenderer extends AbstractXMLRenderer {
     }
 
     /** {@inheritDoc} */
+    @Override
     public void renderPage(PageViewport page) throws IOException, FOPException {
         atts.clear();
         addAttribute("bounds", page.getViewArea());
@@ -416,6 +424,7 @@ public class XMLRenderer extends AbstractXMLRenderer {
     }
 
     /** {@inheritDoc} */
+    @Override
     protected void handleExtensionAttachments(List attachments) {
         if (attachments != null && attachments.size() > 0) {
             startElement("extension-attachments");
@@ -438,6 +447,7 @@ public class XMLRenderer extends AbstractXMLRenderer {
     }
 
     /** {@inheritDoc} */
+    @Override
     public void startPageSequence(PageSequence pageSequence) {
         handleDocumentExtensionAttachments();
         endPageSequence();  // move this before handleDocumentExtensionAttachments() ?
@@ -502,13 +512,14 @@ public class XMLRenderer extends AbstractXMLRenderer {
     /**
      * {@inheritDoc}
      */
+    @Override
     protected void renderRegionViewport(RegionViewport port) {
         if (port != null) {
             atts.clear();
             addAreaAttributes(port);
             addTraitAttributes(port);
             addAttribute("rect", port.getViewArea());
-            if (port.isClip()) {
+            if (port.hasClip()) {
                 addAttribute("clipped", "true");
             }
             startElement("regionViewport", atts);
@@ -548,12 +559,13 @@ public class XMLRenderer extends AbstractXMLRenderer {
         }
     }
 
-    /** {@inheritDoc} */
-    protected void startVParea(CTM ctm, Rectangle2D clippingRect) {
+    @Override
+    protected void startVParea(CTM ctm, Rectangle clippingRect) {
         //only necessary for graphical output
     }
 
     /** {@inheritDoc} */
+    @Override
     protected void endVParea() {
         //only necessary for graphical output
     }
@@ -562,6 +574,7 @@ public class XMLRenderer extends AbstractXMLRenderer {
      * {@inheritDoc}
      *          org.apache.fop.area.inline.InlineArea)
      */
+    @Override
     protected void renderInlineAreaBackAndBorders(InlineArea area) {
         //only necessary for graphical output
     }
@@ -569,6 +582,7 @@ public class XMLRenderer extends AbstractXMLRenderer {
     /**
      * {@inheritDoc}
      */
+    @Override
     protected void renderBeforeFloat(BeforeFloat bf) {
         startElement("beforeFloat");
         super.renderBeforeFloat(bf);
@@ -578,6 +592,7 @@ public class XMLRenderer extends AbstractXMLRenderer {
     /**
      * {@inheritDoc}
      */
+    @Override
     protected void renderFootnote(Footnote footnote) {
         atts.clear();
         addAttribute("top-offset", footnote.getTop());
@@ -589,6 +604,7 @@ public class XMLRenderer extends AbstractXMLRenderer {
     /**
      * {@inheritDoc}
      */
+    @Override
     protected void renderMainReference(MainReference mr) {
         atts.clear();
         addAreaAttributes(mr);
@@ -610,7 +626,7 @@ public class XMLRenderer extends AbstractXMLRenderer {
             addTraitAttributes(span);
             startElement("span", atts);
             for (int c = 0; c < span.getColumnCount(); c++) {
-                NormalFlow flow = (NormalFlow) span.getNormalFlow(c);
+                NormalFlow flow = span.getNormalFlow(c);
 
                 renderFlow(flow);
             }
@@ -622,6 +638,7 @@ public class XMLRenderer extends AbstractXMLRenderer {
     /**
      * {@inheritDoc}
      */
+    @Override
     protected void renderFlow(NormalFlow flow) {
         // the normal flow reference area contains stacked blocks
         atts.clear();
@@ -633,6 +650,7 @@ public class XMLRenderer extends AbstractXMLRenderer {
     }
 
     /** {@inheritDoc} */
+    @Override
     protected void renderReferenceArea(Block block) {
         handleBlockTraits(block);
 
@@ -643,6 +661,7 @@ public class XMLRenderer extends AbstractXMLRenderer {
     }
 
     /** {@inheritDoc} */
+    @Override
     protected void renderBlock(Block block) {
         atts.clear();
         addAreaAttributes(block);
@@ -660,7 +679,7 @@ public class XMLRenderer extends AbstractXMLRenderer {
                 addAttribute("top-position", bvp.getYOffset());
             }
             addAttribute("ctm", bvp.getCTM().toString());
-            if (bvp.getClip()) {
+            if (bvp.hasClip()) {
                 addAttribute("clipped", "true");
             }
         } else {
@@ -691,6 +710,7 @@ public class XMLRenderer extends AbstractXMLRenderer {
     /**
      * {@inheritDoc}
      */
+    @Override
     protected void renderLineArea(LineArea line) {
         atts.clear();
         addAreaAttributes(line);
@@ -703,6 +723,7 @@ public class XMLRenderer extends AbstractXMLRenderer {
     /**
      * {@inheritDoc}
      */
+    @Override
     protected void renderInlineArea(InlineArea inlineArea) {
         atts.clear();
         if (inlineArea.getClass() == InlineArea.class) {
@@ -721,13 +742,14 @@ public class XMLRenderer extends AbstractXMLRenderer {
     /**
      * {@inheritDoc}
      */
+    @Override
     protected void renderViewport(Viewport viewport) {
         atts.clear();
         addAreaAttributes(viewport);
         addTraitAttributes(viewport);
         addAttribute("offset", viewport.getOffset());
         addAttribute("pos", viewport.getContentPosition());
-        if (viewport.getClip()) {
+        if (viewport.hasClip()) {
             addAttribute("clip", "true");
         }
         startElement("viewport", atts);
@@ -738,6 +760,7 @@ public class XMLRenderer extends AbstractXMLRenderer {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void renderImage(Image image, Rectangle2D pos) {
         atts.clear();
         addAreaAttributes(image);
@@ -751,6 +774,7 @@ public class XMLRenderer extends AbstractXMLRenderer {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void renderContainer(Container cont) {
         startElement("container");
         super.renderContainer(cont);
@@ -763,6 +787,7 @@ public class XMLRenderer extends AbstractXMLRenderer {
      * @param pos the position of the foreign object
      * @see org.apache.fop.render.AbstractRenderer#renderForeignObject(ForeignObject, Rectangle2D)
      */
+    @Override
     public void renderForeignObject(ForeignObject fo, Rectangle2D pos) {
         atts.clear();
         addAreaAttributes(fo);
@@ -779,6 +804,7 @@ public class XMLRenderer extends AbstractXMLRenderer {
     /**
      * {@inheritDoc}
      */
+    @Override
     protected void renderInlineSpace(Space space) {
         atts.clear();
         addAreaAttributes(space);
@@ -791,6 +817,7 @@ public class XMLRenderer extends AbstractXMLRenderer {
     /**
      * {@inheritDoc}
      */
+    @Override
     protected void renderText(TextArea text) {
         atts.clear();
         if (text.getTextWordSpaceAdjust() != 0) {
@@ -811,6 +838,7 @@ public class XMLRenderer extends AbstractXMLRenderer {
     /**
      * {@inheritDoc}
      */
+    @Override
     protected void renderWord(WordArea word) {
         atts.clear();
         addAttribute("offset", word.getOffset());
@@ -838,6 +866,7 @@ public class XMLRenderer extends AbstractXMLRenderer {
     /**
      * {@inheritDoc}
      */
+    @Override
     protected void renderSpace(SpaceArea space) {
         atts.clear();
         addAttribute("offset", space.getOffset());
@@ -853,6 +882,7 @@ public class XMLRenderer extends AbstractXMLRenderer {
     /**
      * {@inheritDoc}
      */
+    @Override
     protected void renderInlineParent(InlineParent ip) {
         atts.clear();
         addAreaAttributes(ip);
@@ -866,6 +896,7 @@ public class XMLRenderer extends AbstractXMLRenderer {
     /**
      * {@inheritDoc}
      */
+    @Override
     protected void renderInlineBlockParent(InlineBlockParent ibp) {
         atts.clear();
         addAreaAttributes(ibp);
@@ -879,6 +910,7 @@ public class XMLRenderer extends AbstractXMLRenderer {
     /**
      * {@inheritDoc}
      */
+    @Override
     protected void renderLeader(Leader area) {
         atts.clear();
         addAreaAttributes(area);

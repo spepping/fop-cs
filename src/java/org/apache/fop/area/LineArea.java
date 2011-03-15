@@ -19,12 +19,16 @@
 
 package org.apache.fop.area;
 
-import org.apache.fop.area.inline.InlineArea;
-import org.apache.fop.fo.Constants;
-
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.apache.fop.area.inline.InlineArea;
+
+import static org.apache.fop.fo.Constants.EN_START;
+import static org.apache.fop.fo.Constants.EN_CENTER;
+import static org.apache.fop.fo.Constants.EN_END;
+import static org.apache.fop.fo.Constants.EN_JUSTIFY;
 
 /**
  * The line area.
@@ -40,7 +44,7 @@ public class LineArea extends Area {
      * page-number or a page-number-citation is resolved
      */
     private final class LineAdjustingInfo implements Serializable {
-        
+
         private static final long serialVersionUID = -6103629976229458273L;
 
         private int lineAlignment;
@@ -59,6 +63,15 @@ public class LineArea extends Area {
             variationFactor = 1.0;
             bAddedToAreaTree = false;
         }
+
+        /** {@inheritDoc} */
+        public String toString() {
+            return getClass().getSimpleName()
+                + ": diff=" + difference
+                + ", variation=" + variationFactor
+                + ", stretch=" + availableStretch
+                + ", shrink=" + availableShrink;
+        }
     }
 
     private LineAdjustingInfo adjustingInfo = null;
@@ -66,7 +79,7 @@ public class LineArea extends Area {
     // this class can contain the dominant char styling info
     // this means that many renderers can optimise a bit
 
-    private List inlineAreas = new ArrayList();
+    private List<InlineArea> inlineAreas = new ArrayList<InlineArea>();
 
     /**
      * default constructor:
@@ -93,11 +106,12 @@ public class LineArea extends Area {
      *
      * @param childArea the inline child area to add
      */
+    @Override
     public void addChildArea(Area childArea) {
         if (childArea instanceof InlineArea) {
             addInlineArea((InlineArea)childArea);
             // set the parent area for the child area
-            ((InlineArea) childArea).setParentArea(this);
+            ((InlineArea)childArea).setParentArea(this);
         }
     }
 
@@ -141,8 +155,8 @@ public class LineArea extends Area {
         int ipd = 0;
         int bpd = 0;
         for (int i = 0, len = inlineAreas.size(); i < len; i++) {
-            ipd = Math.max(ipd, ((InlineArea)inlineAreas.get(i)).getAllocIPD());
-            bpd += ((InlineArea)inlineAreas.get(i)).getAllocBPD();
+            ipd = Math.max(ipd, inlineAreas.get(i).getAllocIPD());
+            bpd += inlineAreas.get(i).getAllocBPD();
         }
         setIPD(ipd);
         setBPD(bpd);
@@ -165,18 +179,18 @@ public class LineArea extends Area {
      */
     public void handleIPDVariation(int ipdVariation) {
         switch (adjustingInfo.lineAlignment) {
-            case Constants.EN_START:
+            case EN_START:
                 // nothing to do in this case
                 break;
-            case Constants.EN_CENTER:
+            case EN_CENTER:
                 // re-compute indent
-                addTrait(Trait.START_INDENT, new Integer(getStartIndent() - ipdVariation / 2));
+                addTrait(Trait.START_INDENT, getStartIndent() - ipdVariation / 2);
                 break;
-            case Constants.EN_END:
+            case EN_END:
                 // re-compute indent
-                addTrait(Trait.START_INDENT, new Integer(getStartIndent() - ipdVariation));
+                addTrait(Trait.START_INDENT, getStartIndent() - ipdVariation);
                 break;
-            case Constants.EN_JUSTIFY:
+            case EN_JUSTIFY:
                 // compute variation factor
                 adjustingInfo.variationFactor *= (float) (adjustingInfo.difference - ipdVariation)
                         / adjustingInfo.difference;
@@ -198,7 +212,10 @@ public class LineArea extends Area {
      * no UnresolvedAreas left
      */
     public void finalise() {
-        if (adjustingInfo.lineAlignment == Constants.EN_JUSTIFY) {
+        if (adjustingInfo.lineAlignment == EN_JUSTIFY) {
+            if (log.isTraceEnabled()) {
+                log.trace("Applying variation factor to justified line: " + adjustingInfo);
+            }
             // justified line: apply the variation factor
             boolean bUnresolvedAreasPresent = false;
             // recursively apply variation factor to descendant areas

@@ -165,7 +165,8 @@ public class TextLayoutManager extends LeafNodeLayoutManager {
     private int hyphIPD;
 
     private boolean hasChanged = false;
-    private int returnedIndex = 0;
+    private int[] returnedIndices = {0, 0};
+    private int changeOffset = 0;
     private int thisStart = 0;
     private int tempStart = 0;
     private List changeList = new LinkedList();
@@ -704,7 +705,7 @@ public class TextLayoutManager extends LeafNodeLayoutManager {
         if (inWord) {
             processWord(alignment, sequence, prevAreaInfo, ch, false, false);
         } else if (inWhitespace) {
-            processWhitespace(alignment, sequence, true);
+            processWhitespace(alignment, sequence, !keepTogether);
         } else if (areaInfo != null) {
             processLeftoverAreaInfo(alignment, sequence, areaInfo,
                     ch == CharUtilities.ZERO_WIDTH_SPACE);
@@ -769,11 +770,8 @@ public class TextLayoutManager extends LeafNodeLayoutManager {
         while (lastIndex > 0 && foText.charAt(lastIndex - 1) == CharUtilities.SOFT_HYPHEN) {
             lastIndex--;
         }
-        final boolean endsWithHyphen = checkEndsWithHyphen
-                && foText.charAt(lastIndex) == CharUtilities.SOFT_HYPHEN;
         Font font = FontSelector
             .selectFontForCharactersInText(foText, thisStart, lastIndex, foText, this);
-        int wordLength = lastIndex - thisStart;
         boolean kerning = font.hasKerning();
         MinOptMax wordIPD = MinOptMax.ZERO;
         for (int i = thisStart; i < lastIndex; i++) {
@@ -800,30 +798,38 @@ public class TextLayoutManager extends LeafNodeLayoutManager {
                 }
             }
         }
+        boolean endsWithHyphen = checkEndsWithHyphen
+                                 && foText.charAt(lastIndex) == CharUtilities.SOFT_HYPHEN;
         if (kerning
                 && breakOpportunity
                 && !TextLayoutManager.isSpace(ch)
                 && lastIndex > 0
                 && endsWithHyphen) {
-            final int kern = font.getKernValue(foText.charAt(lastIndex - 1), ch);
+            int kern = font.getKernValue(foText.charAt(lastIndex - 1), ch);
             if (kern != 0) {
                 addToLetterAdjust(lastIndex, kern);
                 //TODO: add kern to wordIPD?
             }
         }
-        int iLetterSpaces = wordLength - 1;
-        // if there is a break opportunity and the next one
-        // is not a space, it could be used as a line end;
-        // add one more letter space, in case other text follows
-        if (breakOpportunity && !TextLayoutManager.isSpace(ch)) {
-            iLetterSpaces++;
+        // shy+chars at start of word: wordLength == 0 && breakOpportunity
+        // shy only characters in word: wordLength == 0 && !breakOpportunity
+        int wordLength = lastIndex - thisStart;
+        int letterSpaces = 0;
+        if (wordLength != 0) {
+            letterSpaces = wordLength - 1;
+            // if there is a break opportunity and the next one
+            // is not a space, it could be used as a line end;
+            // add one more letter space, in case other text follows
+            if (breakOpportunity && !TextLayoutManager.isSpace(ch)) {
+                letterSpaces++;
+            }
         }
-        assert iLetterSpaces >= 0;
-        wordIPD = wordIPD.plus(letterSpaceIPD.mult(iLetterSpaces));
+        assert letterSpaces >= 0;
+        wordIPD = wordIPD.plus(letterSpaceIPD.mult(letterSpaces));
 
         // create the AreaInfo object
         AreaInfo areaInfo = new AreaInfo(thisStart, lastIndex, 0,
-                iLetterSpaces, wordIPD,
+                letterSpaces, wordIPD,
                 endsWithHyphen,
                 false, breakOpportunity, font);
         prevAreaInfo = areaInfo;
@@ -838,14 +844,20 @@ public class TextLayoutManager extends LeafNodeLayoutManager {
     }
 
     /** {@inheritDoc} */
-    public List addALetterSpaceTo(final List oldList) {
+    public List addALetterSpaceTo(List oldList) {
+        return addALetterSpaceTo(oldList, 0);
+    }
+
+    /** {@inheritDoc} */
+    public List addALetterSpaceTo(final List oldList, int depth) {
         // old list contains only a box, or the sequence: box penalty glue box;
         // look at the Position stored in the first element in oldList
         // which is always a box
         ListIterator oldListIterator = oldList.listIterator();
         KnuthElement knuthElement = (KnuthElement) oldListIterator.next();
-        LeafPosition pos = (LeafPosition) ((KnuthBox) knuthElement).getPosition();
-        int index = pos.getLeafPos();
+        Position pos = knuthElement.getPosition();
+        LeafPosition leafPos = (LeafPosition) pos.getPosition(depth);
+        int index = leafPos.getLeafPos();
         //element could refer to '-1' position, for non-collapsed spaces (?)
         if (index > -1) {
             AreaInfo areaInfo = getAreaInfo(index);
@@ -860,6 +872,7 @@ public class TextLayoutManager extends LeafNodeLayoutManager {
                 oldListIterator.add(new KnuthGlue(letterSpaceIPD, auxiliaryPosition, false));
             } else if (letterSpaceIPD.isStiff()) {
                 // constant letter space: replace the box
+                // give it the unwrapped position of the replaced element
                 oldListIterator.set(new KnuthInlineBox(areaInfo.areaIPD.getOpt(),
                         alignmentContext, pos, false));
             } else {
@@ -873,41 +886,9 @@ public class TextLayoutManager extends LeafNodeLayoutManager {
         return oldList;
     }
 
-    /**
-     * Removes the <code>AreaInfo</code> object represented by the given elements, so that it won't
-     * generate any element when <code>getChangedKnuthElements</code> is called.
-     *
-     * @param oldList the elements representing the word space
-     */
-    public void removeWordSpace(final List oldList) {
-        // find the element storing the Position whose value
-        // points to the AreaInfo object
-        final ListIterator oldListIterator = oldList.listIterator();
-        if (((KnuthElement) ((LinkedList) oldList).getFirst()).isPenalty()) {
-            // non breaking space: oldList starts with a penalty
-            oldListIterator.next();
-        }
-        if (oldList.size() > 2) {
-            // alignment is either center, start or end:
-            // the first two elements does not store the needed Position
-            oldListIterator.next();
-            oldListIterator.next();
-        }
-        KnuthElement knuthElement = (KnuthElement) oldListIterator.next();
-        int leafValue = ((LeafPosition) knuthElement.getPosition()).getLeafPos();
-        // only the last word space can be a trailing space!
-        if (leafValue == areaInfos.size() - 1) {
-            areaInfos.remove(leafValue);
-        } else {
-            TextLayoutManager.LOG.error("trying to remove a non-trailing word space");
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     public void hyphenate(Position pos, HyphContext hyphContext) {
-        AreaInfo areaInfo = getAreaInfo(((LeafPosition) pos).getLeafPos());
+        AreaInfo areaInfo = getAreaInfo(((LeafPosition) pos).getLeafPos() + changeOffset);
         int startIndex = areaInfo.startIndex;
         int stopIndex;
         boolean nothingChanged = true;
@@ -962,7 +943,7 @@ public class TextLayoutManager extends LeafNodeLayoutManager {
                 // the new AreaInfo object is not equal to the old one
                 changeList.add(new PendingChange(new AreaInfo(startIndex, stopIndex, 0,
                         letterSpaceCount, newIPD, hyphenFollows, false, false, font),
-                        ((LeafPosition) pos).getLeafPos()));
+                        ((LeafPosition) pos).getLeafPos() + changeOffset));
                 nothingChanged = false;
             }
             startIndex = stopIndex;
@@ -972,11 +953,48 @@ public class TextLayoutManager extends LeafNodeLayoutManager {
 
     /** {@inheritDoc} */
     public boolean applyChanges(final List oldList) {
+        return applyChanges(oldList, 0);
+    }
+
+    /** {@inheritDoc} */
+    public boolean applyChanges(final List oldList, int depth) {
+
+        // make sure the LM appears unfinished in between this call
+        // and the next call to getChangedKnuthElements()
         setFinished(false);
 
+        if (oldList.isEmpty()) {
+            return false;
+        }
+
+        // Find the first and last positions in oldList that point to an AreaInfo
+        // (i.e. getLeafPos() != -1)
+        LeafPosition startPos = null, endPos = null;
+        ListIterator oldListIter;
+        for (oldListIter = oldList.listIterator(); oldListIter.hasNext();) {
+            Position pos = ((KnuthElement) oldListIter.next()).getPosition();
+            startPos = (LeafPosition) pos.getPosition(depth);
+            if (startPos != null && startPos.getLeafPos() != -1) {
+                break;
+            }
+        }
+        for (oldListIter = oldList.listIterator(oldList.size()); oldListIter.hasPrevious();) {
+            Position pos = ((KnuthElement) oldListIter.previous()).getPosition();
+            endPos = (LeafPosition) pos.getPosition(depth);
+            if (endPos != null && endPos.getLeafPos() != -1) {
+                break;
+            }
+        }
+
+        // set start/end index, taking into account any offset due to
+        // changes applied to previous paragraphs
+        returnedIndices[0] = (startPos != null ? startPos.getLeafPos() : -1) + changeOffset;
+        returnedIndices[1] = (endPos != null ? endPos.getLeafPos() : -1) + changeOffset;
+
+        int areaInfosAdded = 0;
+        int areaInfosRemoved = 0;
+
         if (!changeList.isEmpty()) {
-            int areaInfosAdded = 0;
-            int areaInfosRemoved = 0;
             int oldIndex = -1, changeIndex;
             PendingChange currChange;
             ListIterator changeListIterator = changeList.listIterator();
@@ -997,7 +1015,11 @@ public class TextLayoutManager extends LeafNodeLayoutManager {
             changeList.clear();
         }
 
-        returnedIndex = 0;
+        // increase the end index for getChangedKnuthElements()
+        returnedIndices[1] += (areaInfosAdded - areaInfosRemoved);
+        // increase offset to use for subsequent paragraphs
+        changeOffset += (areaInfosAdded - areaInfosRemoved);
+
         return hasChanged;
     }
 
@@ -1009,27 +1031,24 @@ public class TextLayoutManager extends LeafNodeLayoutManager {
 
         final LinkedList returnList = new LinkedList();
 
-        while (returnedIndex < areaInfos.size()) {
-            AreaInfo areaInfo = getAreaInfo(returnedIndex);
+        for (; returnedIndices[0] <= returnedIndices[1]; returnedIndices[0]++) {
+            AreaInfo areaInfo = getAreaInfo(returnedIndices[0]);
             if (areaInfo.wordSpaceCount == 0) {
                 // areaInfo refers either to a word or a word fragment
-                addElementsForAWordFragment(returnList, alignment, areaInfo, returnedIndex);
+                addElementsForAWordFragment(returnList, alignment, areaInfo, returnedIndices[0]);
             } else {
                 // areaInfo refers to a space
-                addElementsForASpace(returnList, alignment, areaInfo, returnedIndex);
+                addElementsForASpace(returnList, alignment, areaInfo, returnedIndices[0]);
             }
-            returnedIndex++;
         }
-        setFinished(true);
+        setFinished(returnedIndices[0] == areaInfos.size() - 1);
         //ElementListObserver.observe(returnList, "text-changed", null);
         return returnList;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     public String getWordChars(Position pos) {
-        int leafValue = ((LeafPosition) pos).getLeafPos();
+        int leafValue = ((LeafPosition) pos).getLeafPos() + changeOffset;
         if (leafValue != -1) {
             AreaInfo areaInfo = getAreaInfo(leafValue);
             StringBuffer buffer = new StringBuffer(areaInfo.getCharLength());

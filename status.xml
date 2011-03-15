@@ -49,6 +49,7 @@
     <context id="API" title="Changes to the End-User API"/>
     <context id="Extensions" title="Changes to the Bundled Extensions"/>
     <context id="Images" title="Changes to the Image Support"/>
+	<context id="Config" title="Changes to the User Configuration"/>
   </contexts>
 
   <changes>
@@ -58,6 +59,68 @@
       documents. Example: the fix of marks layering will be such a case when it's done.
     -->
     <release version="FOP Trunk" date="TBD">
+      <action context="Layout" dev="VH" type="fix" fixes-bug="50196" due-to="Matthias Reischenbacher">
+        Bugzilla #50196: padding-start ignored when table-header/footer is repeated.
+      </action>
+      <action context="Renderers" dev="JM" type="fix">
+        Increased maximum possible PDF size from 2GB to around 9GB (hard maximum imposed by the PDF specification).
+      </action>
+      <action context="Renderers" dev="JM" type="add">
+        Added support for CIE Lab colors (from XSL-FO 2.0 WD).
+      </action>
+      <action context="Renderers" dev="JM" type="add" fixes-bug="49403" due-to="Patrick Jaromin">
+        Initial work on spot colors (aka named colors) for PDF output.
+      </action>
+      <action context="Renderers" dev="JM" type="fix" fixes-bug="50705" due-to="Mehdi Houshmand">
+        Fix to preserve the order of AFP TLEs and NOPs as given in the XSL-FO document.
+      </action>
+      <action context="Fonts" dev="JM" type="add" fixes-bug="50699" due-to="Alexandros Papadakis">
+        Added support for lookup of alternative glyphs when additional single-byte encodings are
+        used, ex. replacing "Omegagreek" by "Omega" and vice versa.
+      </action>
+      <action context="Code" dev="AD" type="add" fixes-bug="48334">
+        Added support for resolution of relative URIs against a specified xml:base during
+        property refinement.
+      </action>
+      <action context="Renderers" dev="JM" type="add">
+        Allow afp:no-operation to also appear under fo:page-sequence and fo:declarations.
+      </action>
+      <action context="Code" dev="AD" type="fix" fixes-bug="50635" due-to="mkoegler.AT.auto.tuwien.ac.at">
+        Bugfix: fix issue in RenderPagesModel.checkPreparedPages() where the same page-sequence
+        is potentially started multiple times.
+      </action>
+      <action context="Code" dev="AD" type="fix" fixes-bug="50636" due-to="mkoegler.AT.auto.tuwien.ac.at">
+        Bugfix: fix performance issue when adding pages, if the total number of pages
+        is significantly large.
+      </action>
+      <action context="Code" dev="AD" type="fix" fixes-bug="50626" due-to="mkoegler.AT.auto.tuwien.ac.at">
+        Bugfix: fix performance issue when adding nodes, if the number of children
+        is significantly large.
+      </action>
+	  <action context="Config" dev="SP" type="fix">
+		Bugfix: relative URIs in the configuration file (base, font-base, hyphenation-base) are evaluated relative to the base URI of the configuration file.
+	  </action>
+      <action context="Layout" dev="AD" type="fix" fixes-bug="49848">
+        Bugfix: correct behavior of keep-together.within-line in case there are nested inlines
+      </action>
+      <action context="Code" dev="AD" type="fix" fixes-bug="50471">
+        Bugfix: avoid ArrayIndexOutOfBoundsException for codepoints without a linebreak class
+      </action>
+      <action context="Layout" dev="AD" type="fix" fixes-bug="48380">
+        Bugfix: avoid ClassCastException when using fox:widow-content-limit
+      </action>
+      <action context="Layout" dev="VH" type="fix" fixes-bug="50089">
+        Bugfix: content after forced break in block-container is not rendered.
+      </action>
+      <action context="Layout" dev="JM" type="fix" fixes-bug="42034">
+        Fixed adjustment of inline parent area for justified text containing a forward page reference.
+      </action>
+      <action context="Layout" dev="AD" type="fix" fixes-bug="38264">
+        Fixed behavior when combining hyphenation with preserved linefeeds or whitespace.
+      </action>
+      <action context="Code" dev="VH" type="fix" fixes-bug="49695" due-to="Joshua Marquart">
+        Replaced magic numbers with constants from UnitConv and GraphicsConstants.
+      </action>
       <action context="Renderers" dev="JM" type="add" fixes-bug="42600" due-to="Maximilian Aster">
         Added some support for break-before/-after for RTF output.
       </action>

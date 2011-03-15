@@ -178,6 +178,7 @@ public class InlineArea extends Area {
      *
      * {@inheritDoc}
      */
+    @Override
     public void addChildArea(Area childArea) {
         super.addChildArea(childArea);
         if (childArea instanceof InlineArea) {
@@ -185,9 +186,7 @@ public class InlineArea extends Area {
         }
     }
 
-    /**
-     *@return true if the inline area is underlined.
-     */
+    /** @return true if the inline area is underlined. */
     public boolean hasUnderline() {
         return getTraitAsBoolean(Trait.UNDERLINE);
     }
@@ -228,6 +227,11 @@ public class InlineArea extends Area {
      * @param ipdVariation the variation
      */
     public void handleIPDVariation(int ipdVariation) {
+        if (log.isTraceEnabled()) {
+            log.trace("Handling IPD variation for " + getClass().getSimpleName()
+                    + ": increase by " + ipdVariation + " mpt.");
+        }
+
         increaseIPD(ipdVariation);
         notifyIPDVariation(ipdVariation);
     }

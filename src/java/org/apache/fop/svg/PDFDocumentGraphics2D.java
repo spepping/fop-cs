@@ -30,11 +30,13 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.StringWriter;
 
+import org.apache.xmlgraphics.image.GraphicsConstants;
+
 import org.apache.fop.Version;
 import org.apache.fop.fonts.FontInfo;
 import org.apache.fop.fonts.FontSetup;
 import org.apache.fop.pdf.PDFAnnotList;
-import org.apache.fop.pdf.PDFColor;
+import org.apache.fop.pdf.PDFColorHandler;
 import org.apache.fop.pdf.PDFDocument;
 import org.apache.fop.pdf.PDFFilterList;
 import org.apache.fop.pdf.PDFNumber;
@@ -64,7 +66,7 @@ public class PDFDocumentGraphics2D extends PDFGraphics2D {
     /** Normal PDF resolution (72dpi) */
     public static final int NORMAL_PDF_RESOLUTION = 72;
     /** Default device resolution (300dpi is a resonable quality for most purposes) */
-    public static final int DEFAULT_NATIVE_DPI = 300;
+    public static final int DEFAULT_NATIVE_DPI = GraphicsConstants.DEFAULT_SAMPLE_DPI;
 
     /**
      * The device resolution may be different from the normal target resolution. See
@@ -99,6 +101,7 @@ public class PDFDocumentGraphics2D extends PDFGraphics2D {
         this.pdfDoc = new PDFDocument("Apache FOP Version " + Version.getVersion()
                 + ": PDFDocumentGraphics2D");
         this.pdfContext = new PDFContext();
+        this.colorHandler = new PDFColorHandler(this.pdfDoc.getResources());
     }
 
     /**
@@ -230,15 +233,15 @@ public class PDFDocumentGraphics2D extends PDFGraphics2D {
      * @param col the background colour to fill
      */
     public void setBackgroundColor(Color col) {
-        Color c = col;
-        PDFColor currentColour = new PDFColor(c.getRed(), c.getGreen(), c.getBlue());
-        currentStream.write("q\n");
-        currentStream.write(currentColour.getColorSpaceOut(true));
+        StringBuffer sb = new StringBuffer();
+        sb.append("q\n");
+        this.colorHandler.establishColor(sb, col, true);
 
-        currentStream.write("0 0 " + width + " " + height + " re\n");
+        sb.append("0 0 ").append(width).append(" ").append(height).append(" re\n");
 
-        currentStream.write("f\n");
-        currentStream.write("Q\n");
+        sb.append("f\n");
+        sb.append("Q\n");
+        currentStream.write(sb.toString());
     }
 
     /**

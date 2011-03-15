@@ -124,13 +124,9 @@ public abstract class PDFElement extends PDFObj {
         }
     }
 
-    private TransformerFactory getTransformerFactory() {
+    private synchronized TransformerFactory getTransformerFactory() {
         if ( transformerFactory == null ) {
-            synchronized ( PDFElement.class ) {
-                if ( transformerFactory == null ) {
-                    transformerFactory = SAXTransformerFactory.newInstance();
-                }
-            }
+            transformerFactory = SAXTransformerFactory.newInstance();
         }
         return transformerFactory;
     }

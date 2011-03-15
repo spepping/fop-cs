@@ -112,13 +112,9 @@ public class PDFDictionaryContentHandlerFactory implements ContentHandlerFactory
             setDelegateContentHandler ( handler );
         }
 
-        private SAXTransformerFactory getTransformerFactory() {
+        private synchronized SAXTransformerFactory getTransformerFactory() {
             if ( transformerFactory == null ) {
-                synchronized ( DocumentHandler.class )  {
-                    if ( transformerFactory == null ) {
-                        transformerFactory = (SAXTransformerFactory) SAXTransformerFactory.newInstance();
-                    }
-                }
+                transformerFactory = (SAXTransformerFactory) SAXTransformerFactory.newInstance();
             }
             return transformerFactory;
         }

@@ -22,6 +22,8 @@ package org.apache.fop.apps;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -33,6 +35,7 @@ import org.apache.avalon.framework.configuration.DefaultConfigurationBuilder;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import org.apache.xmlgraphics.image.GraphicsConstants;
 import org.apache.xmlgraphics.image.loader.spi.ImageImplRegistry;
 import org.apache.xmlgraphics.image.loader.util.Penalty;
 
@@ -61,10 +64,10 @@ public class FopFactoryConfigurator {
     public static final String DEFAULT_PAGE_HEIGHT = "11in";
 
     /** Defines the default source resolution (72dpi) for FOP */
-    public static final float DEFAULT_SOURCE_RESOLUTION = 72.0f; //dpi
+    public static final float DEFAULT_SOURCE_RESOLUTION = GraphicsConstants.DEFAULT_DPI; //dpi
 
     /** Defines the default target resolution (72dpi) for FOP */
-    public static final float DEFAULT_TARGET_RESOLUTION = 72.0f; //dpi
+    public static final float DEFAULT_TARGET_RESOLUTION = GraphicsConstants.DEFAULT_DPI; //dpi
 
     private static final String PREFER_RENDERER = "prefer-renderer";
 
@@ -76,6 +79,9 @@ public class FopFactoryConfigurator {
 
     /** Fop factory configuration */
     private Configuration cfg = null;
+
+    /** The base URI of the configuration file **/
+    private URI baseURI = null;
 
     /**
      * Default constructor
@@ -129,17 +135,23 @@ public class FopFactoryConfigurator {
 
         // base definitions for relative path resolution
         if (cfg.getChild("base", false) != null) {
+            String path = cfg.getChild("base").getValue(null);
+            if (baseURI != null) {
+                path = baseURI.resolve(path).normalize().toString();
+            }
             try {
-                factory.setBaseURL(
-                        cfg.getChild("base").getValue(null));
+                factory.setBaseURL(path);
             } catch (MalformedURLException mfue) {
                 LogUtil.handleException(log, mfue, strict);
             }
         }
         if (cfg.getChild("hyphenation-base", false) != null) {
+            String path = cfg.getChild("hyphenation-base").getValue(null);
+            if (baseURI != null) {
+                path = baseURI.resolve(path).normalize().toString();
+            }
             try {
-                factory.setHyphenBaseURL(
-                        cfg.getChild("hyphenation-base").getValue(null));
+                factory.setHyphenBaseURL(path);
             } catch (MalformedURLException mfue) {
                 LogUtil.handleException(log, mfue, strict);
             }
@@ -159,7 +171,7 @@ public class FopFactoryConfigurator {
 
                 lang = hyphPatConfig[i].getAttribute("lang", null);
                 if (lang == null) {
-                    addError("The lang attribute of a hyphenation-pattern configuration" 
+                    addError("The lang attribute of a hyphenation-pattern configuration"
                              + " element must exist (" + location + ")", error);
                 } else if (!lang.matches("[a-zA-Z]{2}")) {
                     addError("The lang attribute of a hyphenation-pattern configuration"
@@ -191,7 +203,7 @@ public class FopFactoryConfigurator {
                     LogUtil.handleError(log, error.toString(), strict);
                     continue;
                 }
-                
+
                 String llccKey = HyphenationTreeCache.constructLlccKey(lang, country);
                 hyphPatNames.put(llccKey, filename);
                 if (log.isDebugEnabled()) {
@@ -258,7 +270,7 @@ public class FopFactoryConfigurator {
         }
 
         // configure font manager
-        new FontManagerConfigurator(cfg).configure(factory.getFontManager(), strict);
+        new FontManagerConfigurator(cfg, baseURI).configure(factory.getFontManager(), strict);
 
         // configure image loader framework
         configureImageLoading(cfg.getChild("image-loading", false), strict);
@@ -270,7 +282,7 @@ public class FopFactoryConfigurator {
         }
         error.append(message);
     }
-    
+
     private void configureImageLoading(Configuration parent, boolean strict) throws FOPException {
         if (parent == null) {
             return;
@@ -338,6 +350,7 @@ public class FopFactoryConfigurator {
      */
     public void setUserConfig(Configuration cfg) throws FOPException {
         this.cfg = cfg;
+        setBaseURI();
         configure(this.factory);
     }
 
@@ -348,4 +361,34 @@ public class FopFactoryConfigurator {
     public Configuration getUserConfig() {
         return this.cfg;
     }
+
+    /**
+     * @return the baseURI
+     */
+    public URI getBaseURI() {
+        return baseURI;
+    }
+
+    /**
+     * @param baseURI the baseURI to set
+     */
+    public void setBaseURI(URI baseURI) {
+        this.baseURI = baseURI;
+    }
+
+    private void setBaseURI() throws FOPException {
+        String loc = cfg.getLocation();
+        try {
+            if (loc != null && loc.startsWith("file:")) {
+                baseURI = new URI(loc);
+                baseURI = baseURI.resolve(".").normalize();
+            }
+            if (baseURI == null) {
+                baseURI = new File(System.getProperty("user.dir")).toURI();
+            }
+        } catch (URISyntaxException e) {
+            throw new FOPException(e);
+        }
+    }
+
 }
