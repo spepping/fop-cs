@@ -709,7 +709,9 @@ public class IFSerializer extends AbstractXMLWritingIFDocumentHandler
             Iterator iter = tree.getBookmarks().iterator();
             while (iter.hasNext()) {
                 Bookmark b = (Bookmark)iter.next();
-                serializeBookmark(b);
+                if (b.getAction() != null) {
+                    serializeBookmark(b);
+                }
             }
             handler.endElement(DocumentNavigationExtensionConstants.BOOKMARK_TREE);
         } catch (SAXException e) {
@@ -729,10 +731,11 @@ public class IFSerializer extends AbstractXMLWritingIFDocumentHandler
         Iterator iter = bookmark.getChildBookmarks().iterator();
         while (iter.hasNext()) {
             Bookmark b = (Bookmark)iter.next();
-            serializeBookmark(b);
+            if (b.getAction() != null) {
+                serializeBookmark(b);
+            }
         }
         handler.endElement(DocumentNavigationExtensionConstants.BOOKMARK);
-
     }
 
     /** {@inheritDoc} */
