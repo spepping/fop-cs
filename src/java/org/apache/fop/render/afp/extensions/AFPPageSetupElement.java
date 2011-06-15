@@ -29,13 +29,12 @@ import org.apache.fop.fo.PropertyList;
 import org.apache.fop.fo.extensions.ExtensionAttachment;
 
 /**
- * This class faciliates extraction of elements from formatted objects based on
+ * This class extends the org.apache.fop.extensions.ExtensionObj class. The
+ * object facilitates extraction of elements from formatted objects based on
  * the static list as defined in the AFPElementMapping implementation.
- * <p/>
  */
 public class AFPPageSetupElement extends AbstractAFPExtensionObject {
 
-    private static final String ATT_VALUE = "value";
     private static final String ATT_SRC = "src";
 
     /**
@@ -100,12 +99,16 @@ public class AFPPageSetupElement extends AbstractAFPExtensionObject {
                 missingPropertyError(ATT_SRC);
             }
         } else if (AFPElementMapping.TAG_LOGICAL_ELEMENT.equals(elementName)) {
-            String attr = attlist.getValue(ATT_VALUE);
+            String attr = attlist.getValue(AFPPageSetup.ATT_VALUE);
             if (attr != null && attr.length() > 0) {
                 pageSetup.setValue(attr);
             } else {
-                missingPropertyError(ATT_VALUE);
+                missingPropertyError(AFPPageSetup.ATT_VALUE);
             }
+        }
+        String placement = attlist.getValue(AFPPageSetup.ATT_PLACEMENT);
+        if (placement != null && placement.length() > 0) {
+            pageSetup.setPlacement(ExtensionPlacement.fromXMLValue(placement));
         }
     }
 
