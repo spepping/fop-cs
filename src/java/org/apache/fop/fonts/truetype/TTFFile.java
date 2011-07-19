@@ -66,6 +66,10 @@ public class TTFFile {
     private final String encoding = "WinAnsiEncoding";    // Default encoding
 
     private final short firstChar = 0;
+
+    private boolean useKerning = false;
+    private boolean useAdvanced = false;
+
     private boolean isEmbeddable = true;
     private boolean hasSerifs = true;
     /**
@@ -152,6 +156,16 @@ public class TTFFile {
      * logging instance
      */
     protected Log log = LogFactory.getLog(TTFFile.class);
+
+    /**
+     * Constructor
+     * @param useKerning true if kerning data should be loaded
+     * @param useAdvanced true if advanced typographic tables should be loaded
+     */
+    public TTFFile ( boolean useKerning, boolean useAdvanced ) {
+        this.useKerning = useKerning;
+        this.useAdvanced = useAdvanced;
+    }
 
     /**
      * Key-value helper class
@@ -623,19 +637,23 @@ public class TTFFile {
         // Create cmaps for bfentries
         createCMaps();
 
-        readKerning(in);
+        if ( useKerning ) {
+            readKerning(in);
+        }
 
         // Read advanced typographic tables. If any format exception,
         // reset (thus ignoring) all advanced typographic tables.
-        try {
-            readGDEF(in);
-            readGSUB(in);
-            readGPOS(in);
-        } catch ( AdvancedTypographicTableFormatException e ) {
-            resetATStateAll();
-            log.warn ( "Encountered format constraint violation in advanced (typographic) table (AT) "
-                       + "in font '" + getFullName() + "', ignoring AT data: "
-                       + e.getMessage() );
+        if ( useAdvanced ) {
+            try {
+                readGDEF(in);
+                readGSUB(in);
+                readGPOS(in);
+            } catch ( AdvancedTypographicTableFormatException e ) {
+                resetATStateAll();
+                log.warn ( "Encountered format constraint violation in advanced (typographic) table (AT) "
+                           + "in font '" + getFullName() + "', ignoring AT data: "
+                           + e.getMessage() );
+            }
         }
 
         guessVerticalMetricsFromGlyphBBox();
@@ -5462,7 +5480,9 @@ public class TTFFile {
      */
     public static void main(String[] args) {
         try {
-            TTFFile ttfFile = new TTFFile();
+            boolean useKerning = true;
+            boolean useAdvanced = true;
+            TTFFile ttfFile = new TTFFile(useKerning, useAdvanced);
 
             FontFileReader reader = new FontFileReader(args[0]);
 

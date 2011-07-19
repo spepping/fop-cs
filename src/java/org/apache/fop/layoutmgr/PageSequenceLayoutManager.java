@@ -78,7 +78,9 @@ public class PageSequenceLayoutManager extends AbstractPageSequenceLayoutManager
         initialize();
 
         // perform step 5.8 of refinement process (Unicode BIDI Processing)
-        BidiUtil.resolveInlineDirectionality(getPageSequence());
+        if ( areaTreeHandler.isComplexScriptFeaturesEnabled() ) {
+            BidiUtil.resolveInlineDirectionality(getPageSequence());
+        }
 
         LineArea title = null;
         if (getPageSequence().getTitleFO() != null) {
