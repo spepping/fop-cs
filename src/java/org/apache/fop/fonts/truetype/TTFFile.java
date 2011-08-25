@@ -142,9 +142,9 @@ public class TTFFile {
     private boolean isCFF;
 
     /* advanced typographic support */
-    private Map/*<String,Object[3]>*/ seScripts;
-    private Map/*<String,Object[2]>*/ seLanguages;
-    private Map/*<String,List<String>>*/ seFeatures;
+    private Map/*<String,Object[3]>*/ seScripts;                // script-tag         => Object[3] : { default-language-tag, List(language-tag), seLanguages }
+    private Map/*<String,Object[2]>*/ seLanguages;              // language-tag       => Object[2] : { "f<required-feature-index>", List("f<feature-index>")
+    private Map/*<String,List<String>>*/ seFeatures;            // "f<feature-index>" => Object[2] : { feature-tag, List("lu<lookup-index>") }
     private GlyphMappingTable seMapping;
     private List seEntries;
     private List seSubtables;
@@ -5139,12 +5139,12 @@ public class TTFFile {
     private GlyphSubtable constructGDEFSubtable ( Object[] stp ) {
         GlyphSubtable st = null;
         assert ( stp != null ) && ( stp.length == 8 );
-        Integer tt = (Integer) stp[0];
-        Integer lt = (Integer) stp[1];
-        Integer ln = (Integer) stp[2];
-        Integer lf = (Integer) stp[3];
-        Integer sn = (Integer) stp[4];
-        Integer sf = (Integer) stp[5];
+        Integer tt = (Integer) stp[0];          // table type
+        Integer lt = (Integer) stp[1];          // lookup type
+        Integer ln = (Integer) stp[2];          // lookup sequence number
+        Integer lf = (Integer) stp[3];          // lookup flags
+        Integer sn = (Integer) stp[4];          // subtable sequence number
+        Integer sf = (Integer) stp[5];          // subtable format
         GlyphMappingTable mapping = (GlyphMappingTable) stp[6];
         List entries = (List) stp[7];
         if ( tt.intValue() == GlyphTable.GLYPH_TABLE_TYPE_DEFINITION ) {
@@ -5175,12 +5175,12 @@ public class TTFFile {
     private GlyphSubtable constructGSUBSubtable ( Object[] stp ) {
         GlyphSubtable st = null;
         assert ( stp != null ) && ( stp.length == 8 );
-        Integer tt = (Integer) stp[0];
-        Integer lt = (Integer) stp[1];
-        Integer ln = (Integer) stp[2];
-        Integer lf = (Integer) stp[3];
-        Integer sn = (Integer) stp[4];
-        Integer sf = (Integer) stp[5];
+        Integer tt = (Integer) stp[0];          // table type
+        Integer lt = (Integer) stp[1];          // lookup type
+        Integer ln = (Integer) stp[2];          // lookup sequence number
+        Integer lf = (Integer) stp[3];          // lookup flags
+        Integer sn = (Integer) stp[4];          // subtable sequence number
+        Integer sf = (Integer) stp[5];          // subtable format
         GlyphCoverageTable coverage = (GlyphCoverageTable) stp[6];
         List entries = (List) stp[7];
         if ( tt.intValue() == GlyphTable.GLYPH_TABLE_TYPE_SUBSTITUTION ) {
@@ -5211,12 +5211,12 @@ public class TTFFile {
     private GlyphSubtable constructGPOSSubtable ( Object[] stp ) {
         GlyphSubtable st = null;
         assert ( stp != null ) && ( stp.length == 8 );
-        Integer tt = (Integer) stp[0];
-        Integer lt = (Integer) stp[1];
-        Integer ln = (Integer) stp[2];
-        Integer lf = (Integer) stp[3];
-        Integer sn = (Integer) stp[4];
-        Integer sf = (Integer) stp[5];
+        Integer tt = (Integer) stp[0];          // table type
+        Integer lt = (Integer) stp[1];          // lookup type
+        Integer ln = (Integer) stp[2];          // lookup sequence number
+        Integer lf = (Integer) stp[3];          // lookup flags
+        Integer sn = (Integer) stp[4];          // subtable sequence number
+        Integer sf = (Integer) stp[5];          // subtable format
         GlyphCoverageTable coverage = (GlyphCoverageTable) stp[6];
         List entries = (List) stp[7];
         if ( tt.intValue() == GlyphTable.GLYPH_TABLE_TYPE_POSITIONING ) {
