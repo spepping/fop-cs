@@ -30,6 +30,7 @@ import org.apache.fop.traits.BorderPropsTestCase;
 import org.apache.fop.util.BitmapImageUtilTestCase;
 import org.apache.fop.util.ColorUtilTestCase;
 import org.apache.fop.util.ElementListUtilsTestCase;
+import org.apache.fop.util.NumberConverterTestCase;
 import org.apache.fop.util.PDFNumberTestCase;
 import org.apache.fop.util.XMLResourceBundleTestCase;
 
@@ -57,6 +58,7 @@ public class UtilityCodeTestSuite {
         suite.addTest(new TestSuite(URIResolutionTestCase.class));
         suite.addTest(new TestSuite(BitmapImageUtilTestCase.class));
         suite.addTest(new TestSuite(PDFEncryptionJCETestCase.class));
+        suite.addTest(new TestSuite(NumberConverterTestCase.class));
         //$JUnit-END$
         return suite;
     }
