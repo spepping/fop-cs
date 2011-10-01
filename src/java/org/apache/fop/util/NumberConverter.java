@@ -23,6 +23,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 // CSOFF: LineLengthCheck
+// CSOFF: InnerAssignmentCheck
+// CSOFF: NoWhitespaceAfterCheck
+// CSOFF: AvoidNestedBlocksCheck
 
 /**
  * Implementation of Number to String Conversion algorithm specified by
@@ -63,22 +66,22 @@ import java.util.List;
 public class NumberConverter {
 
     /** alphabetical  */
-    static public final int LETTER_VALUE_ALPHABETIC = 1;
+    public static final int LETTER_VALUE_ALPHABETIC = 1;
     /** traditional  */
-    static public final int LETTER_VALUE_TRADITIONAL = 2;
+    public static final int LETTER_VALUE_TRADITIONAL = 2;
 
     /** no token type */
-    static private final int TOKEN_NONE = 0;
+    private static final int TOKEN_NONE = 0;
     /** alhphanumeric token type */
-    static private final int TOKEN_ALPHANUMERIC = 1;
+    private static final int TOKEN_ALPHANUMERIC = 1;
     /** nonalphanumeric token type */
-    static private final int TOKEN_NONALPHANUMERIC = 2;
+    private static final int TOKEN_NONALPHANUMERIC = 2;
     /** default token */
-    static private final Integer[] DEFAULT_TOKEN = new Integer[] { (int) '1' };
+    private static final Integer[] DEFAULT_TOKEN = new Integer[] { (int) '1' };
     /** default separator */
-    static private final Integer[] DEFAULT_SEPARATOR = new Integer[] { (int) '.' };
+    private static final Integer[] DEFAULT_SEPARATOR = new Integer[] { (int) '.' };
     /** default language */
-    static private final String DEFAULT_LANGUAGE = "eng";
+    private static final String DEFAULT_LANGUAGE = "eng";
 
     /** prefix token */
     private Integer[] prefix;
@@ -110,6 +113,7 @@ public class NumberConverter {
      * @param features features (feature sub-parameters)
      * @param language (may be null or empty, which is treated as null)
      * @param country (may be null or empty, which is treated as null)
+     * @throws IllegalArgumentException if format is not a valid UTF-16 string (e.g., has unpaired surrogate)
      */
     public NumberConverter ( String format, int groupingSeparator, int groupingSize, int letterValue, String features, String language, String country )
         throws IllegalArgumentException {
@@ -135,7 +139,7 @@ public class NumberConverter {
 
     /**
      * Convert list of numbers to string according to conversion parameters.
-     * @param list of numbers to convert
+     * @param numbers list of numbers to convert
      * @return string representing converted list of numbers
      */
     public String convert ( List<Long> numbers ) {
@@ -192,7 +196,7 @@ public class NumberConverter {
         this.tokens = tokens.toArray ( new Integer [ tokens.size() ] [] );
     }
 
-    static private boolean isAlphaNumeric ( int c ) {
+    private static boolean isAlphaNumeric ( int c ) {
         switch ( Character.getType ( c ) ) {
         case Character.DECIMAL_DIGIT_NUMBER:    // Nd
         case Character.LETTER_NUMBER:           // Nl
@@ -327,7 +331,7 @@ public class NumberConverter {
         return sl.toArray ( new Integer [ sl.size() ] );
     }
 
-    static private List<Integer> performGrouping ( List<Integer> sl, int groupingSize, int groupingSeparator ) {
+    private static List<Integer> performGrouping ( List<Integer> sl, int groupingSize, int groupingSeparator ) {
         assert groupingSize > 0;
         assert groupingSeparator != 0;
         if ( sl.size() > groupingSize ) {
@@ -419,21 +423,18 @@ public class NumberConverter {
             return false;
         } else if ( language.equals ( iso3Code ) ) {
             return true;
-        } else if ( isSameLanguage ( iso3Code, language ) ) {
-            return true;
         } else {
-            return false;
+            return isSameLanguage ( iso3Code, language );
         }
     }
 
-    static private String[][] equivalentLanguages =
-    {
+    private static String[][] equivalentLanguages = {
         { "eng", "en" },
         { "fra", "fre", "fr" },
         { "spa", "es" },
     };
 
-    static private boolean isSameLanguage ( String i3c, String lc ) {
+    private static boolean isSameLanguage ( String i3c, String lc ) {
         for ( String[] el : equivalentLanguages ) {
             assert el.length >= 2;
             if ( el[0].equals ( i3c ) ) {
@@ -448,7 +449,7 @@ public class NumberConverter {
         return false;
     }
 
-    static private boolean hasFeature ( String features, String feature ) {
+    private static boolean hasFeature ( String features, String feature ) {
         if ( features != null ) {
             assert feature != null;
             assert feature.length() != 0;
@@ -466,7 +467,8 @@ public class NumberConverter {
         return false;
     }
 
-    static private String getFeatureValue ( String features, String feature ) {
+    /* not yet used
+    private static String getFeatureValue ( String features, String feature ) {
         if ( features != null ) {
             assert feature != null;
             assert feature.length() != 0;
@@ -483,19 +485,20 @@ public class NumberConverter {
         }
         return "";
     }
+    */
 
-    static private void appendScalars ( List<Integer> scalars, Integer[] sa ) {
+    private static void appendScalars ( List<Integer> scalars, Integer[] sa ) {
         for ( Integer s : sa ) {
             scalars.add ( s );
         }
     }
 
-    static private String scalarsToString ( List<Integer> scalars ) {
+    private static String scalarsToString ( List<Integer> scalars ) {
         Integer[] sa = scalars.toArray ( new Integer [ scalars.size() ] );
         return CharUtilities.fromUTF32 ( sa );
     }
 
-    static private boolean isPaddedOne ( Integer[] token ) {
+    private static boolean isPaddedOne ( Integer[] token ) {
         if ( getDecimalValue ( token [ token.length - 1 ] ) != 1 ) {
             return false;
         } else {
@@ -508,7 +511,7 @@ public class NumberConverter {
         }
     }
 
-    static private int getDecimalValue ( Integer scalar ) {
+    private static int getDecimalValue ( Integer scalar ) {
         int s = scalar.intValue();
         if ( Character.getType ( s ) == Character.DECIMAL_DIGIT_NUMBER ) {
             return Character.getNumericValue ( s );
@@ -517,19 +520,18 @@ public class NumberConverter {
         }
     }
 
-    static private boolean isStartOfDecimalSequence ( int s ) {
+    private static boolean isStartOfDecimalSequence ( int s ) {
         return ( Character.getNumericValue ( s ) == 1 )
             && ( Character.getNumericValue ( s - 1 ) == 0 )
             && ( Character.getNumericValue ( s + 8 ) == 9 );
     }
 
-    static private int[][] supportedAlphabeticSequences =
-    {
+    private static int[][] supportedAlphabeticSequences = {
         { 'A', 26 },            // A...Z
         { 'a', 26 },            // a...z
     };
 
-    static private boolean isStartOfAlphabeticSequence ( int s ) {
+    private static boolean isStartOfAlphabeticSequence ( int s ) {
         for ( int[] ss : supportedAlphabeticSequences ) {
             assert ss.length >= 2;
             if ( ss[0] == s ) {
@@ -539,7 +541,7 @@ public class NumberConverter {
         return false;
     }
 
-    static private int getSequenceBase ( int s ) {
+    private static int getSequenceBase ( int s ) {
         for ( int[] ss : supportedAlphabeticSequences ) {
             assert ss.length >= 2;
             if ( ss[0] == s ) {
@@ -549,8 +551,7 @@ public class NumberConverter {
         return 0;
     }
 
-    static private int[][] supportedSpecials =
-    {
+    private static int[][] supportedSpecials = {
         { 'I' },                // latin - uppercase roman numerals
         { 'i' },                // latin - lowercase roman numerals
         { '\u0391' },           // greek - uppercase isopsephry numerals
@@ -565,7 +566,7 @@ public class NumberConverter {
         { '\u30A4' },           // kana - katakana (iroha)
     };
 
-    static private boolean isStartOfNumericSpecial ( int s ) {
+    private static boolean isStartOfNumericSpecial ( int s ) {
         for ( int[] ss : supportedSpecials ) {
             assert ss.length >= 1;
             if ( ss[0] == s ) {
@@ -605,7 +606,7 @@ public class NumberConverter {
         }
     }
 
-    static private Integer[] toUpperCase ( Integer[] sa ) {
+    private static Integer[] toUpperCase ( Integer[] sa ) {
         assert sa != null;
         for ( int i = 0, n = sa.length; i < n; i++ ) {
             Integer s = sa [ i ];
@@ -614,7 +615,7 @@ public class NumberConverter {
         return sa;
     }
 
-    static private Integer[] toLowerCase ( Integer[] sa ) {
+    private static Integer[] toLowerCase ( Integer[] sa ) {
         assert sa != null;
         for ( int i = 0, n = sa.length; i < n; i++ ) {
             Integer s = sa [ i ];
@@ -623,15 +624,17 @@ public class NumberConverter {
         return sa;
     }
 
-    static private Integer[] toTitleCase ( Integer[] sa ) {
+    /* not yet used
+    private static Integer[] toTitleCase ( Integer[] sa ) {
         assert sa != null;
         if ( sa.length > 0 ) {
             sa [ 0 ] = Character.toTitleCase ( sa [ 0 ] );
         }
         return sa;
     }
+    */
 
-    static private List<String> convertWordCase ( List<String> words, int caseType ) {
+    private static List<String> convertWordCase ( List<String> words, int caseType ) {
         List<String> wl = new ArrayList<String>();
         for ( String w : words ) {
             wl.add ( convertWordCase ( w, caseType ) );
@@ -639,7 +642,7 @@ public class NumberConverter {
         return wl;
     }
 
-    static private String convertWordCase ( String word, int caseType ) {
+    private static String convertWordCase ( String word, int caseType ) {
         if ( caseType == Character.UPPERCASE_LETTER ) {
             return word.toUpperCase();
         } else if ( caseType == Character.LOWERCASE_LETTER ) {
@@ -660,7 +663,7 @@ public class NumberConverter {
         }
     }
 
-    static private String joinWords ( List<String> words, String separator ) {
+    private static String joinWords ( List<String> words, String separator ) {
         StringBuffer sb = new StringBuffer();
         for ( String w : words ) {
             if ( sb.length() > 0 ) {
@@ -691,15 +694,15 @@ public class NumberConverter {
     /**
      * English Word Numerals
      */
-    static private String[] englishWordOnes = { "zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine" };
-    static private String[] englishWordTeens = { "ten", "eleven", "twelve", "thirteen", "fourteen", "fifteen", "sixteen", "seventeen", "eighteen", "nineteen" };
-    static private String[] englishWordTens = { "", "ten", "twenty", "thirty", "forty", "fifty", "sixty", "seventy", "eighty", "ninety" };
-    static private String[] englishWordOthers = { "hundred", "thousand", "million", "billion" };
-    static private String[] englishWordOnesOrd = { "none", "first", "second", "third", "fourth", "fifth", "sixth", "seventh", "eighth", "ninth" };
-    static private String[] englishWordTeensOrd = { "tenth", "eleventh", "twelfth", "thirteenth", "fourteenth", "fifteenth", "sixteenth", "seventeenth", "eighteenth", "nineteenth" };
-    static private String[] englishWordTensOrd = { "", "tenth", "twentieth", "thirtieth", "fortieth", "fiftieth", "sixtieth", "seventieth", "eightieth", "ninetith" };
-    static private String[] englishWordOthersOrd = { "hundredth", "thousandth", "millionth", "billionth" };
-    private class EnglishNumberAsWordFormatter implements SpecialNumberFormatter {
+    private static String[] englishWordOnes = { "zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine" };
+    private static String[] englishWordTeens = { "ten", "eleven", "twelve", "thirteen", "fourteen", "fifteen", "sixteen", "seventeen", "eighteen", "nineteen" };
+    private static String[] englishWordTens = { "", "ten", "twenty", "thirty", "forty", "fifty", "sixty", "seventy", "eighty", "ninety" };
+    private static String[] englishWordOthers = { "hundred", "thousand", "million", "billion" };
+    private static String[] englishWordOnesOrd = { "none", "first", "second", "third", "fourth", "fifth", "sixth", "seventh", "eighth", "ninth" };
+    private static String[] englishWordTeensOrd = { "tenth", "eleventh", "twelfth", "thirteenth", "fourteenth", "fifteenth", "sixteenth", "seventeenth", "eighteenth", "nineteenth" };
+    private static String[] englishWordTensOrd = { "", "tenth", "twentieth", "thirtieth", "fortieth", "fiftieth", "sixtieth", "seventieth", "eightieth", "ninetith" };
+    private static String[] englishWordOthersOrd = { "hundredth", "thousandth", "millionth", "billionth" };
+    private static class EnglishNumberAsWordFormatter implements SpecialNumberFormatter {
         private int caseType = Character.UPPERCASE_LETTER;
         EnglishNumberAsWordFormatter ( int caseType ) {
             this.caseType = caseType;
@@ -803,13 +806,13 @@ public class NumberConverter {
     /**
      * French Word Numerals
      */
-    static private String[] frenchWordOnes = { "z\u00e9ro", "un", "deux", "trois", "quatre", "cinq", "six", "sept", "huit", "neuf" };
-    static private String[] frenchWordTeens = { "dix", "onze", "douze", "treize", "quatorze", "quinze", "seize", "dix-sept", "dix-huit", "dix-neuf" };
-    static private String[] frenchWordTens = { "", "dix", "vingt", "trente", "quarante", "cinquante", "soixante", "soixante-dix", "quatre-vingt", "quatre-vingt-dix" };
-    static private String[] frenchWordOthers = { "cent", "cents", "mille", "million", "millions", "milliard", "milliards" };
-    static private String[] frenchWordOnesOrdMale = { "premier", "deuxi\u00e8me", "troisi\u00e8me", "quatri\u00e8me", "cinqui\u00e8me", "sixi\u00e8me", "septi\u00e8me", "huiti\u00e8me", "neuvi\u00e8me", "dixi\u00e8me" };
-    static private String[] frenchWordOnesOrdFemale = { "premi\u00e8re", "deuxi\u00e8me", "troisi\u00e8me", "quatri\u00e8me", "cinqui\u00e8me", "sixi\u00e8me", "septi\u00e8me", "huiti\u00e8me", "neuvi\u00e8me", "dixi\u00e8me" };
-    private class FrenchNumberAsWordFormatter implements SpecialNumberFormatter {
+    private static String[] frenchWordOnes = { "z\u00e9ro", "un", "deux", "trois", "quatre", "cinq", "six", "sept", "huit", "neuf" };
+    private static String[] frenchWordTeens = { "dix", "onze", "douze", "treize", "quatorze", "quinze", "seize", "dix-sept", "dix-huit", "dix-neuf" };
+    private static String[] frenchWordTens = { "", "dix", "vingt", "trente", "quarante", "cinquante", "soixante", "soixante-dix", "quatre-vingt", "quatre-vingt-dix" };
+    private static String[] frenchWordOthers = { "cent", "cents", "mille", "million", "millions", "milliard", "milliards" };
+    private static String[] frenchWordOnesOrdMale = { "premier", "deuxi\u00e8me", "troisi\u00e8me", "quatri\u00e8me", "cinqui\u00e8me", "sixi\u00e8me", "septi\u00e8me", "huiti\u00e8me", "neuvi\u00e8me", "dixi\u00e8me" };
+    private static String[] frenchWordOnesOrdFemale = { "premi\u00e8re", "deuxi\u00e8me", "troisi\u00e8me", "quatri\u00e8me", "cinqui\u00e8me", "sixi\u00e8me", "septi\u00e8me", "huiti\u00e8me", "neuvi\u00e8me", "dixi\u00e8me" };
+    private static class FrenchNumberAsWordFormatter implements SpecialNumberFormatter {
         private int caseType = Character.UPPERCASE_LETTER;
         FrenchNumberAsWordFormatter ( int caseType ) {
             this.caseType = caseType;
@@ -936,15 +939,15 @@ public class NumberConverter {
     /**
      * Spanish Word Numerals
      */
-    static private String[] spanishWordOnes = { "cero", "uno", "dos", "tres", "cuatro", "cinco", "seise", "siete", "ocho", "nueve" };
-    static private String[] spanishWordTeens = { "diez", "once", "doce", "trece", "catorce", "quince", "diecis\u00e9is", "diecisiete", "dieciocho", "diecinueve" };
-    static private String[] spanishWordTweens = { "veinte", "veintiuno", "veintid\u00f3s", "veintitr\u00e9s", "veinticuatro", "veinticinco", "veintis\u00e9is", "veintisiete", "veintiocho", "veintinueve" };
-    static private String[] spanishWordTens = { "", "diez", "veinte", "treinta", "cuarenta", "cincuenta", "sesenta", "setenta", "ochenta", "noventa" };
-    static private String[] spanishWordHundreds = { "", "ciento", "doscientos", "trescientos", "cuatrocientos", "quinientos", "seiscientos", "setecientos", "ochocientos", "novecientos" };
-    static private String[] spanishWordOthers = { "un", "cien", "mil", "mill\u00f3n", "millones" };
-    static private String[] spanishWordOnesOrdMale = { "ninguno", "primero", "segundo", "tercero", "cuarto", "quinto", "sexto", "s\u00e9ptimo", "octavo", "novento", "d\u00e9cimo" };
-    static private String[] spanishWordOnesOrdFemale = { "ninguna", "primera", "segunda", "tercera", "cuarta", "quinta", "sexta", "s\u00e9ptima", "octava", "noventa", "d\u00e9cima" };
-    private class SpanishNumberAsWordFormatter implements SpecialNumberFormatter {
+    private static String[] spanishWordOnes = { "cero", "uno", "dos", "tres", "cuatro", "cinco", "seise", "siete", "ocho", "nueve" };
+    private static String[] spanishWordTeens = { "diez", "once", "doce", "trece", "catorce", "quince", "diecis\u00e9is", "diecisiete", "dieciocho", "diecinueve" };
+    private static String[] spanishWordTweens = { "veinte", "veintiuno", "veintid\u00f3s", "veintitr\u00e9s", "veinticuatro", "veinticinco", "veintis\u00e9is", "veintisiete", "veintiocho", "veintinueve" };
+    private static String[] spanishWordTens = { "", "diez", "veinte", "treinta", "cuarenta", "cincuenta", "sesenta", "setenta", "ochenta", "noventa" };
+    private static String[] spanishWordHundreds = { "", "ciento", "doscientos", "trescientos", "cuatrocientos", "quinientos", "seiscientos", "setecientos", "ochocientos", "novecientos" };
+    private static String[] spanishWordOthers = { "un", "cien", "mil", "mill\u00f3n", "millones" };
+    private static String[] spanishWordOnesOrdMale = { "ninguno", "primero", "segundo", "tercero", "cuarto", "quinto", "sexto", "s\u00e9ptimo", "octavo", "novento", "d\u00e9cimo" };
+    private static String[] spanishWordOnesOrdFemale = { "ninguna", "primera", "segunda", "tercera", "cuarta", "quinta", "sexta", "s\u00e9ptima", "octava", "noventa", "d\u00e9cima" };
+    private static class SpanishNumberAsWordFormatter implements SpecialNumberFormatter {
         private int caseType = Character.UPPERCASE_LETTER;
         SpanishNumberAsWordFormatter ( int caseType ) {
             this.caseType = caseType;
@@ -1037,7 +1040,7 @@ public class NumberConverter {
     /**
      * Roman (Latin) Numerals
      */
-    static private int[] romanMapping = {
+    private static int[] romanMapping = {
         100000,
         90000,
         50000,
@@ -1065,7 +1068,7 @@ public class NumberConverter {
         2,
         1
     };
-    static private String[] romanStandardForms = {
+    private static String[] romanStandardForms = {
         null,
         null,
         null,
@@ -1093,7 +1096,7 @@ public class NumberConverter {
         null,
         "i"
     };
-    static private String[] romanLargeForms = {
+    private static String[] romanLargeForms = {
         "\u2188",
         "\u2182\u2188",
         "\u2187",
@@ -1121,7 +1124,7 @@ public class NumberConverter {
         null,
         "i"
     };
-    static private String[] romanNumberForms = {
+    private static String[] romanNumberForms = {
         "\u2188",
         "\u2182\u2188",
         "\u2187",
@@ -1149,7 +1152,7 @@ public class NumberConverter {
         "\u2161",
         "\u2160"
     };
-    private class RomanNumeralsFormatter implements SpecialNumberFormatter {
+    private static class RomanNumeralsFormatter implements SpecialNumberFormatter {
         @Override
         public Integer[] format ( long number, int one, int letterValue, String features, String language, String country ) {
             List<Integer> sl = new ArrayList<Integer>();
@@ -1196,7 +1199,7 @@ public class NumberConverter {
     /**
      * Isopsephry (Greek) Numerals
      */
-    private class IsopsephryNumeralsFormatter implements SpecialNumberFormatter {
+    private static class IsopsephryNumeralsFormatter implements SpecialNumberFormatter {
         @Override
         public Integer[] format ( long number, int one, int letterValue, String features, String language, String country ) {
             return null;
@@ -1206,8 +1209,7 @@ public class NumberConverter {
     /**
      * Gematria (Hebrew) Numerals
      */
-    static private int[] hebrewGematriaAlphabeticMap =
-    {
+    private static int[] hebrewGematriaAlphabeticMap = {
         // ones
         0x05D0, // ALEF
         0x05D1, // BET
@@ -1314,8 +1316,7 @@ public class NumberConverter {
     /**
      * Arabic Numerals
      */
-    static private int[] arabicAbjadiAlphabeticMap =
-    {
+    private static int[] arabicAbjadiAlphabeticMap = {
         // ones
         0x0623, // ALEF WITH HAMZA ABOVE
         0x0628, // BEH
@@ -1349,8 +1350,7 @@ public class NumberConverter {
         // thousands
         0x063A, // GHAIN
     };
-    static private int[] arabicHijaiAlphabeticMap =
-    {
+    private static int[] arabicHijaiAlphabeticMap = {
         0x0623, // ALEF WITH HAMZA ABOVE
         0x0628, // BEH
         0x062A, // TEH
@@ -1438,8 +1438,7 @@ public class NumberConverter {
     /**
      * Kana (Japanese) Numerals
      */
-    static private int[] hiraganaGojuonAlphabeticMap =
-    {
+    private static int[] hiraganaGojuonAlphabeticMap = {
         0x3042, // A
         0x3044, // I
         0x3046, // U
@@ -1489,8 +1488,7 @@ public class NumberConverter {
         0x3092, // WO
         0x3093, // N
     };
-    static private int[] katakanaGojuonAlphabeticMap =
-    {
+    private static int[] katakanaGojuonAlphabeticMap = {
         0x30A2, // A
         0x30A4, // I
         0x30A6, // U
@@ -1556,8 +1554,7 @@ public class NumberConverter {
     /**
      * Thai Numerals
      */
-    static private int[] thaiAlphabeticMap =
-    {
+    private static int[] thaiAlphabeticMap = {
         0x0E01,
         0x0E02,
         0x0E03,
