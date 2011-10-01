@@ -60,6 +60,29 @@
       documents. Example: the fix of marks layering will be such a case when it's done.
     -->
     <release version="FOP Trunk" date="TBD">
+      <action context="Fonts" dev="PH" type="fix" fixes-bug="48696">
+        Bugfix for color model in IOCA IDE structure parameter for 4- and 8-bit grayscale images.
+        Revision 4.
+      </action>
+      <action context="Fonts" dev="PH" type="fix" fixes-bug="51760" due-to="Mehdi Houshmand">
+        Changes the way PostScript handles Graphics2D images such that if the language is set to
+        level 3, the image is stored as an embedded file which has no length limit.  Previously it
+        was stored as an array which has a implementation limit of 65535 elements.
+      </action>
+      <action context="Fonts" dev="PH" type="fix" fixes-bug="51759" due-to="Mehdi Houshmand">
+        PDFFactory responsible for asdigning name to a subset font.
+      </action>
+      <action context="Fonts" dev="PH" type="fix" fixes-bug="51530" due-to="Mehdi Houshmand">
+        Improved support for EBCDIC encoded double byte fonts fo AFP.
+      </action>
+      <action context="Fonts" dev="PH" type="fix" fixes-bug="51205" due-to="Mehdi Houshmand">
+        Corrected typographical errors in AFPBase12FontCollection.
+      </action>
+      <action context="Renderers" dev="PH" type="fix" fixes-bug="48062">
+        Improved fix of a bug relating to PCL painter thread safetly.  Previous fix in rev 895012
+        worked by synchronizing methods of a static instance of Java2DFontMetrics.  This fix uses a
+        unique instance for per thread.
+      </action>
       <action context="Renderers" dev="PH" type="fix">
         Fixed a bug in AFP where an ArrayOutofBoundsException is throwqn when embedding a Page 
         Segment.
