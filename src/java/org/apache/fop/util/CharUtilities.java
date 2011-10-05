@@ -1117,7 +1117,14 @@ public class CharUtilities {
         return sb.toString();
     }
 
-    private static String padLeft ( String s, int width, char pad ) {
+    /**
+     * Pad a string S on left out to width W using padding character PAD.
+     * @param s string to pad
+     * @param width width of field to add padding
+     * @param pad character to use for padding
+     * @return padded string
+     */
+    public static String padLeft ( String s, int width, char pad ) {
         StringBuffer sb = new StringBuffer();
         for ( int i = s.length(); i < width; i++ ) {
             sb.append(pad);

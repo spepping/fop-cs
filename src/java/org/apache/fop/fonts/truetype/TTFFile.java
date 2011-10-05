@@ -2928,14 +2928,14 @@ public class TTFFile {
         }
         // read input glyph count
         int nig = in.readTTFUShort();
-        // read backtrack glyph coverage offsets
+        // read input glyph coverage offsets
         int[] igcoa = new int [ nig ];
         for ( int i = 0; i < nig; i++ ) {
             igcoa [ i ] = in.readTTFUShort();
         }
         // read lookahead glyph count
         int nlg = in.readTTFUShort();
-        // read backtrack glyph coverage offsets
+        // read lookahead glyph coverage offsets
         int[] lgcoa = new int [ nlg ];
         for ( int i = 0; i < nlg; i++ ) {
             lgcoa [ i ] = in.readTTFUShort();
