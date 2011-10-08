@@ -247,14 +247,55 @@ public class GSUBTestCase extends TestCase implements ScriptContextTester, Glyph
     private static Object[][] ltMultiple = {
         { GlyphSubstitutionTable.GSUB_LOOKUP_TYPE_MULTIPLE },
         // arab-001.ttx
-        { "f0", "lu9", },
+        { "f0", "lu9", "arab", "*", "*",
+          new String[][][] {
+              { { "alefwithhamzabelow" }, { "arabicalef", "uni0655" } },
+          }
+        },
         // arab-002.ttx
-        { "f1", "lu14", },
-        { "f1", "lu15", },
+        { "f1", "lu14", "arab", "*", "*",
+          new String[][][] {
+              { { "pehinitial" }, { "pehinitial", "tatweel" } },
+              { { "yehwithhamzaaboveinitial" }, { "yehwithhamzaaboveinitial", "tatweel" } },
+              { { "behinitial" }, { "behinitial", "tatweel" } },
+              { { "tehinitial" }, { "tehinitial", "tatweel" } },
+              { { "thehinitial" }, { "thehinitial", "tatweel" } },
+              { { "fehinitial" }, { "fehinitial", "tatweel" } },
+              { { "qafinitial" }, { "qafinitial", "tatweel" } },
+              { { "nooninitial" }, { "nooninitial", "tatweel" } },
+              { { "yehinitial" }, { "yehinitial", "tatweel" } },
+              { { "uni0649.init" }, { "uni0649.init", "tatweel" } },
+          }
+        },
+        { "f1", "lu15", "arab", "*", "*",
+          new String[][][] {
+              { { "pehmedial" }, { "pehmedial", "tatweel" } },
+              { { "yehwithhamzaabovemedial" }, { "yehwithhamzaabovemedial", "tatweel" } },
+              { { "behmedial" }, { "behmedial", "tatweel" } },
+              { { "tehmedial" }, { "tehmedial", "tatweel" } },
+              { { "thehmedial" }, { "thehmedial", "tatweel" } },
+              { { "noonmedial" }, { "noonmedial", "tatweel" } },
+              { { "yehmedial" }, { "yehmedial", "tatweel" } },
+              { { "uni0649.medi" }, { "uni0649.medi", "tatweel" } },
+          }
+        },
         // arab-003.ttx
-        { "f2", "lu0", },
+        { "f2", "lu0", "arab", "dflt", "ccmp",
+          new String[][][] {
+              { { "uni0622" }, { "uni0627", "uni0653" } },
+              { { "uni0623" }, { "uni0627", "uni0654" } },
+              { { "uni0625" }, { "uni0627", "uni0655" } },
+              { { "uni0626" }, { "uni064A", "uni0654" } },
+          }
+        },
         // arab-004.ttx
-        { "f3", "lu0", },
+        { "f3", "lu0", "arab", "dflt", "ccmp",
+          new String[][][] {
+              { { "uni0622" }, { "uni0627", "uni0653" } },
+              { { "uni0623" }, { "uni0627", "uni0654" } },
+              { { "uni0625" }, { "uni0627", "uni0655" } },
+          }
+        },
     };
 
     private static Object[][] ltAlternate = {
@@ -269,9 +310,54 @@ public class GSUBTestCase extends TestCase implements ScriptContextTester, Glyph
     private static Object[][] ltLigature = {
         { GlyphSubstitutionTable.GSUB_LOOKUP_TYPE_LIGATURE },
         // arab-001.ttx
-        { "f0", "lu0", },
-        { "f0", "lu7", },
-        { "f0", "lu8", },
+        { "f0", "lu0", "arab", "dflt", "ccmp",
+          new String[][][] {
+              { { "damma", "shadda" }, { "shaddawithdammalow" } },
+              { { "damma", "highhamza" }, { "dammaonhamza" } },
+              { { "dammatan", "shadda" }, { "shaddawithdammatanlow" } },
+              { { "dammatan", "highhamza" }, { "dammatanonhamza" } },
+              { { "fatha", "shadda" }, { "shaddawithfathalow" } },
+              { { "fatha", "highhamza" }, { "fathaonhamza" } },
+              { { "fathatan", "shadda" }, { "shaddawithfathatanlow" } },
+              { { "fathatan", "highhamza" }, { "fathatanonhamza" } },
+              { { "highhamza", "fatha" }, { "fathaonhamza" } },
+              { { "highhamza", "fathatan" }, { "fathatanonhamza" } },
+              { { "highhamza", "sukun" }, { "sukunonhamza" } },
+              { { "highhamza", "damma" }, { "dammaonhamza" } },
+              { { "highhamza", "dammatan" }, { "dammatanonhamza" } },
+              { { "kasra", "shadda" }, { "shaddawithkasralow" } },
+              { { "kasra", "uni0655" }, { "uni06550650" } },
+              { { "kasratan", "shadda" }, { "shaddawithkasratanlow" } },
+              { { "kasratan", "uni0655" }, { "uni0655064D" } },
+              { { "shadda", "dammatan" }, { "shaddawithdammatanlow" } },
+              { { "shadda", "fatha" }, { "shaddawithfathalow" } },
+              { { "shadda", "damma" }, { "shaddawithdammalow" } },
+              { { "shadda", "fathatan" }, { "shaddawithfathatanlow" } },
+              { { "shadda", "kasratan" }, { "shaddawithkasratanlow" } },
+              { { "shadda", "kasra" }, { "shaddawithkasralow" } },
+              { { "sukun", "highhamza" }, { "sukunonhamza" } },
+              { { "uni0655", "kasratan" }, { "uni0655064D" } },
+              { { "uni0655", "kasra" }, { "uni06550650" } },
+          }
+        },
+        { "f0", "lu7", "arab", "dflt", "rlig",
+          new String[][][] {
+              { { "lamisolated", "alefwithmaddaabovefinal" }, { "lamwithalefmaddaaboveisolatedd" } },
+              { { "lamisolated", "alefwithhamzaabovefinal" }, { "lamwithalefhamzaaboveisolatedd" } },
+              { { "lamisolated", "alefwithhamzabelowfinal" }, { "lamwithalefhamzabelowisolated" } },
+              { { "lamisolated", "aleffinal" }, { "lamwithalefisolated" } },
+              { { "lammedial", "alefwithmaddaabovefinal" }, { "lamwithalefmaddaabovefinal" } },
+              { { "lammedial", "alefwithhamzaabovefinal" }, { "lamwithalefhamzaabovefinal" } },
+              { { "lammedial", "alefwithhamzabelowfinal" }, { "lamwithalefhamzabelowfinal" } },
+              { { "lammedial", "aleffinal" }, { "lamwithaleffinal" } },
+          }
+        },
+        { "f0", "lu8", "arab", "dflt", "liga",
+          new String[][][] {
+              { { "lamisolated", "lammedial", "hehfinal" }, { "allahisolated" } },
+              { { "reh", "yehmedial", "aleffinal", "lam" }, { "rayaleflam" } },
+          }
+        },
         // arab-002.ttx
         { "f1", "lu0", },
         { "f1", "lu6", },
@@ -414,29 +500,16 @@ public class GSUBTestCase extends TestCase implements ScriptContextTester, Glyph
     }
 
     private GlyphSubstitutionSubtable[] findGSUBSubtables ( GlyphSubstitutionTable gsub, String script, String language, String feature, String lid ) {
-        Map<LookupSpec,List<LookupTable>> lookups = (Map<LookupSpec,List<LookupTable>>) gsub.matchLookups ( script, language, feature );
-        for ( List<LookupTable> ltl : lookups.values() ) {
-            for ( LookupTable lt : ltl ) {
-                if ( lt.getId().equals ( lid ) ) {
-                    return (GlyphSubstitutionSubtable[]) lt.getSubtables();
-                }
-            }
+        LookupTable lt = gsub.getLookupTable ( lid );
+        if ( lt != null ) {
+            return (GlyphSubstitutionSubtable[]) lt.getSubtables();
+        } else {
+            return null;
         }
-        return null;
     }
 
     private ScriptContextTester findScriptContextTester ( String script, String language, String feature ) {
         return this;
-    }
-
-    private GlyphSequence getInputGlyphs ( Object[] td ) {
-        // TODO - IMPLEMENT ME
-        return null;
-    }
-
-    private GlyphSequence getOutputGlyphs ( Object[] td ) {
-        // TODO - IMPLEMENT ME
-        return null;
     }
 
     @Override
