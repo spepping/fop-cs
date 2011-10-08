@@ -22,6 +22,8 @@ package org.apache.fop.complexscripts.util;
 import java.io.File;
 import java.io.IOException;
 
+import java.nio.IntBuffer;
+
 import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -53,6 +55,7 @@ import org.apache.fop.fonts.GlyphPositioningTable.Anchor;
 import org.apache.fop.fonts.GlyphPositioningTable.MarkAnchor;
 import org.apache.fop.fonts.GlyphPositioningTable.PairValues;
 import org.apache.fop.fonts.GlyphPositioningTable.Value;
+import org.apache.fop.fonts.GlyphSequence;
 import org.apache.fop.fonts.GlyphSubstitutionSubtable;
 import org.apache.fop.fonts.GlyphSubstitutionTable;
 import org.apache.fop.fonts.GlyphSubstitutionTable.Ligature;
@@ -96,6 +99,9 @@ public class TTXFile {
     private static final String DEFAULT_SCRIPT_TAG = "dflt";
     /** default language tag */
     private static final String DEFAULT_LANGUAGE_TAG = "dflt";
+
+    /** ttxfile cache */
+    private static Map<String,TTXFile> cache = new HashMap<String,TTXFile>();
 
     // transient parsing state
     private Locator locator;                                    // current document locator
@@ -240,6 +246,50 @@ public class TTXFile {
         } catch ( IOException e ) {
             throw new RuntimeException ( e.getMessage() );
         }
+    }
+    public GlyphSequence getGlyphSequence ( String[] gids ) {
+        assert gids != null;
+        int ng = gids.length;
+        IntBuffer cb = IntBuffer.allocate ( ng );
+        IntBuffer gb = IntBuffer.allocate ( ng );
+        for ( String gid : gids ) {
+            int g = mapGlyphId0 ( gid );
+            if ( g >= 0 ) {
+                int c = mapGlyphIdToChar ( gid );
+                if ( c < 0 ) {
+                    c = CharUtilities.NOT_A_CHARACTER;
+                }
+                cb.put ( c );
+                gb.put ( g );
+            } else {
+                throw new IllegalArgumentException ( "unmapped glyph id \"" + gid + "\"" );
+            }
+        }
+        cb.rewind();
+        gb.rewind();
+        return new GlyphSequence ( cb, gb, null );
+    }
+    public GlyphDefinitionTable getGDEF() {
+        return gdef;
+    }
+    public GlyphSubstitutionTable getGSUB() {
+        return gsub;
+    }
+    public GlyphPositioningTable getGPOS() {
+        return gpos;
+    }
+    public static synchronized TTXFile getFromCache ( String filename ) {
+        assert cache != null;
+        TTXFile f;
+        if ( ( f = (TTXFile) cache.get ( filename ) ) == null ) {
+            f = new TTXFile();
+            f.parse ( filename );
+            cache.put ( filename, f );
+        }
+        return f;
+    }
+    public static synchronized void clearCache() {
+        cache.clear();
     }
     private class Handler extends DefaultHandler {
         private Handler() {
@@ -3140,13 +3190,22 @@ public class TTXFile {
             addGPOSSubtable ( stType, coverage, extractSubtableEntries() );
         }
     }
-    private int mapGlyphId ( String glyph, String[] currentElement ) throws SAXException {
+    private int mapGlyphId0 ( String glyph ) {
+        assert glyphIds != null;
         Integer gid = glyphIds.get ( glyph );
         if ( gid != null ) {
             return (int) gid;
         } else {
+            return -1;
+        }
+    }
+    private int mapGlyphId ( String glyph, String[] currentElement ) throws SAXException {
+        int g = mapGlyphId0 ( glyph );
+        if ( g < 0 ) {
             unsupportedGlyph ( currentElement, glyph );
             return -1;
+        } else {
+            return g;
         }
     }
     private int[] mapGlyphIds ( String glyphs, String[] currentElement ) throws SAXException {
@@ -3157,6 +3216,19 @@ public class TTXFile {
             gids[i++] = mapGlyphId ( glyph, currentElement );
         }
         return gids;
+    }
+    private int mapGlyphIdToChar ( String glyph ) {
+        assert glyphIds != null;
+        Integer gid = glyphIds.get ( glyph );
+        if ( gid != null ) {
+            if ( gmap != null ) {
+                Integer cid = gmap.get ( gid ); 
+                if ( cid != null ) {
+                    return cid.intValue();
+                }
+            }
+        }
+        return -1;
     }
     private String formatLocator() {
         if ( locator == null ) {
