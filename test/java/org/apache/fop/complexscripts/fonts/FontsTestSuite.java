@@ -43,7 +43,7 @@ public class FontsTestSuite {
         suite.addTest(new TestSuite(TTXFileTestCase.class));
         //suite.addTest(new TestSuite(GDEFTestCase.class));
         suite.addTest(new TestSuite(GSUBTestCase.class));
-        //suite.addTest(new TestSuite(GPOSTestCase.class));
+        suite.addTest(new TestSuite(GPOSTestCase.class));
         //$JUnit-END$
         return suite;
     }

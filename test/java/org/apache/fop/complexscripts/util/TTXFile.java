@@ -269,6 +269,27 @@ public class TTXFile {
         gb.rewind();
         return new GlyphSequence ( cb, gb, null );
     }
+    public int[] getWidths ( String[] gids ) {
+        assert gids != null;
+        int ng = gids.length;
+        int[] widths = new int [ ng ];
+        int i = 0;
+        for ( String gid : gids ) {
+            int g = mapGlyphId0 ( gid );
+            int w = 0;
+            if ( g >= 0 ) {
+                if ( ( hmtxEntries != null ) && ( g < hmtxEntries.size() ) ) {
+                    int[] mtx = (int[] ) hmtxEntries.get ( g );
+                    assert mtx != null;
+                    assert mtx.length > 0;
+                    w = mtx[0];
+                }
+            }
+            widths [ i++ ] = w;
+        }
+        assert i == ng;
+        return widths;
+    }
     public GlyphDefinitionTable getGDEF() {
         return gdef;
     }
