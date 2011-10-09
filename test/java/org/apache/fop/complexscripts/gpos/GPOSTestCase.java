@@ -123,10 +123,60 @@ public class GPOSTestCase extends TestCase implements ScriptContextTester, Glyph
 
     private static Object[][] ltPair = {
         { GlyphPositioningTable.GPOS_LOOKUP_TYPE_PAIR },
+        { "f0", "lu0", "arab", "dflt", "kern",
+          new Object[][] {
+                {
+                    new String[] { "wawwithhamzaabove", "hamza" },
+                    new int[][] {
+                        { -300, 0, -300, 0 }, { 0, 0, 0, 0 }
+                    }
+                },
+                {
+                    new String[] { "reh", "alefwithmaddaabove" },
+                    new int[][] {
+                        { -500, 0, -500, 0 }, { 0, 0, 0, 0 }
+                    }
+                },
+                {
+                    new String[] { "zain", "zain" },
+                    new int[][] {
+                        { -190, 0, -190, 0 }, { 0, 0, 0, 0 }
+                    }
+                },
+                {
+                    new String[] { "waw", "uni0649.init" },
+                    new int[][] {
+                        { -145, 0, -145, 0 }, { 0, 0, 0, 0 }
+                    }
+                },
+                {
+                    new String[] { "jeh", "uni06A5.init" },
+                    new int[][] {
+                        { -345, 0, -345, 0 }, { 0, 0, 0, 0 }
+                    }
+                },
+          },
+        },
     };
 
     private static Object[][] ltCursive = {
         { GlyphPositioningTable.GPOS_LOOKUP_TYPE_CURSIVE },
+        { "f2", "lu0", "arab", "dflt", "curs",
+          new Object[][] {
+                {
+                    new String[] { "uni0644.init.preAlef", "uni0622.fina.postLamIni" },
+                    new int[][] {
+                        { 576, 0, 0, 0 }, { 0, 0, 0, 0 }
+                    }
+                },
+                {
+                    new String[] { "uni0644.medi.preAlef", "uni0622.fina.postLamMed" },
+                    new int[][] {
+                        { 550, 0, 0, 0 }, { 0, 0, 0, 0 }
+                    }
+                },
+          },
+        },
     };
 
     private static Object[][] ltMarkToBase = {
