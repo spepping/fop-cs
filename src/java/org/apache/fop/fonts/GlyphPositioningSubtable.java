@@ -112,10 +112,11 @@ public abstract class GlyphPositioningSubtable extends GlyphSubtable implements 
      * @param script tag
      * @param language tag
      * @param feature tag
+     * @param fontSize the font size
      * @param sta subtable array
-     * @param sta array of subtables to apply
-     * @param widths
-     * @param adjustments
+     * @param widths array
+     * @param adjustments array (receives output adjustments)
+     * @param sct script context tester
      * @return true if a non-zero adjustment occurred
      */
     public static final boolean position ( GlyphSequence gs, String script, String language, String feature, int fontSize, GlyphPositioningSubtable[] sta, int[] widths, int[][] adjustments, ScriptContextTester sct ) {

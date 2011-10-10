@@ -20,6 +20,7 @@
 package org.apache.fop.complexscripts.gsub;
 
 import java.io.File;
+import java.nio.IntBuffer;
 import java.util.List;
 import java.util.Map;
 
@@ -1661,10 +1662,10 @@ public class GSUBTestCase extends TestCase implements ScriptContextTester, Glyph
 
     private static Object[][] ltAlternate = {
         { GlyphSubstitutionTable.GSUB_LOOKUP_TYPE_ALTERNATE },
-        // arab-001.ttx
-        // arab-002.ttx
-        // arab-003.ttx
-        // arab-004.ttx
+        // arab-001.ttx - none used
+        // arab-002.ttx - none used
+        // arab-003.ttx - none used
+        // arab-004.ttx - add tests
         { "f3", "lu14", "arab", "dflt", "salt" },
     };
 
@@ -1945,10 +1946,10 @@ public class GSUBTestCase extends TestCase implements ScriptContextTester, Glyph
 
     private static Object[][] ltContextual = {
         { GlyphSubstitutionTable.GSUB_LOOKUP_TYPE_CONTEXTUAL },
-        // arab-001.ttx
-        // arab-002.ttx
-        // arab-003.ttx
-        // arab-004.ttx
+        // arab-001.ttx - none used
+        // arab-002.ttx - none used
+        // arab-003.ttx - none used
+        // arab-004.ttx - none used
     };
 
     private static Object[][] ltChainedContextual = {
@@ -2187,7 +2188,7 @@ public class GSUBTestCase extends TestCase implements ScriptContextTester, Glyph
                         GlyphSequence igs = tf.getGlyphSequence ( igia );
                         GlyphSequence ogs = tf.getGlyphSequence ( ogia );
                         GlyphSequence tgs = GlyphSubstitutionSubtable.substitute ( igs, script, language, feature, sta, sct );
-                        assertTrue ( ogs.compareGlyphs ( tgs.getGlyphs() ) == 0 );
+                        assertSameGlyphs ( ogs, tgs );
                     }
                 }
             }
@@ -2239,5 +2240,18 @@ public class GSUBTestCase extends TestCase implements ScriptContextTester, Glyph
     public boolean test ( String script, String language, String feature, GlyphSequence gs, int index ) {
         return true;
     }
-        
+
+    private void assertSameGlyphs ( GlyphSequence gs1, GlyphSequence gs2 ) {
+        assertNotNull ( gs1 );
+        assertNotNull ( gs2 );
+        IntBuffer gb1 = gs1.getGlyphs();
+        IntBuffer gb2 = gs2.getGlyphs();
+        assertEquals ( "unequal glyph count", gb1.limit(), gb2.limit() );
+        for ( int i = 0; i < gb1.limit(); i++ ) {
+            int g1 = gb1.get(i);
+            int g2 = gb2.get(i);
+            assertEquals ( "unequal glyph code", g1, g2 );
+        }
+    }
+
 }

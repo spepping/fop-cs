@@ -119,10 +119,14 @@ public class GPOSTestCase extends TestCase implements ScriptContextTester, Glyph
                 },
           },
         },
+        // arab-002.ttx - maybe add tests
+        // arab-003.ttx - maybe add tests
+        // arab-004.ttx - maybe add tests
     };
 
     private static Object[][] ltPair = {
         { GlyphPositioningTable.GPOS_LOOKUP_TYPE_PAIR },
+        // arab-001.ttx
         { "f0", "lu0", "arab", "dflt", "kern",
           new Object[][] {
                 {
@@ -157,10 +161,16 @@ public class GPOSTestCase extends TestCase implements ScriptContextTester, Glyph
                 },
           },
         },
+        // arab-002.ttx - maybe add tests
+        // arab-003.ttx - maybe add tests
+        // arab-004.ttx - maybe add tests
     };
 
     private static Object[][] ltCursive = {
         { GlyphPositioningTable.GPOS_LOOKUP_TYPE_CURSIVE },
+        // arab-001.ttx - none used
+        // arab-002.ttx - none used
+        // arab-003.ttx - maybe add tests
         { "f2", "lu0", "arab", "dflt", "curs",
           new Object[][] {
                 {
@@ -177,26 +187,125 @@ public class GPOSTestCase extends TestCase implements ScriptContextTester, Glyph
                 },
           },
         },
+        // arab-004.ttx - none used
     };
 
     private static Object[][] ltMarkToBase = {
         { GlyphPositioningTable.GPOS_LOOKUP_TYPE_MARK_TO_BASE },
+        // arab-001.ttx - maybe add tests
+        // arab-002.ttx
+        { "f1", "lu4", "arab", "dflt", "mark",
+          new Object[][] {
+                {
+                    new String[] { "beh", "fatha" },
+                    new int[][] {
+                        { 0, 0, 0, 0 }, { 266, -672, 0, 0 }
+                    }
+                },
+                {
+                    new String[] { "alefwithhamzabelow", "kasra" },
+                    new int[][] {
+                        { 0, 0, 0, 0 }, { -48, 344, 0, 0 }
+                    }
+                },
+          },
+        },
+        // arab-003.ttx - maybe add tests
+        // arab-004.ttx - maybe add tests
     };
 
     private static Object[][] ltMarkToLigature = {
         { GlyphPositioningTable.GPOS_LOOKUP_TYPE_MARK_TO_LIGATURE },
+        // arab-001.ttx
+        { "f0", "lu4", "arab", "dflt", "mark",
+          new Object[][] {
+                {
+                    new String[] { "rayaleflam", "fatha", "fatha", "fatha", "fatha" },
+                    new int[][] {
+                        { 0, 0, 0, 0 }, { 1260, -1150, 0, 0 }, { 910, -1020, 0, 0 }, { 590, -630, 0, 0 }, { 110, -720, 0, 0 }
+                    }
+                },
+                {
+                    new String[] { "rayaleflam", "kasra", "kasra", "kasra", "kasra" },
+                    new int[][] {
+                        { 0, 0, 0, 0 }, { 1110 , 225, 0, 0 }, { 760, 275, 0, 0 }, { 520, 475, 0, 0 }, { 110, 425, 0, 0 }
+                    }
+                },
+          },
+        },
+        // arab-002.ttx - maybe add tests
+        // arab-003.ttx - maybe add tests
+        // arab-004.ttx - maybe add tests
     };
 
     private static Object[][] ltMarkToMark = {
         { GlyphPositioningTable.GPOS_LOOKUP_TYPE_MARK_TO_MARK },
+        // arab-001.ttx - maybe add tests
+        // arab-002.ttx - maybe add tests
+        // arab-003.ttx - maybe add tests
+        // arab-004.ttx
+        { "f3", "lu3", "arab", "dflt", "mkmk",
+          new Object[][] {
+                {
+                    new String[] { "uni064F", "uni064E" },
+                    new int[][] {
+                        { 0, 0, 0, 0 }, { -15, 495, 0, 0 }
+                    }
+                },
+                {
+                    new String[] { "uni0651", "uni0670" },
+                    new int[][] {
+                        { 0, 0, 0, 0 }, { -30, 705, 0, 0 }
+                    }
+                },
+          },
+        },
     };
 
     private static Object[][] ltContextual = {
         { GlyphPositioningTable.GPOS_LOOKUP_TYPE_CONTEXTUAL },
+        // arab-001.ttx - none used
+        // arab-002.ttx - none used
+        // arab-003.ttx - none used
+        // arab-004.ttx - none used
     };
 
     private static Object[][] ltChainedContextual = {
         { GlyphPositioningTable.GPOS_LOOKUP_TYPE_CHAINED_CONTEXTUAL },
+        // arab-001.ttx
+        { "f0", "lu3", "arab", "dflt", "mark",
+          new Object[][] {
+                {
+                    new String[] { "behmedial", "fatha", "lam" },
+                    new int[][] {
+                        { 0, 0, 0, 0 }, { 50, 0, 0, 0 }, { 0, 0, 0, 0 }
+                    }
+                },
+          },
+        },
+        // arab-002.ttx
+        { "f1", "lu6", "arab", "dflt", "mark",
+          new Object[][] {
+                {
+                    new String[] { "zain", "fatha", "kafinitial" },
+                    new int[][] {
+                        { 0, 0, 0, 0 }, { 0, 250, 0, 0 }, { 0, 0, 0, 0 }
+                    }
+                },
+          },
+        },
+        // arab-003.ttx - none used
+        // arab-004.ttx
+        { "f3", "lu5", "arab", "dflt", "mark",
+          new Object[][] {
+                {
+                    new String[] { "uni064D", "uni0622.fina.postLamIni", "uni0650" },
+                    new int[][] {
+                        { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 55, 424, 0, 0 }
+                    }
+                },
+          },
+        },
     };
 
     public void testGPOSSingle() throws Exception {
@@ -272,10 +381,10 @@ public class GPOSTestCase extends TestCase implements ScriptContextTester, Glyph
                         int[][] ogpa = (int[][]) ti[1];         // output glyph positioning array
                         GlyphSequence igs = tf.getGlyphSequence ( igia );
                         int[] widths = tf.getWidths ( igia );
-                        int[][] adjustments = new int [ igia.length ] [ 4 ];
-                        boolean adjusted = GlyphPositioningSubtable.position ( igs, script, language, feature, 1000, sta, widths, adjustments, sct );
+                        int[][] tgpa = new int [ igia.length ] [ 4 ];
+                        boolean adjusted = GlyphPositioningSubtable.position ( igs, script, language, feature, 1000, sta, widths, tgpa, sct );
                         assertTrue ( adjusted );
-                        assertSamePositions ( ogpa, adjustments );
+                        assertSamePositions ( ogpa, tgpa );
                     }
                 }
             }
@@ -331,17 +440,18 @@ public class GPOSTestCase extends TestCase implements ScriptContextTester, Glyph
     private void assertSamePositions ( int[][] pa1, int[][] pa2 ) {
         assertNotNull ( pa1 );
         assertNotNull ( pa2 );
-        assertEquals ( pa1.length, pa2.length );
+        assertEquals ( "unequal adjustment count", pa1.length, pa2.length );
         for ( int i = 0; i < pa1.length; i++ ) {
             int[] a1 = pa1 [ i ];
             int[] a2 = pa2 [ i ];
             assertNotNull ( a1 );
             assertNotNull ( a2 );
-            assertEquals ( a1.length, a2.length );
+            assertEquals ( "bad adjustment array length", 4, a1.length );
+            assertEquals ( "bad adjustment array length", 4, a2.length );
             for ( int k = 0; k < a1.length; k++ ) {
                 int p1 = a1[k];
                 int p2 = a2[k];
-                assertEquals ( p1, p2 );
+                assertEquals ( "bad adjustment", p1, p2 );
             }
         }
     }

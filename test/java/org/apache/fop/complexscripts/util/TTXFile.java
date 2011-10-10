@@ -278,8 +278,8 @@ public class TTXFile {
             int g = mapGlyphId0 ( gid );
             int w = 0;
             if ( g >= 0 ) {
-                if ( ( hmtxEntries != null ) && ( g < hmtxEntries.size() ) ) {
-                    int[] mtx = (int[] ) hmtxEntries.get ( g );
+                if ( ( hmtx != null ) && ( g < hmtx.length ) ) {
+                    int[] mtx = hmtx [ g ];
                     assert mtx != null;
                     assert mtx.length > 0;
                     w = mtx[0];
