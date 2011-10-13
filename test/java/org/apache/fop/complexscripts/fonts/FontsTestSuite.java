@@ -41,7 +41,7 @@ public class FontsTestSuite {
             "Basic functionality test suite for complex scripts fonts related functionality");
         //$JUnit-BEGIN$
         suite.addTest(new TestSuite(TTXFileTestCase.class));
-        //suite.addTest(new TestSuite(GDEFTestCase.class));
+        suite.addTest(new TestSuite(GDEFTestCase.class));
         suite.addTest(new TestSuite(GSUBTestCase.class));
         suite.addTest(new TestSuite(GPOSTestCase.class));
         //$JUnit-END$

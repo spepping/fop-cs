@@ -247,6 +247,9 @@ public class TTXFile {
             throw new RuntimeException ( e.getMessage() );
         }
     }
+    public int getGlyph ( String gid ) {
+        return mapGlyphId0 ( gid );
+    }
     public GlyphSequence getGlyphSequence ( String[] gids ) {
         assert gids != null;
         int ng = gids.length;
@@ -2597,14 +2600,12 @@ public class TTXFile {
                     l = g - 1;
                     entries.add ( Integer.valueOf ( s ) );
                 }
-                if ( g == ( l + 1 ) ) {
-                    entries.add ( Integer.valueOf ( c ) );
-                } else {
-                    for ( ; l < ( g - 1 ); l++ ) {
-                        entries.add ( zero );
-                    }
+                while ( g > ( l + 1 ) ) {
+                    entries.add ( zero );
+                    l++;
                 }
                 assert l == ( g - 1 );
+                entries.add ( Integer.valueOf ( c ) );
                 l = g;
             }
             return GlyphClassTable.createClassTable ( entries );
