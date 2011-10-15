@@ -33,9 +33,14 @@ import org.apache.fop.fonts.GlyphTable.LookupSpec;
 import org.apache.fop.fonts.GlyphTable.LookupTable;
 import org.apache.fop.fonts.ScriptContextTester;
 
-import junit.framework.TestCase;
+import org.junit.Test;
 
-public class GPOSTestCase extends TestCase implements ScriptContextTester, GlyphContextTester {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+public class GPOSTestCase implements ScriptContextTester, GlyphContextTester {
 
     private static String ttxFilesRoot = "test/resources/complexscripts";
 
@@ -312,34 +317,42 @@ public class GPOSTestCase extends TestCase implements ScriptContextTester, Glyph
         },
     };
 
+    @Test
     public void testGPOSSingle() throws Exception {
         performPositioning ( ltSingle );
     }
 
+    @Test
     public void testGPOSPair() throws Exception {
         performPositioning ( ltPair );
     }
 
+    @Test
     public void testGPOSCursive() throws Exception {
         performPositioning ( ltCursive );
     }
 
+    @Test
     public void testGPOSMarkToBase() throws Exception {
         performPositioning ( ltMarkToBase );
     }
 
+    @Test
     public void testGPOSMarkToLigature() throws Exception {
         performPositioning ( ltMarkToLigature );
     }
 
+    @Test
     public void testGPOSMarkToMark() throws Exception {
         performPositioning ( ltMarkToMark );
     }
 
+    @Test
     public void testGPOSContextual() throws Exception {
         performPositioning ( ltContextual );
     }
 
+    @Test
     public void testGPOSChainedContextual() throws Exception {
         performPositioning ( ltChainedContextual );
     }

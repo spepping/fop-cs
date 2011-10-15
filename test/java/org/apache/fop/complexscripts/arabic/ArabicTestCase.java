@@ -38,13 +38,19 @@ import org.apache.fop.fonts.GlyphPositioningTable;
 import org.apache.fop.fonts.GlyphSequence;
 import org.apache.fop.fonts.GlyphSubstitutionTable;
 
-import junit.framework.TestCase;
+import org.junit.BeforeClass;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * Tests for functionality related to the arabic script.
  */
-public class ArabicTestCase extends TestCase implements ArabicTestConstants {
+public class ArabicTestCase implements ArabicTestConstants {
 
+    @Test
     public void testArabicWordForms() {
         for ( String sfn : srcFiles ) {
             try {

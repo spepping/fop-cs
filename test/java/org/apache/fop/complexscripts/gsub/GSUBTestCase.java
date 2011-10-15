@@ -34,9 +34,14 @@ import org.apache.fop.fonts.GlyphTable.LookupSpec;
 import org.apache.fop.fonts.GlyphTable.LookupTable;
 import org.apache.fop.fonts.ScriptContextTester;
 
-import junit.framework.TestCase;
+import org.junit.Test;
 
-public class GSUBTestCase extends TestCase implements ScriptContextTester, GlyphContextTester {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+public class GSUBTestCase implements ScriptContextTester, GlyphContextTester {
 
     private static String ttxFilesRoot = "test/resources/complexscripts";
 
@@ -2122,26 +2127,32 @@ public class GSUBTestCase extends TestCase implements ScriptContextTester, Glyph
         },
     };
 
+    @Test
     public void testGSUBSingle() throws Exception {
         performSubstitutions ( ltSingle );
     }
 
+    @Test
     public void testGSUBMultiple() throws Exception {
         performSubstitutions ( ltMultiple );
     }
 
+    @Test
     public void testGSUBAlternate() throws Exception {
         performSubstitutions ( ltAlternate );
     }
 
+    @Test
     public void testGSUBLigature() throws Exception {
         performSubstitutions ( ltLigature );
     }
 
+    @Test
     public void testGSUBContextual() throws Exception {
         performSubstitutions ( ltContextual );
     }
 
+    @Test
     public void testGSUBChainedContextual() throws Exception {
         performSubstitutions ( ltChainedContextual );
     }

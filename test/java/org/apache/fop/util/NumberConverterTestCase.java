@@ -22,7 +22,9 @@ package org.apache.fop.util;
 import java.util.ArrayList;
 import java.util.List;
 
-import junit.framework.TestCase;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 // CSOFF: LineLengthCheck
 
@@ -31,7 +33,7 @@ import junit.framework.TestCase;
  *
  * @author Glenn Adams
  */
-public class NumberConverterTestCase extends TestCase {
+public class NumberConverterTestCase {
 
     static private String[][] formatDecimal =
     {
@@ -1325,6 +1327,7 @@ public class NumberConverterTestCase extends TestCase {
      * Tests decimal from latin script.
      * @throws Exception if the test fails
      */
+    @Test
     public void testFormatDecimal() throws Exception {
         performConversions ( formatDecimal );
         performConversions ( formatDecimalPadded );
@@ -1336,6 +1339,7 @@ public class NumberConverterTestCase extends TestCase {
      * Tests decimal from arabic script.
      * @throws Exception if the test fails
      */
+    @Test
     public void testFormatDecimalArabic() throws Exception {
         performConversions ( formatDecimalArabic );
         performConversions ( formatDecimalArabicPadded );
@@ -1347,6 +1351,7 @@ public class NumberConverterTestCase extends TestCase {
      * Tests decimal from thai script.
      * @throws Exception if the test fails
      */
+    @Test
     public void testFormatDecimalThai() throws Exception {
         performConversions ( formatDecimalThai );
         performConversions ( formatDecimalThaiPadded );
@@ -1356,6 +1361,7 @@ public class NumberConverterTestCase extends TestCase {
      * Tests roman numbers.
      * @throws Exception if the test fails
      */
+    @Test
     public void testFormatRoman() throws Exception {
         performConversions ( formatRomanLower );
         performConversions ( formatRomanUpper );
@@ -1369,6 +1375,7 @@ public class NumberConverterTestCase extends TestCase {
      * Tests latin alphabetic sequence numerals.
      * @throws Exception if the test fails
      */
+    @Test
     public void testAlphabeticLatin() throws Exception {
         performConversions ( formatAlphabeticLatinLower );
         performConversions ( formatAlphabeticLatinUpper );
@@ -1378,6 +1385,7 @@ public class NumberConverterTestCase extends TestCase {
      * Tests arabic alphabetic sequence numerals.
      * @throws Exception if the test fails
      */
+    @Test
     public void testAlphabeticArabic() throws Exception {
         performConversions ( formatAlphabeticArabicHijai );
         performConversions ( formatAlphabeticArabicAbjadi );
@@ -1387,6 +1395,7 @@ public class NumberConverterTestCase extends TestCase {
      * Tests hebrew alphabetic sequence numerals.
      * @throws Exception if the test fails
      */
+    @Test
     public void testAlphabeticHebrew() throws Exception {
         performConversions ( formatAlphabeticHebrew );
     }
@@ -1395,6 +1404,7 @@ public class NumberConverterTestCase extends TestCase {
      * Tests latin alphabetic sequence numerals.
      * @throws Exception if the test fails
      */
+    @Test
     public void testAlphabeticThai() throws Exception {
         performConversions ( formatAlphabeticThai );
     }
@@ -1403,6 +1413,7 @@ public class NumberConverterTestCase extends TestCase {
      * Tests arabic numerals..
      * @throws Exception if the test fails
      */
+    @Test
     public void testNumeralArabic() throws Exception {
         performConversions ( formatNumeralArabicAbjadi );
     }
@@ -1411,6 +1422,7 @@ public class NumberConverterTestCase extends TestCase {
      * Tests hebrew numerals.
      * @throws Exception if the test fails
      */
+    @Test
     public void testNumeralHebrew() throws Exception {
         performConversions ( formatNumeralHebrewGematria );
     }
@@ -1419,37 +1431,34 @@ public class NumberConverterTestCase extends TestCase {
      * Tests english word numerals.
      * @throws Exception if the test fails
      */
-    /*
+    @Test
     public void testWordEnglish() throws Exception {
         performConversions ( formatWordEnglishLower );
         performConversions ( formatWordEnglishUpper );
         performConversions ( formatWordEnglishTitle );
     }
-    */
 
     /**
      * Tests spanish word numerals.
      * @throws Exception if the test fails
      */
-    /*
+    @Test
     public void testWordSpanish() throws Exception {
         performConversions ( formatWordSpanishLower );
         performConversions ( formatWordSpanishUpper );
         performConversions ( formatWordSpanishTitle );
     }
-    */
 
     /**
      * Tests french word numerals.
      * @throws Exception if the test fails
      */
-    /*
+    @Test
     public void testWordFrench() throws Exception {
         performConversions ( formatWordFrenchLower );
         performConversions ( formatWordFrenchUpper );
         performConversions ( formatWordFrenchTitle );
     }
-    */
 
     /**
      * Perform conversions according to test specification.

@@ -30,9 +30,13 @@ import org.apache.fop.fonts.GlyphDefinitionTable;
 import org.apache.fop.fonts.GlyphTable.LookupSpec;
 import org.apache.fop.fonts.GlyphTable.LookupTable;
 
-import junit.framework.TestCase;
+import org.junit.Test;
 
-public class GDEFTestCase extends TestCase {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+public class GDEFTestCase {
 
     private static String ttxFilesRoot = "test/resources/complexscripts";
 
@@ -3050,18 +3054,22 @@ public class GDEFTestCase extends TestCase {
         // arab-004.ttx - maybe add tests
     };
 
+    @Test
     public void testGDEFGlyphClass() throws Exception {
         performLookups ( ltGlyphClass );
     }
 
+    @Test
     public void testGDEFAttachmentPoint() throws Exception {
         performLookups ( ltAttachmentPoint );
     }
 
+    @Test
     public void testGDEFLigatureCaret() throws Exception {
         performLookups ( ltLigatureCaret );
     }
 
+    @Test
     public void testGDEFMarkAttachment() throws Exception {
         performLookups ( ltMarkAttachment );
     }

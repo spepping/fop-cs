@@ -839,7 +839,7 @@ list of possible build targets.
   </target>
   <target name="junit-complexscripts" depends="junit-compile" description="Runs FOP's JUnit complex scripts tests" if="junit.present">
     <echo message="Running complex scripts tests for fop.jar"/>
-    <junit dir="${basedir}" haltonfailure="${junit.haltonfailure}" fork="${junit.fork}" errorproperty="fop.junit.error" failureproperty="fop.junit.failure" printsummary="${junit.printsummary}">
+    <junit dir="${basedir}" errorproperty="fop.junit.error" failureproperty="fop.junit.failure">
       <sysproperty key="basedir" value="${basedir}"/>
       <sysproperty key="jawa.awt.headless" value="true"/>
       <formatter type="brief" usefile="false" if="junit.formatter.brief.use"/>
