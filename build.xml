@@ -1510,6 +1510,24 @@ NOTE:
       <arg line="-o ${test.dir}/java/org/apache/fop/complexscripts/bidi/BidiTestData.java"/>
     </java>
   </target>
+  <target name="resgen-complexscripts" depends="compile-java">
+    <mkdir dir="${build.dir}/test-classes"/>
+    <javac destdir="${build.dir}/test-classes" includeAntRuntime="true" memoryMaximumSize="1024m">
+      <src path="${test.dir}/java/org/apache/fop/complexscripts/"/>
+      <classpath>
+        <path refid="libs-build-classpath"/>
+        <pathelement location="${build.classes.dir}"/>
+      </classpath>
+    </javac>
+    <java classname="org.apache.fop.complexscripts.arabic.GenerateArabicTestData">
+      <classpath>
+        <path refid="libs-build-classpath"/>
+        <pathelement location="${build.classes.dir}"/>
+        <pathelement location="${build.dir}/test-classes"/>
+      </classpath>
+      <arg line="-c"/>
+    </java>
+  </target>
 <!-- =================================================================== -->
 <!-- Special target for Gump                                             -->
 <!-- =================================================================== -->

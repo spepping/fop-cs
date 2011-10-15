@@ -22,7 +22,7 @@ package org.apache.fop.complexscripts.scripts;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
-import org.apache.fop.complexscripts.arabic.ArabicScriptTestSuite;
+import org.apache.fop.complexscripts.arabic.ArabicTestCase;
 
 /**
  * Test suite for script specific functionality related to complex scripts.
@@ -37,7 +37,7 @@ public class ScriptsTestSuite {
         TestSuite suite = new TestSuite(
             "Basic functionality test suite for script specific functionality.");
         //$JUnit-BEGIN$
-        suite.addTest(ArabicScriptTestSuite.suite());
+        suite.addTest(new TestSuite(ArabicTestCase.class));
         //$JUnit-END$
         return suite;
     }

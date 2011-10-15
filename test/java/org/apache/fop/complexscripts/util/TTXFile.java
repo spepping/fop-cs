@@ -162,10 +162,11 @@ public class TTXFile {
     private Value v2;                                           // positioining value 2
 
     // resultant state
-    private int ppem;                                           // parts (units) per em
+    private int upem;                                           // units per em
     private Map<Integer,Integer> cmap;                          // constructed character map
     private Map<Integer,Integer> gmap;                          // constructed glyph map
-    private int[][] hmtx;                                       // constructed horizontal metrics - array of { width, lsb } pairs, indexed by glyph code
+    private int[][] hmtx;                                       // constructed horizontal metrics - array of design { width, lsb } pairs, indexed by glyph code
+    private int[] widths;                                       // pdf normalized widths (millipoints)
     private GlyphDefinitionTable gdef;                          // constructed glyph definition table
     private GlyphSubstitutionTable gsub;                        // constructed glyph substitution table
     private GlyphPositioningTable gpos;                         // constructed glyph positioning table
@@ -226,7 +227,7 @@ public class TTXFile {
         featureTag = null;
         v1 = null;
         v2 = null;
-        ppem = -1;
+        upem = -1;
     }
     public void parse ( String filename ) {
         parse ( new File ( filename ) );
@@ -245,6 +246,36 @@ public class TTXFile {
             throw new RuntimeException ( e.getMessage() );
         } catch ( IOException e ) {
             throw new RuntimeException ( e.getMessage() );
+        }
+    }
+    public GlyphSequence mapCharsToGlyphs ( String s ) {
+        Integer[] ca = CharUtilities.toUTF32 ( s, 0, true );
+        int ng = ca.length;
+        IntBuffer cb = IntBuffer.allocate ( ng );
+        IntBuffer gb = IntBuffer.allocate ( ng );
+        for ( Integer c : ca ) {
+            int g = mapCharToGlyph ( (int) c );
+            if ( g >= 0 ) {
+                cb.put ( c );
+                gb.put ( g );
+            } else {
+                throw new IllegalArgumentException ( "character " + CharUtilities.format ( c ) + " has no corresponding glyph" );
+            }
+        }
+        cb.rewind();
+        gb.rewind();
+        return new GlyphSequence ( cb, gb, null );
+    }
+    public int mapCharToGlyph ( int c ) {
+        if ( cmap != null ) {
+            Integer g = cmap.get ( Integer.valueOf ( c ) );
+            if ( g != null ) {
+                return (int) g;
+            } else {
+                return -1;
+            }
+        } else {
+            return -1;
         }
     }
     public int getGlyph ( String gid ) {
@@ -292,6 +323,31 @@ public class TTXFile {
         }
         assert i == ng;
         return widths;
+    }
+    public int[] getWidths() {
+        if ( this.widths == null ) {
+            if ( ( hmtx != null ) && ( upem > 0 ) ) {
+                int[] widths = new int [ hmtx.length ];
+                for ( int i = 0, n = widths.length; i < n; i++ ) {
+                    widths [ i ] = getPDFWidth ( hmtx [ i ] [ 0 ], upem );
+                }
+                this.widths = widths;
+            }
+        }
+        return this.widths;
+    }
+    public static int getPDFWidth ( int tw, int upem ) {
+        // N.B. The following is copied (with minor edits) from TTFFile to insure same results
+        int pw;
+        if ( tw < 0 ) {
+            long rest1 = tw % upem;
+            long storrest = 1000 * rest1;
+            long ledd2 = ( storrest != 0 ) ? ( rest1 / storrest ) : 0;
+            pw = - ( ( -1000 * tw ) / upem - (int) ledd2 );
+        } else {
+            pw = ( tw / upem ) * 1000 + ( ( tw % upem ) * 1000 ) / upem;
+        }
+        return pw;
     }
     public GlyphDefinitionTable getGDEF() {
         return gdef;
@@ -2101,8 +2157,8 @@ public class TTXFile {
                     } else {
                         v = Integer.parseInt ( value );
                     }
-                    assert ppem == -1;
-                    ppem = v;
+                    assert upem == -1;
+                    upem = v;
                 } else {
                     notPermittedInElementContext ( en, getParent(), pn );
                 }

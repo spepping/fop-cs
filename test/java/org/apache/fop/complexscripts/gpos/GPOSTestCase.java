@@ -176,13 +176,15 @@ public class GPOSTestCase extends TestCase implements ScriptContextTester, Glyph
                 {
                     new String[] { "uni0644.init.preAlef", "uni0622.fina.postLamIni" },
                     new int[][] {
-                        { 576, 0, 0, 0 }, { 0, 0, 0, 0 }
+                        // { 576, 0, 0, 0 }, { 0, 0, 0, 0 } - with zero widths
+                        { 295, 0, 0, 0 }, { 0, 0, 0, 0 }
                     }
                 },
                 {
                     new String[] { "uni0644.medi.preAlef", "uni0622.fina.postLamMed" },
                     new int[][] {
-                        { 550, 0, 0, 0 }, { 0, 0, 0, 0 }
+                        // { 550, 0, 0, 0 }, { 0, 0, 0, 0 } - with zero widths
+                        { 282, 0, 0, 0 }, { 0, 0, 0, 0 }
                     }
                 },
           },
@@ -199,13 +201,15 @@ public class GPOSTestCase extends TestCase implements ScriptContextTester, Glyph
                 {
                     new String[] { "beh", "fatha" },
                     new int[][] {
-                        { 0, 0, 0, 0 }, { 266, -672, 0, 0 }
+                        // { 0, 0, 0, 0 }, { 266, -672, 0, 0 } - with zero widths
+                        { 0, 0, 0, 0 }, { 266, -672, -199, 0 }
                     }
                 },
                 {
                     new String[] { "alefwithhamzabelow", "kasra" },
                     new int[][] {
-                        { 0, 0, 0, 0 }, { -48, 344, 0, 0 }
+                        // { 0, 0, 0, 0 }, { -48, 344, 0, 0 } - with zero widths
+                        { 0, 0, 0, 0 }, { -48, 344, -199, 0 }
                     }
                 },
           },
@@ -380,7 +384,7 @@ public class GPOSTestCase extends TestCase implements ScriptContextTester, Glyph
                         String[] igia = (String[]) ti[0];       // input glyph id array
                         int[][] ogpa = (int[][]) ti[1];         // output glyph positioning array
                         GlyphSequence igs = tf.getGlyphSequence ( igia );
-                        int[] widths = tf.getWidths ( igia );
+                        int[] widths = tf.getWidths();
                         int[][] tgpa = new int [ igia.length ] [ 4 ];
                         boolean adjusted = GlyphPositioningSubtable.position ( igs, script, language, feature, 1000, sta, widths, tgpa, sct );
                         assertTrue ( adjusted );
