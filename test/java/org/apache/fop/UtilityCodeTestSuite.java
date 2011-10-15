@@ -52,7 +52,7 @@ import org.apache.fop.util.XMLResourceBundleTestCase;
     FileIDGeneratorTestCase.class,
     PDFFactoryTestCase.class,
     PDFEncryptionJCETestCase.class,
-    BitmapImageUtilTestCase.class
+    BitmapImageUtilTestCase.class,
     NumberConverterTestCase.class
 })
 public class UtilityCodeTestSuite {
