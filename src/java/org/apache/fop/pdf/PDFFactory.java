@@ -27,6 +27,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.BitSet;
@@ -75,6 +76,8 @@ public class PDFFactory {
     private PDFDocument document;
 
     private Log log = LogFactory.getLog(PDFFactory.class);
+
+    private int subsetFontCounter = -1;
 
     /**
      * Creates a new PDFFactory.
@@ -1377,10 +1380,15 @@ public class PDFFactory {
         } else {
             FontType fonttype = metrics.getFontType();
 
-            PDFFontDescriptor pdfdesc = makeFontDescriptor(descriptor);
+            String fontPrefix = descriptor.isSubsetEmbedded() ? createSubsetFontPrefix() : "";
+
+            String subsetFontName = fontPrefix + basefont;
+
+            PDFFontDescriptor pdfdesc = makeFontDescriptor(descriptor, fontPrefix);
 
             PDFFont font = null;
-            font = PDFFont.createFont(fontname, fonttype, basefont, null);
+
+            font = PDFFont.createFont(fontname, fonttype, subsetFontName, null);
             getDocument().registerObject(font);
 
             if (fonttype == FontType.TYPE0) {
@@ -1395,8 +1403,7 @@ public class PDFFactory {
                     = new PDFCIDSystemInfo(cidMetrics.getRegistry(),
                                          cidMetrics.getOrdering(),
                                          cidMetrics.getSupplement());
-                PDFCIDFont cidFont
-                    = new PDFCIDFont(basefont,
+                PDFCIDFont cidFont = new PDFCIDFont(subsetFontName,
                                    cidMetrics.getCIDType(),
                                    cidMetrics.getDefaultWidth(),
                                    getSubsetWidths(cidMetrics), sysInfo,
@@ -1550,18 +1557,35 @@ public class PDFFactory {
         return warray;
     }
 
+    private String createSubsetFontPrefix() {
+        subsetFontCounter++;
+        DecimalFormat counterFormat = new DecimalFormat("00000");
+        String counterString = counterFormat.format(subsetFontCounter);
+
+        // Subset prefix as described in chapter 5.5.3 of PDF 1.4
+        StringBuffer sb = new StringBuffer("E");
+
+        for (char c : counterString.toCharArray()) {
+            // translate numbers to uppercase characters
+            sb.append((char) (c + ('A' - '0')));
+        }
+        sb.append("+");
+        return sb.toString();
+    }
+
     /**
      * make a /FontDescriptor object
      *
      * @param desc the font descriptor
+     * @param fontPrefix the String with which to prefix the font name
      * @return the new PDF font descriptor
      */
-    public PDFFontDescriptor makeFontDescriptor(FontDescriptor desc) {
+    private PDFFontDescriptor makeFontDescriptor(FontDescriptor desc, String fontPrefix) {
         PDFFontDescriptor descriptor = null;
 
         if (desc.getFontType() == FontType.TYPE0) {
             // CID Font
-            descriptor = new PDFCIDFontDescriptor(desc.getEmbedFontName(),
+            descriptor = new PDFCIDFontDescriptor(fontPrefix + desc.getEmbedFontName(),
                                             desc.getFontBBox(),
                                             desc.getCapHeight(),
                                             desc.getFlags(),

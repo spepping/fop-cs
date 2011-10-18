@@ -25,10 +25,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.io.Writer;
-import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -179,6 +176,8 @@ public class PDFDocument {
     private PDFFactory factory;
 
     private boolean encodingOnTheFly = true;
+
+    private FileIDGenerator fileIDGenerator;
 
     /**
      * Creates an empty PDF document.
@@ -524,10 +523,10 @@ public class PDFDocument {
      */
     public void setEncryption(PDFEncryptionParams params) {
         getProfile().verifyEncryptionAllowed();
-        this.encryption = PDFEncryptionManager.newInstance(++this.objectcount, params);
+        fileIDGenerator = FileIDGenerator.getRandomFileIDGenerator();
+        this.encryption = PDFEncryptionManager.newInstance(++this.objectcount, params, this);
         if (this.encryption != null) {
             PDFObject pdfObject = (PDFObject)this.encryption;
-            pdfObject.setDocument(this);
             addTrailerObject(pdfObject);
         } else {
             log.warn(
@@ -990,27 +989,6 @@ public class PDFDocument {
         this.position += bin.length;
     }
 
-    /** @return the "ID" entry for the file trailer */
-    protected String getIDEntry() {
-        try {
-            MessageDigest digest = MessageDigest.getInstance("MD5");
-            DateFormat df = new SimpleDateFormat("yyyy'-'MM'-'dd'T'HH':'mm':'ss'.'SSS");
-            digest.update(encode(df.format(new Date())));
-            //Ignoring the filename here for simplicity even though it's recommended by the PDF spec
-            digest.update(encode(String.valueOf(this.position)));
-            digest.update(getInfo().toPDF());
-            byte[] res = digest.digest();
-            String s = PDFText.toHex(res);
-            return "/ID [" + s + " " + s + "]";
-        } catch (NoSuchAlgorithmException e) {
-            if (getProfile().isIDEntryRequired()) {
-                throw new UnsupportedOperationException("MD5 not available: " + e.getMessage());
-            } else {
-                return ""; //Entry is optional if PDF/A or PDF/X are not active
-            }
-        }
-    }
-
     /**
      * Write the trailer
      *
@@ -1049,7 +1027,9 @@ public class PDFDocument {
         if (this.isEncryptionActive()) {
             pdf.append(this.encryption.getTrailerEntry());
         } else {
-            pdf.append(this.getIDEntry());
+            byte[] fileID = getFileIDGenerator().getOriginalFileID();
+            String fileIDAsString = PDFText.toHex(fileID);
+            pdf.append("/ID [" + fileIDAsString + " " + fileIDAsString + "]");
         }
 
         pdf.append("\n>>\nstartxref\n")
@@ -1100,4 +1080,18 @@ public class PDFDocument {
         return pdfBytes.length;
     }
 
+    long getCurrentFileSize() {
+        return position;
+    }
+
+    FileIDGenerator getFileIDGenerator() {
+        if (fileIDGenerator == null) {
+            try {
+                fileIDGenerator = FileIDGenerator.getDigestFileIDGenerator(this);
+            } catch (NoSuchAlgorithmException e) {
+                fileIDGenerator = FileIDGenerator.getRandomFileIDGenerator();
+            }
+        }
+        return fileIDGenerator;
+    }
 }

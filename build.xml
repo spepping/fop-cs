@@ -252,7 +252,7 @@ list of possible build targets.
     <echo message="${jce.message}"/>
     <available property="jdk14.present" classname="java.lang.CharSequence"/>
     <fail message="${Name} requires at least Java 1.4!" unless="jdk14.present"/>
-    <available property="junit.present" classname="junit.framework.TestCase" classpathref="libs-tools-build-classpath"/>
+    <available property="junit.present" classname="org.junit.Test" classpathref="libs-tools-build-classpath"/>
     <condition property="junit.message" value="JUnit Support PRESENT">
       <equals arg1="${junit.present}" arg2="true"/>
     </condition>
@@ -738,6 +738,7 @@ list of possible build targets.
         <include name="META-INF/**"/>
         <include name="**/*.xml"/>
         <include name="**/*.fo"/>
+        <include name="**/*.afp"/>
       </fileset>
       <fileset dir="${build.dir}/test-gensrc">
         <include name="**/*.xml"/>
@@ -962,7 +963,13 @@ list of possible build targets.
       <test name="org.apache.fop.text.linebreak.LineBreakStatusTest" todir="${junit.reports.dir}"/>
     </junit>
   </target>
-  <target name="junit-reduced" depends="junit-userconfig, junit-basic, junit-transcoder, junit-text-linebreak, junit-fotree"/>
+  <target name="junit-render-pdf" depends="junit-compile">
+    <echo message="Running tests for the render pdf package"/>
+    <junit-run title="render-pdf" testsuite="org.apache.fop.render.pdf.RenderPDFTestSuite" 
+      outfile="TEST-render-pdf"/>
+  </target>
+  <target name="junit-reduced" depends="junit-userconfig, junit-basic, junit-transcoder, 
+    junit-text-linebreak, junit-fotree, junit-render-pdf"/>
   <target name="junit-full" depends="junit-reduced, junit-layout, junit-area-tree-xml-format, junit-intermediate-format"/>
   <target name="junit" depends="junit-full" description="Runs all of FOP's JUnit tests" if="junit.present">
     <fail><condition><or><isset property="fop.junit.error"/><isset property="fop.junit.failure"/><not><isset property="hyphenation.present"/></not></or></condition>
