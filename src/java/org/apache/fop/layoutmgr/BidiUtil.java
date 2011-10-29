@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Stack;
 import java.util.Vector;
 
@@ -65,6 +66,7 @@ import org.apache.fop.fo.flow.PageNumber;
 import org.apache.fop.fo.flow.Wrapper;
 import org.apache.fop.fo.pagination.Flow;
 import org.apache.fop.fo.pagination.PageSequence;
+import org.apache.fop.fo.pagination.StaticContent;
 import org.apache.fop.traits.Direction;
 import org.apache.fop.traits.WritingModeTraits;
 import org.apache.fop.traits.WritingModeTraitsGetter;
@@ -202,7 +204,7 @@ public final class BidiUtil {
             ranges = collectRanges ( ( (ListItem) fn ) .getLabel(), ranges );
             ranges = collectRanges ( ( (ListItem) fn ) .getBody(), ranges );
         } else if ( fn instanceof PageSequence ) {
-            ranges = collectRanges ( ( (PageSequence) fn ) .getMainFlow(), ranges );
+            ranges = collectFlowRanges ( (PageSequence) fn, ranges );
         } else {
             for ( Iterator it = fn.getChildNodes(); ( it != null ) && it.hasNext(); ) {
                 ranges = collectRanges ( (FONode) it.next(), ranges );
@@ -236,6 +238,22 @@ public final class BidiUtil {
         if ( sfx != 0 ) {
             r.append ( sfx, bo );
         }
+        return ranges;
+    }
+
+    private static Stack collectFlowRanges ( PageSequence ps, Stack ranges ) {
+        assert ps != null;
+        // collect ranges in static content flows
+        Map<String, Flow> flows = ps.getFlowMap();
+        if ( flows != null ) {
+            for ( Flow f : flows.values() ) {
+                if ( f instanceof StaticContent ) {
+                    ranges = collectRanges ( f, ranges );
+                }
+            }
+        }
+        // collect ranges in main flow
+        ranges = collectRanges ( ps.getMainFlow(), ranges );
         return ranges;
     }
 
