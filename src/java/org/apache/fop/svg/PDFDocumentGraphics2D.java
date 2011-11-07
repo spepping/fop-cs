@@ -113,8 +113,8 @@ public class PDFDocumentGraphics2D extends PDFGraphics2D {
      * @param textAsShapes set this to true so that text will be rendered
      * using curves and not the font.
      * @param stream the stream that the final document should be written to.
-     * @param width the width of the document
-     * @param height the height of the document
+     * @param width the width of the document (in points)
+     * @param height the height of the document (in points)
      * @throws IOException an io exception if there is a problem
      *         writing to the output stream
      */
@@ -254,6 +254,19 @@ public class PDFDocumentGraphics2D extends PDFGraphics2D {
     }
 
     /**
+     * Is called to prepare the PDFDocumentGraphics2D for the next page to be painted. Basically,
+     * this closes the current page. A new page is prepared as soon as painting starts.
+     * This method allows to start the new page (and following pages) with a different page size.
+     * @param width the width of the new page (in points)
+     * @param height the height of the new page (in points)
+     */
+    public void nextPage(int width, int height) {
+        this.width = width;
+        this.height = height;
+        nextPage();
+    }
+
+    /**
      * Closes the current page and adds it to the PDF file.
      */
     protected void closePage() {
@@ -277,6 +290,7 @@ public class PDFDocumentGraphics2D extends PDFGraphics2D {
     }
 
     /** {@inheritDoc} */
+    @Override
     protected void preparePainting() {
         if (pdfContext.isPagePending()) {
             return;
@@ -392,7 +406,9 @@ public class PDFDocumentGraphics2D extends PDFGraphics2D {
      * @return     a new graphics context that is a copy of
      * this graphics context.
      */
+    @Override
     public Graphics create() {
+        preparePainting();
         return new PDFDocumentGraphics2D(this);
     }
 
@@ -404,6 +420,7 @@ public class PDFDocumentGraphics2D extends PDFGraphics2D {
      * @param x the x position
      * @param y the y position
      */
+    @Override
     public void drawString(String s, float x, float y) {
         if (super.textAsShapes) {
             Font font = super.getFont();

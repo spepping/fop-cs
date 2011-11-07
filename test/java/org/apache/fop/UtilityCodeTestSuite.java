@@ -25,6 +25,7 @@ import org.junit.runners.Suite.SuiteClasses;
 
 import org.apache.fop.events.BasicEventTestCase;
 import org.apache.fop.pdf.FileIDGeneratorTestCase;
+import org.apache.fop.pdf.PDFDocumentGraphics2DTestCase;
 import org.apache.fop.pdf.PDFEncryptionJCETestCase;
 import org.apache.fop.pdf.PDFFactoryTestCase;
 import org.apache.fop.pdf.PDFObjectTestCase;
@@ -53,6 +54,7 @@ import org.apache.fop.util.XMLResourceBundleTestCase;
     PDFFactoryTestCase.class,
     PDFEncryptionJCETestCase.class,
     BitmapImageUtilTestCase.class,
+    PDFDocumentGraphics2DTestCase.class,
     NumberConverterTestCase.class
 })
 public class UtilityCodeTestSuite {
