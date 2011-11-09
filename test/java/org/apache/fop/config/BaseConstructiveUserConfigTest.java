@@ -17,27 +17,30 @@
 
 /* $Id$ */
 
-package org.apache.fop.area;
+package org.apache.fop.config;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
-import java.awt.Rectangle;
+import org.junit.Test;
 
 /**
- * Tests implementations of the {@linkplain Viewport} interface.
+ * Super class of several user config cases.
  */
-public abstract class ViewportTestCase {
+public abstract class BaseConstructiveUserConfigTest extends BaseUserConfigTest {
 
-    protected void checkNonClip(Viewport v) throws Exception {
-        assertFalse(v.hasClip());
-        assertNull(v.getClipRectangle());
-    }
-
-    protected void checkClip(Viewport v, int expectedWidth, int expectedHeight) throws Exception {
-        assertTrue(v.hasClip());
-        assertEquals(new Rectangle(0, 0, expectedWidth, expectedHeight), v.getClipRectangle());
+    /**
+     * Test using a standard FOP font
+     * @throws Exception checkstyle wants a comment here, even a silly one
+     */
+    @Test
+    public void testUserConfig() throws Exception {
+        try {
+            initConfig();
+            convertFO();
+        } catch (Exception e) {
+            // this should *not* happen!
+            e.printStackTrace();
+            fail(e.getMessage());
+        }
     }
 }

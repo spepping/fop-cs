@@ -17,41 +17,21 @@
 
 /* $Id$ */
 
-package org.apache.fop.fonts;
-
-import static org.junit.Assert.assertEquals;
+package org.apache.fop;
 
 import java.io.File;
 
-import org.junit.Before;
-import org.junit.Test;
-
 /**
- *
+ * Abstract base test class for FOP's tests.
  */
-public class DejaVuLGCSerifTest {
-
-    private FontResolver fontResolver = FontManager.createMinimalFontResolver(false);
-    private CustomFont font;
+public abstract class AbstractFOPTest {
 
     /**
-     * sets up the testcase by loading the DejaVu Font.
-     * 
-     * @throws Exception
-     *             if the test fails.
+     * Returns the base directory to use for the tests.
+     * @return the base directory
      */
-    @Before
-    public void setUp() throws Exception {
-        File file = new File("test/resources/fonts/DejaVuLGCSerif.ttf");
-        font = FontLoader.loadFont(file, "", true, EncodingMode.AUTO,
-                fontResolver);
+    protected static File getBaseDir() {
+        return new File(".");
     }
 
-    /**
-     * Simple test to see if font name was detected correctly.
-     */
-    @Test
-    public void testFontName() {
-        assertEquals("DejaVuLGCSerif", font.getFontName());
-    }
 }

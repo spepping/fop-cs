@@ -17,31 +17,27 @@
 
 /* $Id$ */
 
-package org.apache.fop.render.afp;
+package org.apache.fop.area;
 
-import java.io.File;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
-import org.apache.fop.apps.FOUserAgent;
-import org.apache.fop.apps.MimeConstants;
-import org.apache.fop.render.AbstractRenderingTestCase;
+import java.awt.Rectangle;
 
 /**
- * Abstract base class for AFP verification tests.
+ * Tests implementations of the {@linkplain Viewport} interface.
  */
-abstract class AbstractAFPTestCase extends AbstractRenderingTestCase {
+public abstract class ViewportTest {
 
-    /**
-     * Renders a test file.
-     * @param ua the user agent (with override set!)
-     * @param resourceName the resource name for the FO file
-     * @param suffix a suffix for the output filename
-     * @return the output file
-     * @throws Exception if an error occurs
-     */
-    protected File renderFile(FOUserAgent ua, String resourceName, String suffix)
-                throws Exception {
-        return renderFile(ua, resourceName, suffix, MimeConstants.MIME_AFP);
+    protected void checkNonClip(Viewport v) throws Exception {
+        assertFalse(v.hasClip());
+        assertNull(v.getClipRectangle());
     }
 
-
+    protected void checkClip(Viewport v, int expectedWidth, int expectedHeight) throws Exception {
+        assertTrue(v.hasClip());
+        assertEquals(new Rectangle(0, 0, expectedWidth, expectedHeight), v.getClipRectangle());
+    }
 }

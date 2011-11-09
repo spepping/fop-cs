@@ -17,32 +17,41 @@
 
 /* $Id$ */
 
-package org.apache.fop.config;
+package org.apache.fop.fonts;
 
-import static org.junit.Assert.fail;
+import static org.junit.Assert.assertEquals;
 
-import org.apache.fop.apps.FOPException;
+import java.io.File;
+
+import org.junit.Before;
 import org.junit.Test;
 
 /**
- * Super class for several user configuration failure cases.
+ *
  */
-public abstract class BaseDestructiveUserConfigTestCase extends BaseUserConfigTestCase {
+public class DejaVuLGCSerifTestCase {
+
+    private FontResolver fontResolver = FontManager.createMinimalFontResolver(false);
+    private CustomFont font;
 
     /**
-     * Test the user configuration failure.
+     * sets up the testcase by loading the DejaVu Font.
+     *
+     * @throws Exception
+     *             if the test fails.
+     */
+    @Before
+    public void setUp() throws Exception {
+        File file = new File("test/resources/fonts/DejaVuLGCSerif.ttf");
+        font = FontLoader.loadFont(file, "", true, EncodingMode.AUTO,
+                fontResolver);
+    }
+
+    /**
+     * Simple test to see if font name was detected correctly.
      */
     @Test
-    public void testUserConfig() {
-        try {
-            initConfig();
-            convertFO();
-            fail( getName() + ": Expected Configuration Exception" );
-        } catch (FOPException e) {
-            // this *should* happen!
-        } catch (Exception e) {
-            e.printStackTrace();
-            fail( getName() + ": Expected FOPException but got: " + e.getMessage() );
-        }
+    public void testFontName() {
+        assertEquals("DejaVuLGCSerif", font.getFontName());
     }
 }

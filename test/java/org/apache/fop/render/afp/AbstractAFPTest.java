@@ -17,26 +17,31 @@
 
 /* $Id$ */
 
-package org.apache.fop;
+package org.apache.fop.render.afp;
 
 import java.io.File;
 
+import org.apache.fop.apps.FOUserAgent;
+import org.apache.fop.apps.MimeConstants;
+import org.apache.fop.render.AbstractRenderingTest;
+
 /**
- * Abstract base test class for FOP's tests.
+ * Abstract base class for AFP verification tests.
  */
-public abstract class AbstractFOPTestCase {
+abstract class AbstractAFPTest extends AbstractRenderingTest {
 
     /**
-     * Returns the base directory to use for the tests.
-     * @return the base directory
+     * Renders a test file.
+     * @param ua the user agent (with override set!)
+     * @param resourceName the resource name for the FO file
+     * @param suffix a suffix for the output filename
+     * @return the output file
+     * @throws Exception if an error occurs
      */
-    protected static File getBaseDir() {
-        String basedir = System.getProperty("basedir");
-        if (basedir != null) {
-            return new File(basedir);
-        } else {
-            return new File(".");
-        }
+    protected File renderFile(FOUserAgent ua, String resourceName, String suffix)
+                throws Exception {
+        return renderFile(ua, resourceName, suffix, MimeConstants.MIME_AFP);
     }
+
 
 }

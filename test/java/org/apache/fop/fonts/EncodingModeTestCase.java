@@ -23,7 +23,7 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
-public class EncodingModeTest {
+public class EncodingModeTestCase {
 
     @Test
     public void testGetName() {

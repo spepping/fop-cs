@@ -17,28 +17,32 @@
 
 /* $Id$ */
 
-package org.apache.fop.fo.flow.table;
+package org.apache.fop.config;
 
 import static org.junit.Assert.fail;
 
-import org.apache.fop.fo.ValidationException;
+import org.apache.fop.apps.FOPException;
+import org.junit.Test;
 
 /**
- * Abstract class for testing erroneous files, checking that a ValidationException is thrown.
+ * Super class for several user configuration failure cases.
  */
-abstract class ErrorCheckTestCase extends AbstractTableTestCase {
+public abstract class BaseDestructiveUserConfigTest extends BaseUserConfigTest {
 
-    public ErrorCheckTestCase() throws Exception {
-        super();
-    }
-
-    protected void launchTest(String filename) throws Exception {
+    /**
+     * Test the user configuration failure.
+     */
+    @Test
+    public void testUserConfig() {
         try {
-            setUp(filename);
-            fail();
-        } catch (ValidationException e) {
-            // TODO check location
+            initConfig();
+            convertFO();
+            fail( getName() + ": Expected Configuration Exception" );
+        } catch (FOPException e) {
+            // this *should* happen!
+        } catch (Exception e) {
+            e.printStackTrace();
+            fail( getName() + ": Expected FOPException but got: " + e.getMessage() );
         }
     }
-
 }
