@@ -25,11 +25,13 @@ import java.util.Map;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+// CSOFF: LineLengthCheck
+
 /**
  * This class holds font state information and provides access to the font
  * metrics.
  */
-public class Font {
+public class Font implements Substitutable, Positionable {
 
     /** Extra Bold font weight */
     public static final int WEIGHT_EXTRA_BOLD = 800;
@@ -241,8 +243,8 @@ public class Font {
      */
     @Override
     public String toString() {
-        StringBuffer sbuf = new StringBuffer();
-        sbuf.append('(');
+        StringBuffer sbuf = new StringBuffer(super.toString());
+        sbuf.append('{');
         /*
         sbuf.append(fontFamily);
         sbuf.append(',');*/
@@ -254,7 +256,7 @@ public class Font {
         sbuf.append(fontStyle);
         sbuf.append(',');
         sbuf.append(fontWeight);*/
-        sbuf.append(')');
+        sbuf.append('}');
         return sbuf.toString();
     }
 
@@ -347,6 +349,59 @@ public class Font {
         return width;
     }
 
+    /** {@inheritDoc} */
+    public boolean performsSubstitution() {
+        if ( metric instanceof Substitutable ) {
+            Substitutable s = (Substitutable) metric;
+            return s.performsSubstitution();
+        } else {
+            return false;
+        }
+    }
+
+    /** {@inheritDoc} */
+    public CharSequence performSubstitution ( CharSequence cs, String script, String language ) {
+        if ( metric instanceof Substitutable ) {
+            Substitutable s = (Substitutable) metric;
+            return s.performSubstitution ( cs, script, language );
+        } else {
+            throw new UnsupportedOperationException();
+        }
+    }
+
+    /** {@inheritDoc} */
+    public CharSequence reorderCombiningMarks ( CharSequence cs, int[][] gpa, String script, String language ) {
+        if ( metric instanceof Substitutable ) {
+            Substitutable s = (Substitutable) metric;
+            return s.reorderCombiningMarks ( cs, gpa, script, language );
+        } else {
+            throw new UnsupportedOperationException();
+        }
+    }
+
+    /** {@inheritDoc} */
+    public boolean performsPositioning() {
+        if ( metric instanceof Positionable ) {
+            Positionable p = (Positionable) metric;
+            return p.performsPositioning();
+        } else {
+            return false;
+        }
+    }
+
+    /** {@inheritDoc} */
+    public int[][] performPositioning ( CharSequence cs, String script, String language, int fontSize ) {
+        if ( metric instanceof Positionable ) {
+            Positionable p = (Positionable) metric;
+            return p.performPositioning ( cs, script, language, fontSize );
+        } else {
+            throw new UnsupportedOperationException();
+        }
+    }
+
+    /** {@inheritDoc} */
+    public int[][] performPositioning ( CharSequence cs, String script, String language ) {
+        return performPositioning ( cs, script, language, fontSize );
+    }
+
 }
-
-

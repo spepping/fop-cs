@@ -50,7 +50,7 @@ public class FilledArea extends InlineParent {
      * @param v the offset
      */
     /*
-    public void setOffset(int v) {
+    public void setBlockProgressionOffset(int v) {
         setChildOffset(inlines.listIterator(), v);
     }
     */
@@ -63,7 +63,7 @@ public class FilledArea extends InlineParent {
             } else if (child instanceof InlineViewport) {
                 // nothing
             } else {
-                child.setOffset(v);
+                child.setBlockProgressionOffset(v);
             }
         }
     }

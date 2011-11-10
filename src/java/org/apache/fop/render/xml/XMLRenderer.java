@@ -92,6 +92,7 @@ import org.apache.fop.render.RendererContext;
 import org.apache.fop.render.XMLHandler;
 import org.apache.fop.util.ColorUtil;
 import org.apache.fop.util.DOM2SAX;
+import org.apache.fop.util.XMLUtil;
 
 /**
  * Renderer that renders areas to XML for debugging purposes.
@@ -624,6 +625,7 @@ public class XMLRenderer extends AbstractXMLRenderer {
             }
             addAreaAttributes(span);
             addTraitAttributes(span);
+            maybeAddLevelAttribute(span);
             startElement("span", atts);
             for (int c = 0; c < span.getColumnCount(); c++) {
                 NormalFlow flow = span.getNormalFlow(c);
@@ -702,6 +704,7 @@ public class XMLRenderer extends AbstractXMLRenderer {
             break;
         default: //nop
         }
+        maybeAddLevelAttribute(block);
         startElement("block", atts);
         super.renderBlock(block);
         endElement("block");
@@ -715,6 +718,7 @@ public class XMLRenderer extends AbstractXMLRenderer {
         atts.clear();
         addAreaAttributes(line);
         addTraitAttributes(line);
+        maybeAddLevelAttribute(line);
         startElement("lineArea", atts);
         super.renderLineArea(line);
         endElement("lineArea");
@@ -747,7 +751,7 @@ public class XMLRenderer extends AbstractXMLRenderer {
         atts.clear();
         addAreaAttributes(viewport);
         addTraitAttributes(viewport);
-        addAttribute("offset", viewport.getOffset());
+        addAttribute("offset", viewport.getBlockProgressionOffset());
         addAttribute("pos", viewport.getContentPosition());
         if (viewport.hasClip()) {
             addAttribute("clip", "true");
@@ -809,7 +813,7 @@ public class XMLRenderer extends AbstractXMLRenderer {
         atts.clear();
         addAreaAttributes(space);
         addTraitAttributes(space);
-        addAttribute("offset", space.getOffset());
+        addAttribute("offset", space.getBlockProgressionOffset());
         startElement("space", atts);
         endElement("space");
     }
@@ -826,10 +830,11 @@ public class XMLRenderer extends AbstractXMLRenderer {
         if (text.getTextLetterSpaceAdjust() != 0) {
             addAttribute("tlsadjust", text.getTextLetterSpaceAdjust());
         }
-        addAttribute("offset", text.getOffset());
+        addAttribute("offset", text.getBlockProgressionOffset());
         addAttribute("baseline", text.getBaselineOffset());
         addAreaAttributes(text);
         addTraitAttributes(text);
+        maybeAddLevelAttribute(text);
         startElement("text", atts);
         super.renderText(text);
         endElement("text");
@@ -841,7 +846,10 @@ public class XMLRenderer extends AbstractXMLRenderer {
     @Override
     protected void renderWord(WordArea word) {
         atts.clear();
-        addAttribute("offset", word.getOffset());
+        int offset = word.getBlockProgressionOffset();
+        if ( offset != 0 ) {
+            addAttribute("offset", offset);
+        }
         int[] letterAdjust = word.getLetterAdjustArray();
         if (letterAdjust != null) {
             StringBuffer sb = new StringBuffer(64);
@@ -857,6 +865,11 @@ public class XMLRenderer extends AbstractXMLRenderer {
                 addAttribute("letter-adjust", sb.toString());
             }
         }
+        maybeAddLevelAttribute(word);
+        maybeAddPositionAdjustAttribute(word);
+        if ( word.isReversed() ) {
+            addAttribute("reversed", "true");
+        }
         startElement("word", atts);
         characters(word.getWord());
         endElement("word");
@@ -869,7 +882,11 @@ public class XMLRenderer extends AbstractXMLRenderer {
     @Override
     protected void renderSpace(SpaceArea space) {
         atts.clear();
-        addAttribute("offset", space.getOffset());
+        int offset = space.getBlockProgressionOffset();
+        if ( offset != 0 ) {
+            addAttribute("offset", offset);
+        }
+        maybeAddLevelAttribute(space);
         if (!space.isAdjustable()) {
             addAttribute("adj", "false"); //default is true
         }
@@ -887,7 +904,8 @@ public class XMLRenderer extends AbstractXMLRenderer {
         atts.clear();
         addAreaAttributes(ip);
         addTraitAttributes(ip);
-        addAttribute("offset", ip.getOffset());
+        addAttribute("offset", ip.getBlockProgressionOffset());
+        maybeAddLevelAttribute(ip);
         startElement("inlineparent", atts);
         super.renderInlineParent(ip);
         endElement("inlineparent");
@@ -901,7 +919,8 @@ public class XMLRenderer extends AbstractXMLRenderer {
         atts.clear();
         addAreaAttributes(ibp);
         addTraitAttributes(ibp);
-        addAttribute("offset", ibp.getOffset());
+        addAttribute("offset", ibp.getBlockProgressionOffset());
+        maybeAddLevelAttribute(ibp);
         startElement("inlineblockparent", atts);
         super.renderInlineBlockParent(ibp);
         endElement("inlineblockparent");
@@ -915,7 +934,7 @@ public class XMLRenderer extends AbstractXMLRenderer {
         atts.clear();
         addAreaAttributes(area);
         addTraitAttributes(area);
-        addAttribute("offset", area.getOffset());
+        addAttribute("offset", area.getBlockProgressionOffset());
         addAttribute("ruleStyle", area.getRuleStyleAsString());
         addAttribute("ruleThickness", area.getRuleThickness());
         startElement("leader", atts);
@@ -928,5 +947,19 @@ public class XMLRenderer extends AbstractXMLRenderer {
         return XML_MIME_TYPE;
     }
 
-}
+    private void maybeAddLevelAttribute ( Area a ) {
+        int level = a.getBidiLevel();
+        if ( level >= 0 ) {
+            addAttribute ( "level", level );
+        }
+    }
 
+    private void maybeAddPositionAdjustAttribute ( WordArea w ) {
+        int[][] adjustments = w.getGlyphPositionAdjustments();
+        if ( adjustments != null ) {
+            addAttribute ( "position-adjust", XMLUtil.encodePositionAdjustments ( adjustments ) );
+        }
+    }
+
+
+}
