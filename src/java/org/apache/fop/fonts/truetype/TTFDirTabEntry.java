@@ -26,7 +26,7 @@ import java.io.UnsupportedEncodingException;
 /**
  * This class represents an entry to a TrueType font's Dir Tab.
  */
-class TTFDirTabEntry {
+public class TTFDirTabEntry {
 
     private byte[] tag = new byte[4];
     private int checksum;
