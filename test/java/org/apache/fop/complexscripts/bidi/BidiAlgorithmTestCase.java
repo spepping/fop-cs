@@ -22,9 +22,7 @@ package org.apache.fop.complexscripts.bidi;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import org.apache.fop.layoutmgr.BidiUtil;
-import org.apache.fop.text.bidi.BidiClassUtils;
-import org.apache.fop.util.BidiConstants;
+import org.apache.fop.complexscripts.bidi.UnicodeBidiAlgorithm;
 
 import org.junit.Test;
 
@@ -212,14 +210,14 @@ public class BidiAlgorithmTestCase {
             }
             // LTR
             if ( ( bs & 2 ) != 0 ) {
-                int[] levels = BidiUtil.UnicodeBidiAlgorithm.resolveLevels ( null, ta, 0, new int [ n ], true );
+                int[] levels = UnicodeBidiAlgorithm.resolveLevels ( null, ta, 0, new int [ n ], true );
                 if ( ! verifyResults ( la, levels, ta, 0, testSet, testSequence ) ) {
                     passed = false;
                 }
             }
             // RTL
             if ( ( bs & 4 ) != 0 ) {
-                int[] levels = BidiUtil.UnicodeBidiAlgorithm.resolveLevels ( null, ta, 1, new int [ n ], true );
+                int[] levels = UnicodeBidiAlgorithm.resolveLevels ( null, ta, 1, new int [ n ], true );
                 if ( ! verifyResults ( la, levels, ta, 1, testSet, testSequence ) ) {
                     passed = false;
                 }

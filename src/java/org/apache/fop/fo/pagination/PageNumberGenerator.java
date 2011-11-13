@@ -19,7 +19,7 @@
 
 package org.apache.fop.fo.pagination;
 
-import org.apache.fop.util.NumberConverter;
+import org.apache.fop.complexscripts.util.NumberConverter;
 
 // CSOFF: LineLengthCheck
 

@@ -26,6 +26,12 @@ import java.util.Map;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import org.apache.fop.complexscripts.fonts.GlyphDefinitionTable;
+import org.apache.fop.complexscripts.fonts.GlyphPositioningTable;
+import org.apache.fop.complexscripts.fonts.GlyphSubstitutionTable;
+import org.apache.fop.complexscripts.fonts.Positionable;
+import org.apache.fop.complexscripts.fonts.Substitutable;
+import org.apache.fop.complexscripts.util.GlyphSequence;
 import org.apache.fop.util.CharUtilities;
 
 /**

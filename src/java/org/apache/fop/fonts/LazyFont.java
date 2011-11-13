@@ -18,6 +18,7 @@
 /* $Id$ */
 
 package org.apache.fop.fonts;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -29,7 +30,12 @@ import javax.xml.transform.stream.StreamSource;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
 import org.apache.fop.apps.FOPException;
+import org.apache.fop.complexscripts.fonts.Positionable;
+import org.apache.fop.complexscripts.fonts.Substitutable;
+
+
 import org.xml.sax.InputSource;
 
 /**

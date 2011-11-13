@@ -26,6 +26,7 @@ import org.junit.runners.Suite.SuiteClasses;
 import org.apache.fop.complexscripts.bidi.BidiTestSuite;
 import org.apache.fop.complexscripts.fonts.FontsTestSuite;
 import org.apache.fop.complexscripts.scripts.ScriptsTestSuite;
+import org.apache.fop.complexscripts.util.UtilTestSuite;
 
 /**
  * Test suite for complex scripts functionality.
@@ -34,7 +35,8 @@ import org.apache.fop.complexscripts.scripts.ScriptsTestSuite;
 @SuiteClasses({
     BidiTestSuite.class,
     FontsTestSuite.class,
-    ScriptsTestSuite.class
+    ScriptsTestSuite.class,
+    UtilTestSuite.class
 })
 public class ComplexScriptsTestSuite {
 }

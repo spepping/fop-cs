@@ -31,19 +31,19 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.xmlgraphics.fonts.Glyphs;
 
-import org.apache.fop.fonts.AdvancedTypographicTableFormatException;
+import org.apache.fop.complexscripts.fonts.AdvancedTypographicTableFormatException;
+import org.apache.fop.complexscripts.fonts.GlyphClassTable;
+import org.apache.fop.complexscripts.fonts.GlyphCoverageTable;
+import org.apache.fop.complexscripts.fonts.GlyphDefinitionSubtable;
+import org.apache.fop.complexscripts.fonts.GlyphDefinitionTable;
+import org.apache.fop.complexscripts.fonts.GlyphMappingTable;
+import org.apache.fop.complexscripts.fonts.GlyphPositioningSubtable;
+import org.apache.fop.complexscripts.fonts.GlyphPositioningTable;
+import org.apache.fop.complexscripts.fonts.GlyphSubstitutionSubtable;
+import org.apache.fop.complexscripts.fonts.GlyphSubstitutionTable;
+import org.apache.fop.complexscripts.fonts.GlyphSubtable;
+import org.apache.fop.complexscripts.fonts.GlyphTable;
 import org.apache.fop.fonts.FontUtil;
-import org.apache.fop.fonts.GlyphClassTable;
-import org.apache.fop.fonts.GlyphCoverageTable;
-import org.apache.fop.fonts.GlyphDefinitionSubtable;
-import org.apache.fop.fonts.GlyphDefinitionTable;
-import org.apache.fop.fonts.GlyphMappingTable;
-import org.apache.fop.fonts.GlyphPositioningSubtable;
-import org.apache.fop.fonts.GlyphPositioningTable;
-import org.apache.fop.fonts.GlyphSubstitutionSubtable;
-import org.apache.fop.fonts.GlyphSubstitutionTable;
-import org.apache.fop.fonts.GlyphSubtable;
-import org.apache.fop.fonts.GlyphTable;
 
 // CSOFF: AvoidNestedBlocksCheck
 // CSOFF: NoWhitespaceAfterCheck

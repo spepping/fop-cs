@@ -555,6 +555,7 @@ list of possible build targets.
       <include name="org/apache/fop/Version.class"/>
       <include name="org/apache/fop/apps/Fop.class"/>
       <include name="org/apache/fop/apps/FOPException.class"/>
+      <include name="org/apache/fop/complexscripts/fonts/*.class"/>
       <include name="org/apache/fop/fo/Constants.class"/>
       <include name="org/apache/fop/fo/FOTreeBuilder.class"/>
       <include name="org/apache/fop/area/AreaTreeControl*"/>
@@ -1358,9 +1359,9 @@ NOTE:
         <pathelement location="${build.codegen-classes.dir}"/>
       </classpath>
     </javac>
-    <java classname="org.apache.fop.text.bidi.GenerateBidiClassUtils" classpath="${build.codegen-classes.dir}">
+    <java classname="org.apache.fop.complexscripts.bidi.GenerateBidiClass" classpath="${build.codegen-classes.dir}">
       <arg line="-b http://www.unicode.org/Public/6.0.0/ucd/extracted/DerivedBidiClass.txt"/>
-      <arg line="-o ${src.dir}/java/org/apache/fop/text/bidi/BidiClassUtils.java"/>
+      <arg line="-o ${src.dir}/java/org/apache/fop/complexscripts/bidi/BidiClass.java"/>
     </java>
     <delete>
       <fileset dir="${test.dir}/java/org/apache/fop/complexscripts/bidi">
@@ -1384,7 +1385,7 @@ NOTE:
         <pathelement location="${build.classes.dir}"/>
       </classpath>
     </javac>
-    <java classname="org.apache.fop.complexscripts.arabic.GenerateArabicTestData">
+    <java classname="org.apache.fop.complexscripts.scripts.arabic.GenerateArabicTestData">
       <classpath>
         <path refid="libs-build-classpath"/>
         <pathelement location="${build.classes.dir}"/>

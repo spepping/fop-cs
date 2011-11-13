@@ -30,6 +30,7 @@ import org.apache.commons.logging.LogFactory;
 
 import org.apache.fop.area.Trait;
 import org.apache.fop.area.inline.TextArea;
+import org.apache.fop.complexscripts.fonts.GlyphPositioningTable;
 import org.apache.fop.fo.Constants;
 import org.apache.fop.fo.FOText;
 import org.apache.fop.fo.FObj;
@@ -37,7 +38,6 @@ import org.apache.fop.fo.flow.Character;
 import org.apache.fop.fo.properties.StructurePointerPropertySet;
 import org.apache.fop.fonts.Font;
 import org.apache.fop.fonts.FontSelector;
-import org.apache.fop.fonts.GlyphPositioningTable;
 import org.apache.fop.layoutmgr.InlineKnuthSequence;
 import org.apache.fop.layoutmgr.KnuthBox;
 import org.apache.fop.layoutmgr.KnuthElement;

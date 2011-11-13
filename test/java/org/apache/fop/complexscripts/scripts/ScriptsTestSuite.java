@@ -23,7 +23,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
-import org.apache.fop.complexscripts.arabic.ArabicTestCase;
+import org.apache.fop.complexscripts.scripts.arabic.ArabicTestCase;
 
 /**
  * Test suite for script specific functionality related to complex scripts.

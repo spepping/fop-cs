@@ -19,7 +19,7 @@
 
 package org.apache.fop.complexscripts.bidi;
 
-import org.apache.fop.text.bidi.BidiClassUtils;
+import org.apache.fop.complexscripts.bidi.BidiClass;
 import org.apache.fop.util.CharUtilities;
 
 import org.junit.Test;
@@ -49,7 +49,7 @@ public class BidiClassTestCase {
             int s = da[i+0];
             int e = da[i+1];
             for ( int c = s; c < e; c++ ) {
-                int cbc = BidiClassUtils.getBidiClass ( c );
+                int cbc = BidiClass.getBidiClass ( c );
                 assertEquals ( "bad bidi class for CH(" + CharUtilities.format ( c ) + ")", bc, cbc );
             }
         }

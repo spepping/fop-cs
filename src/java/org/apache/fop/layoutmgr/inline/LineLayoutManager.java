@@ -32,6 +32,7 @@ import org.apache.fop.area.Area;
 import org.apache.fop.area.LineArea;
 import org.apache.fop.area.Trait;
 import org.apache.fop.area.inline.InlineArea;
+import org.apache.fop.complexscripts.bidi.BidiResolver;
 import org.apache.fop.datatypes.Length;
 import org.apache.fop.datatypes.Numeric;
 import org.apache.fop.fo.Constants;
@@ -44,7 +45,6 @@ import org.apache.fop.fonts.FontTriplet;
 import org.apache.fop.hyphenation.Hyphenation;
 import org.apache.fop.hyphenation.Hyphenator;
 import org.apache.fop.layoutmgr.Adjustment;
-import org.apache.fop.layoutmgr.BidiUtil;
 import org.apache.fop.layoutmgr.BlockLevelLayoutManager;
 import org.apache.fop.layoutmgr.BreakElement;
 import org.apache.fop.layoutmgr.BreakingAlgorithm;
@@ -1543,7 +1543,7 @@ public class LineLayoutManager extends InlineStackingLayoutManager
         }
         lineArea.finish();
         if ( lineArea.getBidiLevel() >= 0 ) {
-            BidiUtil.reorder ( lineArea );
+            BidiResolver.reorder ( lineArea );
         }
         parentLayoutManager.addChildArea(lineArea);
     }
@@ -1595,7 +1595,7 @@ public class LineLayoutManager extends InlineStackingLayoutManager
         }
         lineArea.updateExtentsFromChildren();
         if ( lineArea.getBidiLevel() >= 0 ) {
-            BidiUtil.reorder ( lineArea );
+            BidiResolver.reorder ( lineArea );
         }
         parentLayoutManager.addChildArea(lineArea);
     }
