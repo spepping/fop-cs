@@ -61,13 +61,11 @@ import org.apache.fop.fo.pagination.StaticContent;
 import org.apache.fop.traits.Direction;
 import org.apache.fop.util.CharUtilities;
 
-// CSOFF: AvoidNestedBlocksCheck
 // CSOFF: EmptyForIteratorPadCheck
-// CSOFF: NoWhitespaceAfterCheck
 // CSOFF: InnerAssignmentCheck
-// CSOFF: SimplifyBooleanReturnCheck
 // CSOFF: LineLengthCheck
-// CSOFF: ParameterNumberCheck
+// CSOFF: NoWhitespaceAfterCheck
+// CSOFF: SimplifyBooleanReturnCheck
 
 /**
  * <p>A utility class for performing bidirectional resolution processing.</p>

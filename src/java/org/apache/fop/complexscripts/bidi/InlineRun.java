@@ -40,6 +40,10 @@ import org.apache.fop.area.inline.WordArea;
 import org.apache.fop.traits.Direction;
 import org.apache.fop.util.CharUtilities;
 
+// CSOFF: EmptyForIteratorPadCheck
+// CSOFF: InnerAssignmentCheck
+// CSOFF: SimplifyBooleanReturnCheck
+
 /**
  * The <code>InlineRun</code> class is a utility class, the instances of which are used
  * to capture a sequence of reordering levels associated with an inline area.

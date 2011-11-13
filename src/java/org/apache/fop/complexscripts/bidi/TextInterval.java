@@ -26,6 +26,9 @@ import org.apache.fop.fo.flow.AbstractGraphics;
 import org.apache.fop.fo.flow.BidiOverride;
 import org.apache.fop.fo.flow.Character;
 
+// CSOFF: LineLengthCheck
+// CSOFF: SimplifyBooleanReturnCheck
+
 /**
  * The <code>TextInterval</code> class is a utility class, the instances of which are used
  * to record backpointers to associated nodes over sub-intervals of a delimited text range.

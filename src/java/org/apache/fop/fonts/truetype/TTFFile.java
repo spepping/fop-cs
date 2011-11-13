@@ -190,10 +190,8 @@ public class TTFFile {
                 UnicodeMapping m = (UnicodeMapping) o;
                 if ( unicodeIndex != m.unicodeIndex ) {
                     return false;
-                } else if ( glyphIndex != m.glyphIndex ) {
-                    return false;
                 } else {
-                    return true;
+                    return ( glyphIndex == m.glyphIndex );
                 }
             } else {
                 return false;
@@ -229,6 +227,11 @@ public class TTFFile {
     /**
      * Position inputstream to position indicated
      * in the dirtab offset + offset
+     * @param in font file reader
+     * @param name (tag) of table
+     * @param offset from start of table
+     * @return true if seek succeeded
+     * @throws IOException if I/O exception occurs during seek
      */
     public boolean seekTab(FontFileReader in, String name,
                   long offset) throws IOException {
@@ -631,8 +634,8 @@ public class TTFFile {
         // Read advanced typographic tables.
         if ( useAdvanced ) {
             try {
-                OTFAdvancedTypographicTableReader atr =
-                    new OTFAdvancedTypographicTableReader ( this, in );
+                OTFAdvancedTypographicTableReader atr
+                    = new OTFAdvancedTypographicTableReader ( this, in );
                 atr.readAll();
                 this.advancedTableReader = atr;
             } catch ( AdvancedTypographicTableFormatException e ) {

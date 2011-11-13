@@ -34,6 +34,11 @@ import org.apache.fop.traits.WritingModeTraits;
 import org.apache.fop.traits.WritingModeTraitsGetter;
 import org.apache.fop.util.CharUtilities;
 
+// CSOFF: EmptyForIteratorPadCheck
+// CSOFF: InnerAssignmentCheck
+// CSOFF: LineLengthCheck
+// CSOFF: NoWhitespaceAfterCheck
+
 /**
  * The <code>DelimitedTextRange</code> class implements the "delimited text range" as described
  * by XML-FO 1.1 §5.8, which contains a flattened sequence of characters. Any FO that generates

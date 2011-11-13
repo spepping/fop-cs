@@ -25,6 +25,13 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.fop.traits.Direction;
 import org.apache.fop.util.CharUtilities;
 
+// CSOFF: AvoidNestedBlocksCheck
+// CSOFF: EmptyForIteratorPadCheck
+// CSOFF: InnerAssignmentCheck
+// CSOFF: LineLengthCheck
+// CSOFF: NoWhitespaceAfterCheck
+// CSOFF: ParameterNumberCheck
+
 /**
  * The <code>UnicodeBidiAlgorithm</code> class implements functionality prescribed by
  * the Unicode Bidirectional Algorithm, Unicode Standard Annex #9.

@@ -11,7 +11,7 @@
   </Match>
   <!-- performance optimizations -->
   <Match>
-    <Class name="org.apache.fop.fonts.ArabicScriptProcessor"/>
+    <Class name="org.apache.fop.complexscripts.scripts.ArabicScriptProcessor"/>
     <Or>
       <Method name="getPositioningFeatures"/>
       <Method name="getSubstitutionFeatures"/>
@@ -19,7 +19,7 @@
     <Bug pattern="EI_EXPOSE_REP"/>
   </Match>
   <Match>
-    <Class name="org.apache.fop.fonts.DefaultScriptProcessor"/>
+    <Class name="org.apache.fop.complexscripts.scripts.DefaultScriptProcessor"/>
     <Or>
       <Method name="getPositioningFeatures"/>
       <Method name="getSubstitutionFeatures"/>
@@ -27,37 +27,37 @@
     <Bug pattern="EI_EXPOSE_REP"/>
   </Match>
   <Match>
-    <Class name="org.apache.fop.fonts.GlyphPositioningState"/>
+    <Class name="org.apache.fop.complexscripts.fonts.GlyphPositioningState"/>
     <Method name="&lt;init&gt;"/>
     <Bug pattern="EI_EXPOSE_REP2"/>
   </Match>
   <Match>
-    <Class name="org.apache.fop.fonts.GlyphPositioningTable$DeviceTable"/>
+    <Class name="org.apache.fop.complexscripts.fonts.GlyphPositioningTable$DeviceTable"/>
     <Method name="getDeltas"/>
     <Bug pattern="EI_EXPOSE_REP"/>
   </Match>
   <Match>
-    <Class name="org.apache.fop.fonts.GlyphPositioningTable$DeviceTable"/>
+    <Class name="org.apache.fop.complexscripts.fonts.GlyphPositioningTable$DeviceTable"/>
     <Method name="&lt;init&gt;"/>
     <Bug pattern="EI_EXPOSE_REP2"/>
   </Match>
   <Match>
-    <Class name="org.apache.fop.fonts.GlyphSequence"/>
+    <Class name="org.apache.fop.complexscripts.util.GlyphSequence"/>
     <Method name="getAssociations"/>
     <Bug pattern="EI_EXPOSE_REP"/>
   </Match>
   <Match>
-    <Class name="org.apache.fop.fonts.GlyphSequence$CharAssociation"/>
+    <Class name="org.apache.fop.complexscripts.util.GlyphSequence$CharAssociation"/>
     <Method name="getSubIntervals"/>
     <Bug pattern="EI_EXPOSE_REP"/>
   </Match>
   <Match>
-    <Class name="org.apache.fop.fonts.GlyphSubstitutionState"/>
+    <Class name="org.apache.fop.complexscripts.fonts.GlyphSubstitutionState"/>
     <Method name="setAlternates"/>
     <Bug pattern="EI_EXPOSE_REP2"/>
   </Match>
   <Match>
-    <Class name="org.apache.fop.fonts.GlyphSubstitutionTable$Ligature"/>
+    <Class name="org.apache.fop.complexscripts.fonts.GlyphSubstitutionTable$Ligature"/>
     <Or>
         <Method name="getComponents"/>
         <Method name="getLigatures"/>
@@ -65,27 +65,27 @@
     <Bug pattern="EI_EXPOSE_REP"/>
   </Match>
   <Match>
-    <Class name="org.apache.fop.fonts.GlyphSubstitutionTable$Ligature"/>
+    <Class name="org.apache.fop.complexscripts.fonts.GlyphSubstitutionTable$Ligature"/>
     <Method name="&lt;init&gt;" params="int, int[]" returns="void"/>
     <Bug pattern="EI_EXPOSE_REP2"/>
   </Match>
   <Match>
-    <Class name="org.apache.fop.fonts.GlyphSubstitutionTable$LigatureSet"/>
+    <Class name="org.apache.fop.complexscripts.fonts.GlyphSubstitutionTable$LigatureSet"/>
     <Method name="getLigatures"/>
     <Bug pattern="EI_EXPOSE_REP"/>
   </Match>
   <Match>
-    <Class name="org.apache.fop.fonts.GlyphSubstitutionTable$LigatureSet"/>
-    <Method name="&lt;init&gt;" params="org.apache.fop.fonts.GlyphSubstitutionTable$Ligature[]" returns="void"/>
+    <Class name="org.apache.fop.complexscripts.fonts.GlyphSubstitutionTable$LigatureSet"/>
+    <Method name="&lt;init&gt;" params="org.apache.fop.complexscripts.fonts.GlyphSubstitutionTable$Ligature[]" returns="void"/>
     <Bug pattern="EI_EXPOSE_REP2"/>
   </Match>
   <Match>
-    <Class name="org.apache.fop.fonts.GlyphTable$ChainedClassSequenceRule"/>
+    <Class name="org.apache.fop.complexscripts.fonts.GlyphTable$ChainedClassSequenceRule"/>
     <Method name="&lt;init&gt;"/>
     <Bug pattern="EI_EXPOSE_REP2"/>
   </Match>
   <Match>
-    <Class name="org.apache.fop.fonts.GlyphTable$ChainedClassSequenceRule"/>
+    <Class name="org.apache.fop.complexscripts.fonts.GlyphTable$ChainedClassSequenceRule"/>
     <Or>
       <Method name="getBacktrackClasses"/>
       <Method name="getLookaheadClasses"/>
@@ -93,12 +93,12 @@
     <Bug pattern="EI_EXPOSE_REP"/>
   </Match>
   <Match>
-    <Class name="org.apache.fop.fonts.GlyphTable$ChainedCoverageSequenceRule"/>
+    <Class name="org.apache.fop.complexscripts.fonts.GlyphTable$ChainedCoverageSequenceRule"/>
     <Method name="&lt;init&gt;"/>
     <Bug pattern="EI_EXPOSE_REP2"/>
   </Match>
   <Match>
-    <Class name="org.apache.fop.fonts.GlyphTable$ChainedCoverageSequenceRule"/>
+    <Class name="org.apache.fop.complexscripts.fonts.GlyphTable$ChainedCoverageSequenceRule"/>
     <Or>
       <Method name="getBacktrackCoverages"/>
       <Method name="getLookaheadCoverages"/>
@@ -106,12 +106,12 @@
     <Bug pattern="EI_EXPOSE_REP"/>
   </Match>
   <Match>
-    <Class name="org.apache.fop.fonts.GlyphTable$ChainedGlyphSequenceRule"/>
+    <Class name="org.apache.fop.complexscripts.fonts.GlyphTable$ChainedGlyphSequenceRule"/>
     <Method name="&lt;init&gt;"/>
     <Bug pattern="EI_EXPOSE_REP2"/>
   </Match>
   <Match>
-    <Class name="org.apache.fop.fonts.GlyphTable$ChainedGlyphSequenceRule"/>
+    <Class name="org.apache.fop.complexscripts.fonts.GlyphTable$ChainedGlyphSequenceRule"/>
     <Or>
       <Method name="getBacktrackGlyphs"/>
       <Method name="getLookaheadGlyphs"/>
@@ -119,52 +119,52 @@
     <Bug pattern="EI_EXPOSE_REP"/>
   </Match>
   <Match>
-    <Class name="org.apache.fop.fonts.GlyphTable$ClassSequenceRule"/>
+    <Class name="org.apache.fop.complexscripts.fonts.GlyphTable$ClassSequenceRule"/>
     <Method name="&lt;init&gt;"/>
     <Bug pattern="EI_EXPOSE_REP2"/>
   </Match>
   <Match>
-    <Class name="org.apache.fop.fonts.GlyphTable$ClassSequenceRule"/>
+    <Class name="org.apache.fop.complexscripts.fonts.GlyphTable$ClassSequenceRule"/>
     <Method name="getClasses"/>
     <Bug pattern="EI_EXPOSE_REP"/>
   </Match>
   <Match>
-    <Class name="org.apache.fop.fonts.GlyphTable$CoverageSequenceRule"/>
+    <Class name="org.apache.fop.complexscripts.fonts.GlyphTable$CoverageSequenceRule"/>
     <Method name="&lt;init&gt;"/>
     <Bug pattern="EI_EXPOSE_REP2"/>
   </Match>
   <Match>
-    <Class name="org.apache.fop.fonts.GlyphTable$CoverageSequenceRule"/>
+    <Class name="org.apache.fop.complexscripts.fonts.GlyphTable$CoverageSequenceRule"/>
     <Method name="getCoverages"/>
     <Bug pattern="EI_EXPOSE_REP"/>
   </Match>
   <Match>
-    <Class name="org.apache.fop.fonts.GlyphTable$GlyphSequenceRule"/>
+    <Class name="org.apache.fop.complexscripts.fonts.GlyphTable$GlyphSequenceRule"/>
     <Method name="&lt;init&gt;"/>
     <Bug pattern="EI_EXPOSE_REP2"/>
   </Match>
   <Match>
-    <Class name="org.apache.fop.fonts.GlyphTable$GlyphSequenceRule"/>
+    <Class name="org.apache.fop.complexscripts.fonts.GlyphTable$GlyphSequenceRule"/>
     <Method name="getGlyphs"/>
     <Bug pattern="EI_EXPOSE_REP"/>
   </Match>
   <Match>
-    <Class name="org.apache.fop.fonts.GlyphTable$Rule"/>
+    <Class name="org.apache.fop.complexscripts.fonts.GlyphTable$Rule"/>
     <Method name="getLookups"/>
     <Bug pattern="EI_EXPOSE_REP"/>
   </Match>
   <Match>
-    <Class name="org.apache.fop.fonts.GlyphTable$RuleSet"/>
+    <Class name="org.apache.fop.complexscripts.fonts.GlyphTable$RuleSet"/>
     <Method name="&lt;init&gt;"/>
     <Bug pattern="EI_EXPOSE_REP2"/>
   </Match>
   <Match>
-    <Class name="org.apache.fop.fonts.GlyphTable$RuleSet"/>
+    <Class name="org.apache.fop.complexscripts.fonts.GlyphTable$RuleSet"/>
     <Method name="getRules"/>
     <Bug pattern="EI_EXPOSE_REP"/>
   </Match>
   <Match>
-    <Class name="org.apache.fop.fonts.IndicScriptProcessor"/>
+    <Class name="org.apache.fop.complexscripts.scripts.IndicScriptProcessor"/>
     <Or>
       <Method name="getPositioningFeatures"/>
       <Method name="getSubstitutionFeatures"/>
@@ -1032,6 +1032,11 @@
       <Method name="toString"/>
       <Bug pattern="DMI_INVOKING_TOSTRING_ON_ARRAY"/>
    </Match>
+  <Match>
+      <Class name="org.apache.fop.fonts.truetype.TTFDirTabEntry"/>
+      <Method name="getTag"/>
+      <Bug pattern="EI_EXPOSE_REP"/>
+  </Match>
    <Match>
       <Class name="org.apache.fop.util.AbstractPaintingState$AbstractData"/>
       <Method name="toString"/>

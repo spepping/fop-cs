@@ -34,6 +34,11 @@ import org.apache.fop.area.inline.SpaceArea;
 import org.apache.fop.area.inline.TextArea;
 import org.apache.fop.area.inline.UnresolvedPageNumber;
 
+// CSOFF: EmptyForIteratorPadCheck
+// CSOFF: LineLengthCheck
+// CSOFF: NoWhitespaceAfterCheck
+// CSOFF: SimplifyBooleanReturnCheck
+
 /**
  * The <code>UnflattenProcessor</code> class is used to reconstruct (by unflattening) a line
  * area's internal area hierarachy after leaf inline area reordering is completed.

@@ -34,7 +34,10 @@ public class TTFDirTabEntry {
     private long length;
 
     /**
-     * Read Dir Tab, return tag name
+     * Read Dir Tab.
+     * @param in font file reader
+     * @return tag name
+     * @throws IOException upon I/O exception
      */
     public String read(FontFileReader in) throws IOException {
         tag[0] = in.readTTFByte();
@@ -52,6 +55,7 @@ public class TTFDirTabEntry {
     }
 
 
+    @Override
     public String toString() {
         return "Read dir tab ["
             + tag[0] + " " + tag[1] + " " + tag[2] + " " + tag[3] + "]"
