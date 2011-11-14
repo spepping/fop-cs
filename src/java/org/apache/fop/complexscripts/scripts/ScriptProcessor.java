@@ -26,9 +26,9 @@ import org.apache.fop.complexscripts.fonts.GlyphDefinitionTable;
 import org.apache.fop.complexscripts.fonts.GlyphPositioningTable;
 import org.apache.fop.complexscripts.fonts.GlyphSubstitutionTable;
 import org.apache.fop.complexscripts.fonts.GlyphTable;
+import org.apache.fop.complexscripts.util.CharScript;
 import org.apache.fop.complexscripts.util.GlyphSequence;
 import org.apache.fop.complexscripts.util.ScriptContextTester;
-import org.apache.fop.util.CharUtilities;
 
 // CSOFF: InnerAssignmentCheck
 // CSOFF: LineLengthCheck
@@ -220,9 +220,10 @@ public abstract class ScriptProcessor {
     // [TBD] - rework to provide more configurable binding between script name and script processor constructor
     private static ScriptProcessor createProcessor ( String script ) {
         ScriptProcessor sp = null;
-        if ( "arab".equals ( script ) ) {
+        int sc = CharScript.scriptCodeFromTag ( script );
+        if ( sc == CharScript.SCRIPT_ARABIC ) {
             sp = new ArabicScriptProcessor ( script );
-        } else if ( CharUtilities.isIndicScript ( script ) ) {
+        } else if ( CharScript.isIndicScript ( sc ) ) {
             sp = IndicScriptProcessor.makeProcessor ( script );
         } else {
             sp = new DefaultScriptProcessor ( script );

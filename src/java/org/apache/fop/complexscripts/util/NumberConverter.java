@@ -22,8 +22,6 @@ package org.apache.fop.complexscripts.util;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.fop.util.CharUtilities;
-
 // CSOFF: LineLengthCheck
 // CSOFF: InnerAssignmentCheck
 // CSOFF: NoWhitespaceAfterCheck
@@ -164,7 +162,7 @@ public class NumberConverter {
         }
         int tokenType = TOKEN_NONE;
         List<Integer> token = new ArrayList<Integer>();
-        Integer[] ca = CharUtilities.toUTF32 ( format, 0, true );
+        Integer[] ca = UTF32.toUTF32 ( format, 0, true );
         for ( int i = 0, n = ca.length; i < n; i++ ) {
             int c = ca[i];
             int tokenTypeNew = isAlphaNumeric ( c ) ? TOKEN_ALPHANUMERIC : TOKEN_NONALPHANUMERIC;
@@ -296,7 +294,7 @@ public class NumberConverter {
             int s = token [ token.length - 1 ].intValue();
             fn = formatNumberAsDecimal ( number, s, token.length );
         } else {
-            throw new IllegalArgumentException ( "invalid format token: \"" + CharUtilities.fromUTF32 ( token ) + "\"" );
+            throw new IllegalArgumentException ( "invalid format token: \"" + UTF32.fromUTF32 ( token ) + "\"" );
         }
         if ( fn == null ) {
             fn = formatNumber ( number, DEFAULT_TOKEN );
@@ -497,7 +495,7 @@ public class NumberConverter {
 
     private static String scalarsToString ( List<Integer> scalars ) {
         Integer[] sa = scalars.toArray ( new Integer [ scalars.size() ] );
-        return CharUtilities.fromUTF32 ( sa );
+        return UTF32.fromUTF32 ( sa );
     }
 
     private static boolean isPaddedOne ( Integer[] token ) {
@@ -754,7 +752,7 @@ public class NumberConverter {
                     }
                 }
                 wl = convertWordCase ( wl, caseType );
-                return CharUtilities.toUTF32 ( joinWords ( wl, " " ), 0, true );
+                return UTF32.toUTF32 ( joinWords ( wl, " " ), 0, true );
             }
         }
         private List<String> formatOnesInThousand ( List<String> wl, int number ) {
@@ -867,7 +865,7 @@ public class NumberConverter {
                     }
                 }
                 wl = convertWordCase ( wl, caseType );
-                return CharUtilities.toUTF32 ( joinWords ( wl, " " ), 0, true );
+                return UTF32.toUTF32 ( joinWords ( wl, " " ), 0, true );
             }
         }
         private List<String> formatOnesInThousand ( List<String> wl, int number ) {
@@ -1005,7 +1003,7 @@ public class NumberConverter {
                     }
                 }
                 wl = convertWordCase ( wl, caseType );
-                return CharUtilities.toUTF32 ( joinWords ( wl, " " ), 0, true );
+                return UTF32.toUTF32 ( joinWords ( wl, " " ), 0, true );
             }
         }
         private List<String> formatOnesInThousand ( List<String> wl, int number ) {
@@ -1180,7 +1178,7 @@ public class NumberConverter {
                         for ( int i = 0, n = romanMapping.length; i < n; i++ ) {
                             int d = romanMapping [ i ];
                             if ( ( number >= d ) && ( forms [ i ] != null ) ) {
-                                appendScalars ( sl, CharUtilities.toUTF32 ( forms [ i ], 0, true ) );
+                                appendScalars ( sl, UTF32.toUTF32 ( forms [ i ], 0, true ) );
                                 number = number - d;
                                 break;
                             }

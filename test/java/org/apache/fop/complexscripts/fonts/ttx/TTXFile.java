@@ -63,6 +63,7 @@ import org.apache.fop.complexscripts.fonts.GlyphSubtable;
 import org.apache.fop.complexscripts.fonts.GlyphTable;
 import org.apache.fop.complexscripts.fonts.GlyphTable.RuleLookup;
 import org.apache.fop.complexscripts.util.GlyphSequence;
+import org.apache.fop.complexscripts.util.UTF32;
 import org.apache.fop.util.CharUtilities;
 
 import org.xml.sax.Attributes;
@@ -249,7 +250,7 @@ public class TTXFile {
         }
     }
     public GlyphSequence mapCharsToGlyphs ( String s ) {
-        Integer[] ca = CharUtilities.toUTF32 ( s, 0, true );
+        Integer[] ca = UTF32.toUTF32 ( s, 0, true );
         int ng = ca.length;
         IntBuffer cb = IntBuffer.allocate ( ng );
         IntBuffer gb = IntBuffer.allocate ( ng );

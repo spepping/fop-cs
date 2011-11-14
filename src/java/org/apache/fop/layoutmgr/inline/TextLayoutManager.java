@@ -31,6 +31,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.fop.area.Trait;
 import org.apache.fop.area.inline.TextArea;
 import org.apache.fop.complexscripts.fonts.GlyphPositioningTable;
+import org.apache.fop.complexscripts.util.CharScript;
 import org.apache.fop.fo.Constants;
 import org.apache.fop.fo.FOText;
 import org.apache.fop.fo.FObj;
@@ -1012,7 +1013,7 @@ public class TextLayoutManager extends LeafNodeLayoutManager {
         // 2. if script is not specified (by FO property) or it is specified as 'auto',
         // then compute dominant script
         if ( ( script == null ) || "auto".equals(script) ) {
-            script = CharUtilities.scriptTagFromCode ( CharUtilities.dominantScript ( ics ) );
+            script = CharScript.scriptTagFromCode ( CharScript.dominantScript ( ics ) );
         }
         if ( ( language == null ) || "none".equals(language) ) {
             language = "dflt";

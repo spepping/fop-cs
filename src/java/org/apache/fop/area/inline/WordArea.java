@@ -21,7 +21,7 @@ package org.apache.fop.area.inline;
 
 import java.util.Arrays;
 
-import org.apache.fop.util.CharUtilities;
+import org.apache.fop.complexscripts.util.CharMirror;
 
 /**
  * A string of characters without spaces
@@ -191,7 +191,7 @@ public class WordArea extends InlineArea {
             }
             reversed = !reversed;
             if ( mirror ) {
-                word = CharUtilities.mirror ( word );
+                word = CharMirror.mirror ( word );
             }
         }
     }
@@ -201,7 +201,7 @@ public class WordArea extends InlineArea {
      */
     public void mirror() {
         if ( word.length() > 0 ) {
-            word = CharUtilities.mirror ( word );
+            word = CharMirror.mirror ( word );
         }
     }
 

@@ -32,10 +32,10 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import org.apache.fop.complexscripts.fonts.GlyphTable;
+import org.apache.fop.complexscripts.util.CharScript;
 import org.apache.fop.complexscripts.util.GlyphContextTester;
 import org.apache.fop.complexscripts.util.GlyphSequence;
 import org.apache.fop.complexscripts.util.ScriptContextTester;
-import org.apache.fop.util.CharUtilities;
 
 // CSOFF: AvoidNestedBlocksCheck
 // CSOFF: NoWhitespaceAfterCheck
@@ -122,9 +122,9 @@ public class IndicScriptProcessor extends DefaultScriptProcessor {
      * @return script processor instance
      */
     public static ScriptProcessor makeProcessor ( String script ) {
-        switch ( CharUtilities.scriptCodeFromTag ( script ) ) {
-        case CharUtilities.SCRIPT_DEVANAGARI:
-        case CharUtilities.SCRIPT_DEVANAGARI_2:
+        switch ( CharScript.scriptCodeFromTag ( script ) ) {
+        case CharScript.SCRIPT_DEVANAGARI:
+        case CharScript.SCRIPT_DEVANAGARI_2:
             return new DevanagariScriptProcessor ( script );
         // [TBD] implement other script processors
         default:

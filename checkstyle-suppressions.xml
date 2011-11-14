@@ -4,6 +4,5 @@
     <suppress files="org/apache/fop/fo/FOPropertyMapping.java" checks="FileLengthCheck"/>
     <suppress files="org/apache/fop/complexscripts/fonts/GlyphPositioningTable.java" checks="FileLengthCheck"/>
     <suppress files="org/apache/fop/complexscripts/fonts/OTFAdvancedTypographicTableReader.java" checks="FileLengthCheck"/>
-    <suppress files="org/apache/fop/util/CharUtilities.java" checks="FileLengthCheck"/>
     <suppress files="org/apache/fop/Version.java" lines="40-50" checks="LineLengthCheck"/>
 </suppressions>
