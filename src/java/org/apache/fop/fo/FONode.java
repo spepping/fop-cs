@@ -864,6 +864,16 @@ public abstract class FONode implements Cloneable {
     }
 
     /**
+     * Determine if node has a delimited text range boundary. N.B. that we report
+     * this to be true by default, while specific subclasses override this method to report false.
+     * @param boundary one of {EN_BEFORE, EN_AFTER, or EN_BOTH} enumeration constants
+     * @return true if indicated boundary (or boundaries) constitute a delimited text range boundary.
+     */
+    public boolean isDelimitedTextRangeBoundary ( int boundary ) {
+        return true;
+    }
+
+    /**
      * Base iterator interface over a FO's children
      */
     public interface FONodeIterator extends ListIterator {

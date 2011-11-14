@@ -451,38 +451,12 @@ public final class BidiResolver {
         return false;
     }
 
-    private static boolean isRangeBoundary ( FONode fn ) {
-        if ( fn instanceof Block ) {                                    // fo:block
-            return true;
-        } else if ( fn instanceof Character ) {                         // fo:character
-            return false;
-        } else if ( fn instanceof InlineLevel ) {                       // fo:inline, fo:leader, fo:bidi-override, fo:title
-            return false;
-        } else if ( fn instanceof InlineContainer ) {                   // fo:inline-container
-            return false;
-        } else if ( fn instanceof BlockContainer ) {                    // fo:block-container
-            return true;
-        } else if ( fn instanceof AbstractPageNumberCitation ) {        // fo:page-number-citation, fo:page-number-citation-last
-            return false;
-        } else if ( fn instanceof PageNumber ) {                        // fo:page-number
-            return false;
-        } else if ( fn instanceof AbstractGraphics ) {                  // fo:external-graphic, fo:instream-foreign-object
-            return false;
-        } else if ( fn instanceof Wrapper ) {                           // fo:wrapper
-            return false;
-        } else if ( fn instanceof FOText ) {                            // #PCDATA
-            return false;
-        } else {
-            return true;
-        }
-    }
-
     private static boolean isRangeBoundaryBefore ( FONode fn ) {
-        return isRangeBoundary ( fn );
+        return fn.isDelimitedTextRangeBoundary ( Constants.EN_BEFORE );
     }
 
     private static boolean isRangeBoundaryAfter ( FONode fn ) {
-        return isRangeBoundary ( fn );
+        return fn.isDelimitedTextRangeBoundary ( Constants.EN_AFTER );
     }
 
     private static List pruneEmptyRanges ( Stack ranges ) {

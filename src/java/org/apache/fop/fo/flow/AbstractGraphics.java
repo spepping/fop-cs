@@ -229,4 +229,9 @@ public abstract class AbstractGraphics extends FObj
     /** @return the graphic's intrinsic alignment-adjust */
     public abstract Length getIntrinsicAlignmentAdjust();
 
+    @Override
+    public boolean isDelimitedTextRangeBoundary ( int boundary ) {
+        return false;
+    }
+
 }

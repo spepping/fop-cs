@@ -228,6 +228,11 @@ public class Character extends FObj implements StructurePointerPropertySet {
         return FO_CHARACTER;
     }
 
+    @Override
+    public boolean isDelimitedTextRangeBoundary ( int boundary ) {
+        return false;
+    }
+
     private class FOCharIterator extends CharIterator {
 
         private boolean bFirst = true;

@@ -184,4 +184,9 @@ public abstract class AbstractPageNumberCitation extends FObj
         return refId;
     }
 
+    @Override
+    public boolean isDelimitedTextRangeBoundary ( int boundary ) {
+        return false;
+    }
+
 }

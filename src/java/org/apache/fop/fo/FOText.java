@@ -723,6 +723,11 @@ public class FOText extends FONode implements CharSequence {
         }
     }
 
+    @Override
+    public boolean isDelimitedTextRangeBoundary ( int boundary ) {
+        return false;
+    }
+
     /**
      * Set bidirectional level over interval [start,end).
      * @param level the resolved level

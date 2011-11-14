@@ -252,4 +252,9 @@ public class InlineContainer extends FObj {
         return FO_INLINE_CONTAINER;
     }
 
+    @Override
+    public boolean isDelimitedTextRangeBoundary ( int boundary ) {
+        return false;
+    }
+
 }

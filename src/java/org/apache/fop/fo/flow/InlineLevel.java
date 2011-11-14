@@ -103,4 +103,9 @@ public abstract class InlineLevel extends FObjMixed {
         return keepWithPrevious;
     }
 
+    @Override
+    public boolean isDelimitedTextRangeBoundary ( int boundary ) {
+        return false;
+    }
+
 }
