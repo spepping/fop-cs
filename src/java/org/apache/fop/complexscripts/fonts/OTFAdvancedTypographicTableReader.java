@@ -89,15 +89,20 @@ public final class OTFAdvancedTypographicTableReader {
     /**
      * Read all advanced typographic tables.
      * @throws AdvancedTypographicTableFormatException if ATT table has invalid format
-     * @throws IOException for other I/O exceptions
      */
-    public void readAll() throws AdvancedTypographicTableFormatException, IOException {
+    public void readAll() throws AdvancedTypographicTableFormatException {
         try {
             readGDEF();
             readGSUB();
             readGPOS();
-        } finally {
+        } catch ( AdvancedTypographicTableFormatException e ) {
             resetATStateAll();
+            throw e;
+        } catch ( IOException e ) {
+            resetATStateAll();
+            throw new AdvancedTypographicTableFormatException ( e.getMessage(), e );
+        } finally {
+            resetATState();
         }
     }
 

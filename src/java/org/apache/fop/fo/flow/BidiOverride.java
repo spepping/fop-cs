@@ -19,9 +19,13 @@
 
 package org.apache.fop.fo.flow;
 
+import java.util.Iterator;
+import java.util.Stack;
+
 import org.xml.sax.Locator;
 
 import org.apache.fop.apps.FOPException;
+import org.apache.fop.complexscripts.bidi.DelimitedTextRange;
 import org.apache.fop.datatypes.Length;
 import org.apache.fop.fo.Constants;
 import org.apache.fop.fo.FONode;
@@ -30,6 +34,7 @@ import org.apache.fop.fo.PropertyList;
 import org.apache.fop.fo.ValidationException;
 import org.apache.fop.fo.properties.Property;
 import org.apache.fop.fo.properties.SpaceProperty;
+import org.apache.fop.util.CharUtilities;
 
 /**
  * Class modelling the <a href="http://www.w3.org/TR/xsl/#fo_bidi-override">
@@ -96,4 +101,32 @@ public class BidiOverride extends Inline {
     public int getNameId() {
         return FO_BIDI_OVERRIDE;
     }
+
+    @Override
+    protected Stack collectDelimitedTextRanges ( Stack ranges, DelimitedTextRange currentRange ) {
+        char pfx = 0;
+        char sfx = 0;
+        int unicodeBidi = getUnicodeBidi();
+        int direction = getDirection();
+        if ( unicodeBidi == Constants.EN_BIDI_OVERRIDE ) {
+            pfx = ( direction == Constants.EN_RTL ) ? CharUtilities.RLO : CharUtilities.LRO;
+            sfx = CharUtilities.PDF;
+        } else if ( unicodeBidi == Constants.EN_EMBED ) {
+            pfx = ( direction == Constants.EN_RTL ) ? CharUtilities.RLE : CharUtilities.LRE;
+            sfx = CharUtilities.PDF;
+        }
+        if ( currentRange != null ) {
+            if ( pfx != 0 ) {
+                currentRange.append ( pfx, this );
+            }
+            for ( Iterator it = getChildNodes(); ( it != null ) && it.hasNext();) {
+                ranges = ( (FONode) it.next() ).collectDelimitedTextRanges ( ranges );
+            }
+            if ( sfx != 0 ) {
+                currentRange.append ( sfx, this );
+            }
+        }
+        return ranges;
+    }
+
 }

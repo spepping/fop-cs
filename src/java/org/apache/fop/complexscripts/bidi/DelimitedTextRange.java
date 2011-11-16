@@ -46,19 +46,32 @@ import org.apache.fop.util.CharUtilities;
  *
  * @author Glenn Adams
  */
-class DelimitedTextRange {
+public class DelimitedTextRange {
     private FONode fn;                              // node that generates this text range
     private StringBuffer buffer;                    // flattened character sequence of generating FO nodes
     private List intervals;                         // list of intervals over buffer of generating FO nodes
-    DelimitedTextRange ( FONode fn ) {
+    /**
+     * Primary constructor.
+     * @param fn node that generates this text range
+     */
+    public DelimitedTextRange ( FONode fn ) {
         this.fn = fn;
         this.buffer = new StringBuffer();
         this.intervals = new Vector();
     }
-    FONode getNode() {
+    /**
+     * Obtain node that generated this text range.
+     * @return node that generated this text range
+     */
+    public FONode getNode() {
         return fn;
     }
-    void append ( CharIterator it, FONode fn ) {
+    /**
+     * Append interval using characters from character iterator IT.
+     * @param it character iterator
+     * @param fn node that generates interval being appended
+     */
+    public void append ( CharIterator it, FONode fn ) {
         if ( it != null ) {
             int s = buffer.length();
             int e = s;
@@ -70,7 +83,12 @@ class DelimitedTextRange {
             intervals.add ( new TextInterval ( fn, s, e ) );
         }
     }
-    void append ( char c, FONode fn ) {
+    /**
+     * Append interval using character C.
+     * @param c character
+     * @param fn node that generates interval being appended
+     */
+    public void append ( char c, FONode fn ) {
         if ( c != 0 ) {
             int s = buffer.length();
             int e = s + 1;
@@ -78,15 +96,23 @@ class DelimitedTextRange {
             intervals.add ( new TextInterval ( fn, s, e ) );
         }
     }
-    boolean isEmpty() {
+    /**
+     * Determine if range is empty.
+     * @return true if range is empty
+     */
+    public boolean isEmpty() {
         return buffer.length() == 0;
     }
-    void resolve() {
+    /**
+     * Resolve bidirectional levels for this range.
+     */
+    public void resolve() {
         WritingModeTraitsGetter tg;
         if ( ( tg = WritingModeTraits.getWritingModeTraitsGetter ( getNode() ) ) != null ) {
             resolve ( tg.getInlineProgressionDirection() );
         }
     }
+    @Override
     public String toString() {
         StringBuffer sb = new StringBuffer ( "DR: " + fn.getLocalName() + " { <" + CharUtilities.toNCRefs ( buffer.toString() ) + ">" );
         sb.append ( ", intervals <" );

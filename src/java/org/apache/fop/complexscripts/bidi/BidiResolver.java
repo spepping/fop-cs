@@ -90,7 +90,7 @@ public final class BidiResolver {
         if (log.isDebugEnabled()) {
             log.debug ( "BD: RESOLVE: " + ps );
         }
-        List ranges = pruneEmptyRanges ( collectRanges ( ps, new Stack() ) );
+        List ranges = pruneEmptyRanges ( ps.collectDelimitedTextRanges ( new Stack() ) );
         resolveInlineDirectionality ( ranges );
     }
 
@@ -147,100 +147,6 @@ public final class BidiResolver {
                 log.debug ( r );
             }
         }
-    }
-
-    /**
-     * Collect the sequence of delimited text ranges of node FO, where each new
-     * range is pushed onto RANGES.
-     */
-    private static Stack collectRanges ( FONode fn, Stack ranges ) {
-        // return existing ranges if passed null node
-        if ( fn == null ) {
-            return ranges;
-        }
-        // if boundary before, then push new range
-        if ( isRangeBoundaryBefore ( fn ) ) {
-            maybeNewRange ( ranges, fn );
-        }
-        // get current range, if one exists
-        DelimitedTextRange r;
-        if ( ranges.size() > 0 ) {
-            r = (DelimitedTextRange) ranges.peek();
-        } else {
-            r = null;
-        }
-        // proceses this node
-        if ( fn instanceof FOText ) {
-            if ( r != null ) {
-                r.append ( ( (FOText) fn ) .charIterator(), fn );
-            }
-        } else if ( fn instanceof Character ) {
-            if ( r != null ) {
-                r.append ( ( (Character) fn ) .charIterator(), fn );
-            }
-        } else if ( ( fn instanceof AbstractPageNumberCitation ) || ( fn instanceof AbstractGraphics ) ) {
-            if ( r != null ) {
-                r.append ( CharUtilities.OBJECT_REPLACEMENT_CHARACTER, fn );
-            }
-        } else if ( fn instanceof BidiOverride ) {
-            if ( r != null ) {
-                ranges = collectBidiOverrideRanges ( (BidiOverride) fn, r, ranges );
-            }
-        } else if ( fn instanceof ListItem ) {
-            ranges = collectRanges ( ( (ListItem) fn ) .getLabel(), ranges );
-            ranges = collectRanges ( ( (ListItem) fn ) .getBody(), ranges );
-        } else if ( fn instanceof PageSequence ) {
-            ranges = collectFlowRanges ( (PageSequence) fn, ranges );
-        } else {
-            for ( Iterator it = fn.getChildNodes(); ( it != null ) && it.hasNext(); ) {
-                ranges = collectRanges ( (FONode) it.next(), ranges );
-            }
-        }
-        // if boundary after, then push new range
-        if ( isRangeBoundaryAfter ( fn ) ) {
-            maybeNewRange ( ranges, fn );
-        }
-        return ranges;
-    }
-
-    private static Stack collectBidiOverrideRanges ( BidiOverride bo, DelimitedTextRange r, Stack ranges ) {
-        char pfx = 0;
-        char sfx = 0;
-        int unicodeBidi = bo.getUnicodeBidi();
-        int direction = bo.getDirection();
-        if ( unicodeBidi == Constants.EN_BIDI_OVERRIDE ) {
-            pfx = ( direction == Constants.EN_RTL ) ? CharUtilities.RLO : CharUtilities.LRO;
-            sfx = CharUtilities.PDF;
-        } else if ( unicodeBidi == Constants.EN_EMBED ) {
-            pfx = ( direction == Constants.EN_RTL ) ? CharUtilities.RLE : CharUtilities.LRE;
-            sfx = CharUtilities.PDF;
-        }
-        if ( pfx != 0 ) {
-            r.append ( pfx, bo );
-        }
-        for ( Iterator it = bo.getChildNodes(); ( it != null ) && it.hasNext(); ) {
-            ranges = collectRanges ( (FONode) it.next(), ranges );
-        }
-        if ( sfx != 0 ) {
-            r.append ( sfx, bo );
-        }
-        return ranges;
-    }
-
-    private static Stack collectFlowRanges ( PageSequence ps, Stack ranges ) {
-        assert ps != null;
-        // collect ranges in static content flows
-        Map<String, Flow> flows = ps.getFlowMap();
-        if ( flows != null ) {
-            for ( Flow f : flows.values() ) {
-                if ( f instanceof StaticContent ) {
-                    ranges = collectRanges ( f, ranges );
-                }
-            }
-        }
-        // collect ranges in main flow
-        ranges = collectRanges ( ps.getMainFlow(), ranges );
-        return ranges;
     }
 
     private static List collectRuns ( List inlines, List runs ) {
@@ -408,55 +314,6 @@ public final class BidiResolver {
             InlineRun ir = (InlineRun) it.next();
             log.debug ( ir );
         }
-    }
-
-    /**
-     * <p>Conditionally add a new delimited text range to RANGES, where new range is
-     * associated with node FN. A new text range is added unless all of the following are true:</p>
-     * <ul>
-     * <li>there exists a current range RCUR in RANGES</li>
-     * <li>RCUR is empty</li>
-     * <li>the node of the RCUR is the same node as FN or a descendent node of FN</li>
-     * </ul>
-     */
-    private static DelimitedTextRange maybeNewRange ( Stack ranges, FONode fn ) {
-        DelimitedTextRange rCur = null;
-        DelimitedTextRange rNew = null;
-        if ( ranges.empty() ) {
-            if ( fn instanceof Block ) {
-                rNew = new DelimitedTextRange(fn);
-            }
-        } else if ( ( rCur = (DelimitedTextRange) ranges.peek() ) != null ) {
-            if ( ! rCur.isEmpty() || ! isSelfOrDescendent ( rCur.getNode(), fn ) ) {
-                rNew = new DelimitedTextRange(fn);
-            }
-        }
-        if ( rNew != null ) {
-            ranges.push ( rNew );
-        } else {
-            rNew = rCur;
-        }
-        return rNew;
-    }
-
-    /**
-     * Determine if node N2 is the same or a descendent of node N1.
-     */
-    private static boolean isSelfOrDescendent ( FONode n1, FONode n2 ) {
-        for ( FONode n = n2; n != null; n = n.getParent() ) {
-            if ( n == n1 ) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private static boolean isRangeBoundaryBefore ( FONode fn ) {
-        return fn.isDelimitedTextRangeBoundary ( Constants.EN_BEFORE );
-    }
-
-    private static boolean isRangeBoundaryAfter ( FONode fn ) {
-        return fn.isDelimitedTextRangeBoundary ( Constants.EN_AFTER );
     }
 
     private static List pruneEmptyRanges ( Stack ranges ) {

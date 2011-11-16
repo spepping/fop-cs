@@ -26,16 +26,24 @@ package org.apache.fop.complexscripts.fonts;
  */
 public class AdvancedTypographicTableFormatException extends RuntimeException {
     /**
-     * Instantiate incompatible subtable exception
+     * Instantiate ATT format exception.
      */
     public AdvancedTypographicTableFormatException() {
         super();
     }
     /**
-     * Instantiate incompatible subtable exception
+     * Instantiate ATT format exception.
      * @param message a message string
      */
     public AdvancedTypographicTableFormatException(String message) {
         super(message);
+    }
+    /**
+     * Instantiate ATT format exception.
+     * @param message a message string
+     * @param cause a <code>Throwable</code> that caused this exception
+     */
+    public AdvancedTypographicTableFormatException(String message, Throwable cause) {
+        super(message, cause);
     }
 }

@@ -23,10 +23,12 @@ import java.awt.Color;
 import java.nio.CharBuffer;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.Stack;
 
 import org.xml.sax.Locator;
 
 import org.apache.fop.apps.FOPException;
+import org.apache.fop.complexscripts.bidi.DelimitedTextRange;
 import org.apache.fop.datatypes.Length;
 import org.apache.fop.fo.flow.Block;
 import org.apache.fop.fo.properties.CommonFont;
@@ -726,6 +728,14 @@ public class FOText extends FONode implements CharSequence {
     @Override
     public boolean isDelimitedTextRangeBoundary ( int boundary ) {
         return false;
+    }
+
+    @Override
+    protected Stack collectDelimitedTextRanges ( Stack ranges, DelimitedTextRange currentRange ) {
+        if ( currentRange != null ) {
+            currentRange.append ( charIterator(), this );
+        }
+        return ranges;
     }
 
     /**

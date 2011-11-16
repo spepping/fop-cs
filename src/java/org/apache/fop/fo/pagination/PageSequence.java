@@ -19,12 +19,13 @@
 
 package org.apache.fop.fo.pagination;
 
-// Java
 import java.util.Map;
+import java.util.Stack;
 
 import org.xml.sax.Locator;
 
 import org.apache.fop.apps.FOPException;
+import org.apache.fop.complexscripts.bidi.DelimitedTextRange;
 import org.apache.fop.datatypes.Numeric;
 import org.apache.fop.fo.FONode;
 import org.apache.fop.fo.PropertyList;
@@ -411,6 +412,26 @@ public class PageSequence extends AbstractPageSequence implements WritingModeTra
         } else {
             return WritingMode.LR_TB;
         }
+    }
+
+
+    @Override
+    protected Stack collectDelimitedTextRanges ( Stack ranges, DelimitedTextRange currentRange ) {
+        // collect ranges from static content flows
+        Map<String, Flow> flows = getFlowMap();
+        if ( flows != null ) {
+            for ( Flow f : flows.values() ) {
+                if ( f instanceof StaticContent ) {
+                    ranges = f.collectDelimitedTextRanges ( ranges );
+                }
+            }
+        }
+        // collect ranges in main flow
+        Flow main = getMainFlow();
+        if ( main != null ) {
+            ranges = main.collectDelimitedTextRanges ( ranges );
+        }
+        return ranges;
     }
 
     /**
