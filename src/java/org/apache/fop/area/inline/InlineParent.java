@@ -112,6 +112,15 @@ public class InlineParent extends InlineArea {
         return hasUnresolvedAreas;
     }
 
+    @Override
+    public List collectInlineRuns ( List runs ) {
+        for ( Iterator<InlineArea> it = getChildAreas().iterator(); it.hasNext();) {
+            InlineArea ia = it.next();
+            runs = ia.collectInlineRuns ( runs );
+        }
+        return runs;
+    }
+
     /**
      * Reset bidirectionality level of all children to default (-1),
      * signalling that they will inherit the level of their parent text area.
@@ -121,6 +130,7 @@ public class InlineParent extends InlineArea {
             ( (InlineArea) it.next() ) .resetBidiLevel();
         }
     }
+
     private void updateLevel ( int newLevel ) {
         if ( newLevel >= 0 ) {
             int curLevel = getBidiLevel();

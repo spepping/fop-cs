@@ -11,20 +11,9 @@
   </Match>
   <!-- performance optimizations -->
   <Match>
-    <Class name="org.apache.fop.complexscripts.scripts.ArabicScriptProcessor"/>
-    <Or>
-      <Method name="getPositioningFeatures"/>
-      <Method name="getSubstitutionFeatures"/>
-    </Or>
-    <Bug pattern="EI_EXPOSE_REP"/>
-  </Match>
-  <Match>
-    <Class name="org.apache.fop.complexscripts.scripts.DefaultScriptProcessor"/>
-    <Or>
-      <Method name="getPositioningFeatures"/>
-      <Method name="getSubstitutionFeatures"/>
-    </Or>
-    <Bug pattern="EI_EXPOSE_REP"/>
+    <Class name="org.apache.fop.complexscripts.bidi.InlineRun"/>
+    <Method name="&lt;init&gt;" params="org.apache.fop.area.inline.InlineArea, int[]" returns="void"/>
+    <Bug pattern="EI_EXPOSE_REP2"/>
   </Match>
   <Match>
     <Class name="org.apache.fop.complexscripts.fonts.GlyphPositioningState"/>
@@ -40,6 +29,22 @@
     <Class name="org.apache.fop.complexscripts.fonts.GlyphPositioningTable$DeviceTable"/>
     <Method name="&lt;init&gt;"/>
     <Bug pattern="EI_EXPOSE_REP2"/>
+  </Match>
+  <Match>
+    <Class name="org.apache.fop.complexscripts.scripts.ArabicScriptProcessor"/>
+    <Or>
+      <Method name="getPositioningFeatures"/>
+      <Method name="getSubstitutionFeatures"/>
+    </Or>
+    <Bug pattern="EI_EXPOSE_REP"/>
+  </Match>
+  <Match>
+    <Class name="org.apache.fop.complexscripts.scripts.DefaultScriptProcessor"/>
+    <Or>
+      <Method name="getPositioningFeatures"/>
+      <Method name="getSubstitutionFeatures"/>
+    </Or>
+    <Bug pattern="EI_EXPOSE_REP"/>
   </Match>
   <Match>
     <Class name="org.apache.fop.complexscripts.util.GlyphSequence"/>

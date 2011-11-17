@@ -20,10 +20,12 @@
 package org.apache.fop.area.inline;
 
 import java.io.Serializable;
+import java.util.List;
 
 import org.apache.fop.area.Area;
 import org.apache.fop.area.LineArea;
 import org.apache.fop.area.Trait;
+import org.apache.fop.complexscripts.bidi.InlineRun;
 
 /**
  * Inline Area
@@ -295,4 +297,16 @@ public class InlineArea extends Area {
     int getVirtualBPD() {
         return getBPD();
     }
+
+    /**
+     * Collection bidi inline runs.
+     * @param runs current list of inline runs
+     * @return modified list of inline runs, having appended new run
+     */
+    public List collectInlineRuns ( List runs ) {
+        assert runs != null;
+        runs.add ( new InlineRun ( this, new int[] {getBidiLevel()}) );
+        return runs;
+    }
+
 }

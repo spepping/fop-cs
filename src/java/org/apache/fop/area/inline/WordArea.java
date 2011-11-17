@@ -20,7 +20,9 @@
 package org.apache.fop.area.inline;
 
 import java.util.Arrays;
+import java.util.List;
 
+import org.apache.fop.complexscripts.bidi.InlineRun;
 import org.apache.fop.complexscripts.util.CharMirror;
 
 /**
@@ -147,6 +149,13 @@ public class WordArea extends InlineArea {
         } else {
             return -1;
         }
+    }
+
+    @Override
+    public List collectInlineRuns ( List runs ) {
+        assert runs != null;
+        runs.add ( new InlineRun ( this, getBidiLevels() ) );
+        return runs;
     }
 
     /**

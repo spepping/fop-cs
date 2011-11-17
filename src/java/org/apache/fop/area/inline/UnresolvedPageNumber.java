@@ -19,11 +19,12 @@
 
 package org.apache.fop.area.inline;
 
+import java.util.List;
+
 import org.apache.fop.area.PageViewport;
 import org.apache.fop.area.Resolvable;
+import org.apache.fop.complexscripts.bidi.InlineRun;
 import org.apache.fop.fonts.Font;
-
-import java.util.List;
 
 /**
  * Unresolvable page number area.
@@ -148,5 +149,22 @@ public class UnresolvedPageNumber extends TextArea implements Resolvable {
     public boolean applyVariationFactor(double variationFactor,
                                         int lineStretch, int lineShrink) {
         return true;
+    }
+
+    /**
+     * Collection bidi inline runs.
+     * Override of @{link InlineParent} implementation.
+     *
+     * N.B. [GA] without this override, the page-number-citation_writing_mode_rl
+     * layout engine test will fail. It may be that the test needs to
+     * be updated rather than using this override.
+     * @param runs current list of inline runs
+     * @return modified list of inline runs, having appended new run
+     */
+    @Override
+    public List collectInlineRuns ( List runs ) {
+        assert runs != null;
+        runs.add ( new InlineRun ( this, new int[] {getBidiLevel()}) );
+        return runs;
     }
 }

@@ -47,13 +47,18 @@ import org.apache.fop.util.CharUtilities;
  *
  * @author Glenn Adams
  */
-class InlineRun {
+public class InlineRun {
     private InlineArea inline;
     private int[] levels;
     private int minLevel;
     private int maxLevel;
     private int reversals;
-    InlineRun ( InlineArea inline, int[] levels ) {
+    /**
+     * Primary constructor.
+     * @param inline which generated this inline run
+     * @param levels levels array
+     */
+    public InlineRun ( InlineArea inline, int[] levels ) {
         this.inline = inline;
         this.levels = levels;
         setMinMax ( levels );
@@ -61,11 +66,26 @@ class InlineRun {
     private InlineRun ( InlineArea inline, int level, int count ) {
         this ( inline, makeLevels ( level, count ) );
     }
-    InlineArea getInline() {
+    /**
+     * Obtain inline area that generated this inline run.
+     * @return inline area that generated this inline run.
+     */
+    public InlineArea getInline() {
         return inline;
     }
-    int getMinLevel() {
+    /**
+     * Obtain minimum bidi level for this run.
+     * @return minimum bidi level
+     */
+    public int getMinLevel() {
         return minLevel;
+    }
+    /**
+     * Obtain maximum bidi level for this run.
+     * @return maximum bidi level
+     */
+    public int getMaxLevel() {
+        return maxLevel;
     }
     private void setMinMax ( int[] levels ) {
         int mn = Integer.MAX_VALUE;
@@ -86,9 +106,17 @@ class InlineRun {
         this.minLevel = mn;
         this.maxLevel = mx;
     }
+    /**
+     * Determine if this run has homogenous (same valued) bidi levels.
+     * @return true if homogenous
+     */
     public boolean isHomogenous() {
         return minLevel == maxLevel;
     }
+    /**
+     * Split this inline run into homogenous runs.
+     * @return list of new runs
+     */
     public List split() {
         List runs = new Vector();
         for ( int i = 0, n = levels.length; i < n; ) {
@@ -110,6 +138,10 @@ class InlineRun {
         assert runs.size() < 2 : "heterogeneous inlines not yet supported!!";
         return runs;
     }
+    /**
+     * Update a min/max array to correspond with this run's min/max values.
+     * @param mm reference to min/max array
+     */
     public void updateMinMax ( int[] mm ) {
         if ( minLevel < mm[0] ) {
             mm[0] = minLevel;
@@ -118,12 +150,24 @@ class InlineRun {
             mm[1] = maxLevel;
         }
     }
+    /**
+     * Determine if run needs mirroring.
+     * @return true if run is homogenous and odd (i.e., right to left)
+     */
     public boolean maybeNeedsMirroring() {
         return ( minLevel == maxLevel ) && ( ( minLevel & 1 ) != 0 );
     }
+    /**
+     * Reverse run (by incrementing reversal count, not actually reversing).
+     */
     public void reverse() {
         reversals++;
     }
+    /**
+     * Reverse inline area if it is a word area and it requires
+     * reversal.
+     * @param mirror if true then also mirror characters
+     */
     public void maybeReverseWord ( boolean mirror ) {
         if ( inline instanceof WordArea ) {
             WordArea w = (WordArea) inline;
@@ -134,6 +178,7 @@ class InlineRun {
             }
         }
     }
+    @Override
     public boolean equals ( Object o ) {
         if ( o instanceof InlineRun ) {
             InlineRun ir = (InlineRun) o;
@@ -163,12 +208,14 @@ class InlineRun {
             return false;
         }
     }
+    @Override
     public int hashCode() {
         int l = ( inline != null ) ? inline.hashCode() : 0;
         l = ( l ^ minLevel ) + ( l << 19 );
         l = ( l ^ maxLevel )   + ( l << 11 );
         return l;
     }
+    @Override
     public String toString() {
         StringBuffer sb = new StringBuffer( "RR: { type = \'" );
         char c;

@@ -22,7 +22,6 @@ package org.apache.fop.complexscripts.bidi;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Stack;
 import java.util.Vector;
 
@@ -30,36 +29,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import org.apache.fop.area.LineArea;
-import org.apache.fop.area.inline.Anchor;
 import org.apache.fop.area.inline.InlineArea;
-import org.apache.fop.area.inline.InlineBlockParent;
-import org.apache.fop.area.inline.InlineParent;
-import org.apache.fop.area.inline.InlineViewport;
-import org.apache.fop.area.inline.Leader;
-import org.apache.fop.area.inline.Space;
-import org.apache.fop.area.inline.SpaceArea;
-import org.apache.fop.area.inline.TextArea;
-import org.apache.fop.area.inline.UnresolvedPageNumber;
-import org.apache.fop.area.inline.WordArea;
-import org.apache.fop.fo.Constants;
-import org.apache.fop.fo.FONode;
-import org.apache.fop.fo.FOText;
-import org.apache.fop.fo.flow.AbstractPageNumberCitation;
-import org.apache.fop.fo.flow.AbstractGraphics;
-import org.apache.fop.fo.flow.BidiOverride;
-import org.apache.fop.fo.flow.Block;
-import org.apache.fop.fo.flow.BlockContainer;
-import org.apache.fop.fo.flow.Character;
-import org.apache.fop.fo.flow.InlineContainer;
-import org.apache.fop.fo.flow.InlineLevel;
-import org.apache.fop.fo.flow.ListItem;
-import org.apache.fop.fo.flow.PageNumber;
-import org.apache.fop.fo.flow.Wrapper;
-import org.apache.fop.fo.pagination.Flow;
 import org.apache.fop.fo.pagination.PageSequence;
-import org.apache.fop.fo.pagination.StaticContent;
-import org.apache.fop.traits.Direction;
-import org.apache.fop.util.CharUtilities;
 
 // CSOFF: EmptyForIteratorPadCheck
 // CSOFF: InnerAssignmentCheck
@@ -152,70 +123,8 @@ public final class BidiResolver {
     private static List collectRuns ( List inlines, List runs ) {
         for ( Iterator it = inlines.iterator(); it.hasNext(); ) {
             InlineArea ia = (InlineArea) it.next();
-            if ( ia instanceof WordArea ) {
-                runs = collectRuns ( (WordArea) ia, runs );
-            } else if ( ia instanceof SpaceArea ) {
-                runs = collectRuns ( (SpaceArea) ia, runs );
-            } else if ( ia instanceof Anchor ) {
-                runs = collectRuns ( (Anchor) ia, runs );
-            } else if ( ia instanceof Leader ) {
-                runs = collectRuns ( (Leader) ia, runs );
-            } else if ( ia instanceof Space ) {
-                runs = collectRuns ( (Space) ia, runs );
-            } else if ( ia instanceof UnresolvedPageNumber ) {
-                runs = collectRuns ( (UnresolvedPageNumber) ia, runs );
-            } else if ( ia instanceof InlineBlockParent ) {
-                runs = collectRuns ( (InlineBlockParent) ia, runs );
-            } else if ( ia instanceof InlineViewport ) {
-                runs = collectRuns ( (InlineViewport) ia, runs );
-            } else if ( ia instanceof InlineParent ) {
-                runs = collectRuns ( (InlineParent) ia, runs );
-            }
+            runs = ia.collectInlineRuns ( runs );
         }
-        return runs;
-    }
-
-    private static List collectRuns ( Anchor a, List runs ) {
-        runs.add ( new InlineRun ( a, new int[] {a.getBidiLevel()}) );
-        return runs;
-    }
-
-    private static List collectRuns ( InlineBlockParent a, List runs ) {
-        runs.add ( new InlineRun ( a, new int[] {a.getBidiLevel()}) );
-        return runs;
-    }
-
-    private static List collectRuns ( InlineParent a, List runs ) {
-        return collectRuns ( a.getChildAreas(), runs );
-    }
-
-    private static List collectRuns ( InlineViewport a, List runs ) {
-        runs.add ( new InlineRun ( a, new int[] {a.getBidiLevel()}) );
-        return runs;
-    }
-
-    private static List collectRuns ( Leader a, List runs ) {
-        runs.add ( new InlineRun ( a, new int[] {a.getBidiLevel()}) );
-        return runs;
-    }
-
-    private static List collectRuns ( Space a, List runs ) {
-        runs.add ( new InlineRun ( a, new int[] {a.getBidiLevel()}) );
-        return runs;
-    }
-
-    private static List collectRuns ( SpaceArea a, List runs ) {
-        runs.add ( new InlineRun ( a, new int[] {a.getBidiLevel()}) );
-        return runs;
-    }
-
-    private static List collectRuns ( UnresolvedPageNumber a, List runs ) {
-        runs.add ( new InlineRun ( a, new int[] {a.getBidiLevel()}) );
-        return runs;
-    }
-
-    private static List collectRuns ( WordArea a, List runs ) {
-        runs.add ( new InlineRun ( a, a.getBidiLevels() ) );
         return runs;
     }
 
