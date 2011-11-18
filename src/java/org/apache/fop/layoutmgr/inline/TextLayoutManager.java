@@ -1025,7 +1025,11 @@ public class TextLayoutManager extends LeafNodeLayoutManager {
         // 4. compute glyph position adjustments on (substituted) characters
         int[][] gpa;
         if ( font.performsPositioning() ) {
+            // handle GPOS adjustments
             gpa = font.performPositioning ( mcs, script, language );
+        } else if ( font.hasKerning() ) {
+            // handle standard (non-GPOS) kerning adjustments
+            gpa = getKerningAdjustments ( mcs, font );
         } else {
             gpa = null;
         }
@@ -1042,26 +1046,64 @@ public class TextLayoutManager extends LeafNodeLayoutManager {
         // 7. compute word ipd based on final position adjustments
         MinOptMax ipd = MinOptMax.ZERO;
         for ( int i = 0, n = mcs.length(); i < n; i++ ) {
-            char c = mcs.charAt ( i );
+            int c = mcs.charAt ( i );
+            // TODO !BMP
             int  w = font.getCharWidth ( c );
+            if ( w < 0 ) {
+                w = 0;
+            }
             if ( gpa != null ) {
                 w += gpa [ i ] [ GlyphPositioningTable.Value.IDX_X_ADVANCE ];
             }
             ipd = ipd.plus ( w );
         }
 
-        // [TBD] - handle kerning - note that standard kerning would only apply in
-        // the off-chance that a font supports substitution, but does not support
-        // positioning and yet has kerning data
-        // if ( ! font.performsPositioning() ) {
-        //   // do standard kerning
-        // }
-
         // [TBD] - handle letter spacing
 
         return new AreaInfo
             ( s, e, 0, nLS, ipd, endsWithHyphen, false,
               breakOpportunityChar != 0, font, level, gpa );
+    }
+
+    /**
+     * Given a mapped character sequence MCS, obtain glyph position adjustments
+     * from the font's kerning data.
+     * @param mcs mapped character sequence
+     * @param font applicable font
+     * @return glyph position adjustments (or null if no kerning)
+     */
+    private int[][] getKerningAdjustments ( CharSequence mcs, final Font font ) {
+        int nc = mcs.length();
+        // extract kerning array
+        int[] ka = new int [ nc ]; // kerning array
+        for ( int i = 0, n = nc, cPrev = -1; i < n; i++ ) {
+            int c = mcs.charAt ( i );
+            // TODO !BMP
+            if ( cPrev >= 0 ) {
+                ka[i] = font.getKernValue ( cPrev, c );
+            }
+            cPrev = c;
+        }
+        // was there a non-zero kerning?
+        boolean hasKerning = false;
+        for ( int i = 0, n = nc; i < n; i++ ) {
+            if ( ka[i] != 0 ) {
+                hasKerning = true;
+                break;
+            }
+        }
+        // if non-zero kerning, then create and return glyph position adjustment array
+        if ( hasKerning ) {
+            int[][] gpa = new int [ nc ] [ 4 ];
+            for ( int i = 0, n = nc; i < n; i++ ) {
+                if ( i > 0 ) {
+                    gpa [ i - 1 ] [ GlyphPositioningTable.Value.IDX_X_ADVANCE ] = ka [ i ];
+                }
+            }
+            return gpa;
+        } else {
+            return null;
+        }
     }
 
     private AreaInfo processWordNoMapping(int lastIndex, final Font font, AreaInfo prevAreaInfo,
