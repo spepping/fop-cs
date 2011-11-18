@@ -194,6 +194,30 @@ public class Font implements Substitutable, Positionable {
     }
 
     /**
+     * Returns the amount of kerning between two characters.
+     *
+     * The value returned measures in pt. So it is already adjusted for font size.
+     *
+     * @param ch1 first character
+     * @param ch2 second character
+     * @return the distance to adjust for kerning, 0 if there's no kerning
+     */
+    public int getKernValue(int ch1, int ch2) {
+        // TODO !BMP
+        if ( ch1 > 0x10000 ) {
+            return 0;
+        } else if ( ( ch1 >= 0xD800 ) && ( ch1 <= 0xE000 ) ) {
+            return 0;
+        } else if ( ch2 > 0x10000 ) {
+            return 0;
+        } else if ( ( ch2 >= 0xD800 ) && ( ch2 <= 0xE000 ) ) {
+            return 0;
+        } else {
+            return getKernValue ( (char) ch1, (char) ch2 );
+        }
+    }
+
+    /**
      * Returns the width of a character
      * @param charnum character to look up
      * @return width of the character
@@ -269,7 +293,7 @@ public class Font implements Substitutable, Positionable {
      * This also performs some guessing on widths on various
      * versions of space that might not exists in the font.
      * @param c character to inspect
-     * @return the width of the character
+     * @return the width of the character or -1 if no width available
      */
     public int getCharWidth(char c) {
         int width;
@@ -331,6 +355,23 @@ public class Font implements Substitutable, Positionable {
         }
 
         return width;
+    }
+
+    /**
+     * Helper method for getting the width of a unicode char
+     * from the current fontstate.
+     * This also performs some guessing on widths on various
+     * versions of space that might not exists in the font.
+     * @param c character to inspect
+     * @return the width of the character or -1 if no width available
+     */
+    public int getCharWidth(int c) {
+        if ( c < 0x10000 ) {
+            return getCharWidth ( (char) c );
+        } else {
+            // TODO !BMP
+            return -1;
+        }
     }
 
     /**
