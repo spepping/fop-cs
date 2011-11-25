@@ -215,4 +215,14 @@
     <description>Test erroneously depends upon incorrect implementation of writing-mode trait
     derivation on fo:region-*.</description>
   </testcase>
+  <testcase>
+    <name>Temporary Regression</name>
+    <file>list-block_writing-mode_rl.xml</file>
+    <description></description>
+  </testcase>
+  <testcase>
+    <name>Temporary Regression</name>
+    <file>page-number-citation_writing-mode_rl.xml</file>
+    <description></description>
+  </testcase>
 </disabled-testcases>

@@ -566,6 +566,13 @@ public abstract class FObj extends FONode implements Constants {
         assert bidiLevel >= 0;
         if ( bidiLevel >= 0 ) {
             this.bidiLevel = bidiLevel;
+            if ( parent != null ) {
+                FObj foParent = (FObj) parent;
+                int parentBidiLevel = foParent.getBidiLevel();
+                if ( ( parentBidiLevel < 0 ) || ( bidiLevel < parentBidiLevel ) ) {
+                    foParent.setBidiLevel ( bidiLevel );
+                }
+            }
         }
     }
 
@@ -576,6 +583,25 @@ public abstract class FObj extends FONode implements Constants {
      */
     public int getBidiLevel() {
         return bidiLevel;
+    }
+
+    /**
+     * Obtain resolved bidirectional level of FO or nearest FO
+     * ancestor that has a resolved level.
+     * @return either a non-negative bidi embedding level or -1
+     * in case no bidi levels have been assigned to this FO or
+     * any ancestor
+     */
+    public int getBidiLevelRecursive() {
+        for ( FONode fn = this; fn != null; fn = fn.getParent() ) {
+            if ( fn instanceof FObj ) {
+                int level = ( (FObj) fn).getBidiLevel();
+                if ( level >= 0 ) {
+                    return level;
+                }
+            }
+        }
+        return -1;
     }
 
     /**

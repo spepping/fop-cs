@@ -174,6 +174,7 @@ public class XMLRenderer extends AbstractXMLRenderer {
     protected void addAreaAttributes(Area area) {
         addAttribute("ipd", area.getIPD());
         addAttribute("bpd", area.getBPD());
+        maybeAddLevelAttribute(area);
         if (isDetailedFormat()) {
             if (area.getIPD() != 0) {
                 addAttribute("ipda", area.getAllocIPD());
@@ -625,7 +626,6 @@ public class XMLRenderer extends AbstractXMLRenderer {
             }
             addAreaAttributes(span);
             addTraitAttributes(span);
-            maybeAddLevelAttribute(span);
             startElement("span", atts);
             for (int c = 0; c < span.getColumnCount(); c++) {
                 NormalFlow flow = span.getNormalFlow(c);
@@ -704,7 +704,6 @@ public class XMLRenderer extends AbstractXMLRenderer {
             break;
         default: //nop
         }
-        maybeAddLevelAttribute(block);
         startElement("block", atts);
         super.renderBlock(block);
         endElement("block");
@@ -718,7 +717,6 @@ public class XMLRenderer extends AbstractXMLRenderer {
         atts.clear();
         addAreaAttributes(line);
         addTraitAttributes(line);
-        maybeAddLevelAttribute(line);
         startElement("lineArea", atts);
         super.renderLineArea(line);
         endElement("lineArea");
@@ -834,7 +832,6 @@ public class XMLRenderer extends AbstractXMLRenderer {
         addAttribute("baseline", text.getBaselineOffset());
         addAreaAttributes(text);
         addTraitAttributes(text);
-        maybeAddLevelAttribute(text);
         startElement("text", atts);
         super.renderText(text);
         endElement("text");
@@ -905,7 +902,6 @@ public class XMLRenderer extends AbstractXMLRenderer {
         addAreaAttributes(ip);
         addTraitAttributes(ip);
         addAttribute("offset", ip.getBlockProgressionOffset());
-        maybeAddLevelAttribute(ip);
         startElement("inlineparent", atts);
         super.renderInlineParent(ip);
         endElement("inlineparent");
@@ -920,7 +916,6 @@ public class XMLRenderer extends AbstractXMLRenderer {
         addAreaAttributes(ibp);
         addTraitAttributes(ibp);
         addAttribute("offset", ibp.getBlockProgressionOffset());
-        maybeAddLevelAttribute(ibp);
         startElement("inlineblockparent", atts);
         super.renderInlineBlockParent(ibp);
         endElement("inlineblockparent");

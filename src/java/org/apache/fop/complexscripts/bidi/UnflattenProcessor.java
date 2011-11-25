@@ -28,6 +28,7 @@ import java.util.Stack;
 import org.apache.fop.area.Area;
 import org.apache.fop.area.LinkResolver;
 import org.apache.fop.area.inline.BasicLinkArea;
+import org.apache.fop.area.inline.FilledArea;
 import org.apache.fop.area.inline.InlineArea;
 import org.apache.fop.area.inline.InlineParent;
 import org.apache.fop.area.inline.SpaceArea;
@@ -73,9 +74,14 @@ class UnflattenProcessor {
         process ( findInlineContainers ( ia ), findTextContainer ( ia ), ia );
     }
     private void process ( List<InlineParent> ich, TextArea tc, InlineArea ia ) {
-        maybeFinishTextContainer ( tc, ia );
-        maybeFinishInlineContainers ( ich, tc, ia );
-        update ( ich, tc, ia );
+        if ( ( tcNew == null ) || ( tc != tcNew ) ) {
+            maybeFinishTextContainer ( tc, ia );
+            maybeFinishInlineContainers ( ich, tc, ia );
+            update ( ich, tc, ia );
+        } else {
+            // skip inline area whose text container is the current new text container,
+            // which occurs in the context of the inline runs produced by a filled area
+        }
     }
     private boolean shouldFinishTextContainer ( TextArea tc, InlineArea ia ) {
         if ( ( tcOrig != null ) && ( tc != tcOrig ) ) {
@@ -170,16 +176,31 @@ class UnflattenProcessor {
         finishInlineContainer();
     }
     private void update ( List<InlineParent> ich, TextArea tc, InlineArea ia ) {
-        if ( ( ich != null ) && ! ich.isEmpty() ) {
-            pushInlineContainers ( ich );
-        }
-        if ( tc != null ) {
-            pushTextContainer ( tc, ia );
+        if ( ! alreadyUnflattened ( ia ) ) {
+            if ( ( ich != null ) && ! ich.isEmpty() ) {
+                pushInlineContainers ( ich );
+            }
+            if ( tc != null ) {
+                pushTextContainer ( tc, ia );
+            } else {
+                pushNonTextInline ( ia );
+            }
+            iaLevelLast = ia.getBidiLevel();
+            tcOrig = tc;
+        } else  if ( tcNew != null ) {
+            finishTextContainer();
+            tcOrig = null;
         } else {
-            pushNonTextInline ( ia );
+            tcOrig = null;
         }
-        iaLevelLast = ia.getBidiLevel();
-        tcOrig = tc;
+    }
+    private boolean alreadyUnflattened ( InlineArea ia ) {
+        for ( Iterator<InlineArea> it = ilNew.iterator(); it.hasNext(); ) {
+            if ( ia.isAncestorOrSelf ( it.next() ) ) {
+                return true;
+            }
+        }
+        return false;
     }
     private void pushInlineContainers ( List<InlineParent> ich ) {
         LinkedList<InlineParent> icl = new LinkedList<InlineParent>();
@@ -217,6 +238,8 @@ class UnflattenProcessor {
     private InlineParent generateInlineContainer ( InlineParent i ) {
         if ( i instanceof BasicLinkArea ) {
             return generateBasicLinkArea ( (BasicLinkArea) i );
+        } else if ( i instanceof FilledArea ) {
+            return generateFilledArea ( (FilledArea) i );
         } else {
             return generateInlineContainer0 ( i );
         }
@@ -242,6 +265,20 @@ class UnflattenProcessor {
                 r.addDependent ( lr );
             }
         }
+    }
+    private InlineParent generateFilledArea ( FilledArea f ) {
+        FilledArea fc = new FilledArea();
+        if ( f != null ) {
+            initializeInlineContainer ( fc, f );
+            initializeFilledArea ( fc, f );
+        }
+        return fc;
+    }
+    private void initializeFilledArea ( FilledArea fc, FilledArea f ) {
+        assert fc != null;
+        assert f != null;
+        fc.setIPD ( f.getIPD() );
+        fc.setUnitWidth ( f.getUnitWidth() );
     }
     private InlineParent generateInlineContainer0 ( InlineParent i ) {
         InlineParent ic = new InlineParent();

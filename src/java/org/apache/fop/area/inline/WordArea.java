@@ -122,7 +122,7 @@ public class WordArea extends InlineArea {
      */
     public int[] getBidiLevels ( int start, int end ) {
         assert start <= end;
-        if ( levels != null ) {
+        if ( this.levels != null ) {
             int n = end - start;
             int[] levels = new int [ n ];
             for ( int i = 0; i < n; i++ ) {
@@ -154,7 +154,13 @@ public class WordArea extends InlineArea {
     @Override
     public List collectInlineRuns ( List runs ) {
         assert runs != null;
-        runs.add ( new InlineRun ( this, getBidiLevels() ) );
+        InlineRun r;
+        if ( getBidiLevels() != null ) {
+            r = new InlineRun ( this, getBidiLevels() );
+        } else {
+            r = new InlineRun ( this, -1, word.length() );
+        }
+        runs.add ( r );
         return runs;
     }
 

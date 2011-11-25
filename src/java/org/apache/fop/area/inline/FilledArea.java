@@ -53,7 +53,6 @@ public class FilledArea extends InlineParent {
     public void setBlockProgressionOffset(int v) {
         setChildOffset(inlines.listIterator(), v);
     }
-    */
 
     private void setChildOffset(ListIterator childrenIterator, int v) {
         while (childrenIterator.hasNext()) {
@@ -67,6 +66,7 @@ public class FilledArea extends InlineParent {
             }
         }
     }
+    */
 
     /**
      * Set the unit width for the areas to fill the full width.
@@ -129,5 +129,6 @@ public class FilledArea extends InlineParent {
         setIPD(getIPD() + adjustingInfo.applyVariationFactor(variationFactor));
         return false;
     }
+
 }
 

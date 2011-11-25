@@ -25,6 +25,7 @@ import org.apache.fop.fo.flow.AbstractPageNumberCitation;
 import org.apache.fop.fo.flow.AbstractGraphics;
 import org.apache.fop.fo.flow.BidiOverride;
 import org.apache.fop.fo.flow.Character;
+import org.apache.fop.fo.flow.Leader;
 
 // CSOFF: LineLengthCheck
 // CSOFF: SimplifyBooleanReturnCheck
@@ -90,6 +91,8 @@ class TextInterval {
             ( (AbstractPageNumberCitation) fn ) .setBidiLevel ( level );
         } else if ( fn instanceof AbstractGraphics ) {
             ( (AbstractGraphics) fn ) .setBidiLevel ( level );
+        } else if ( fn instanceof Leader ) {
+            ( (Leader) fn ) .setBidiLevel ( level );
         }
     }
     public boolean equals ( Object o ) {
@@ -127,6 +130,8 @@ class TextInterval {
             c = '#';
         } else if ( fn instanceof AbstractGraphics ) {
             c = 'G';
+        } else if ( fn instanceof Leader ) {
+            c = 'L';
         } else {
             c = '?';
         }

@@ -19,14 +19,18 @@
 
 package org.apache.fop.fo.flow;
 
+import java.util.Stack;
+
 import org.xml.sax.Locator;
 
 import org.apache.fop.apps.FOPException;
+import org.apache.fop.complexscripts.bidi.DelimitedTextRange;
 import org.apache.fop.datatypes.Length;
 import org.apache.fop.fo.FONode;
 import org.apache.fop.fo.PropertyList;
 import org.apache.fop.fo.ValidationException;
 import org.apache.fop.fo.properties.LengthRangeProperty;
+import org.apache.fop.util.CharUtilities;
 
 /**
  * Class modelling the <a href="http://www.w3.org/TR/xsl/#fo_leader">
@@ -182,4 +186,17 @@ public class Leader extends InlineLevel {
     public int getNameId() {
         return FO_LEADER;
     }
+
+    @Override
+    protected Stack collectDelimitedTextRanges ( Stack ranges, DelimitedTextRange currentRange ) {
+        if ( currentRange != null ) {
+            if ( leaderPattern == EN_USECONTENT ) {
+                ranges = super.collectDelimitedTextRanges ( ranges, currentRange );
+            } else {
+                currentRange.append ( CharUtilities.OBJECT_REPLACEMENT_CHARACTER, this );
+            }
+        }
+        return ranges;
+    }
+
 }

@@ -19,10 +19,11 @@
 
 package org.apache.fop.area;
 
+import java.util.Iterator;
+import java.util.List;
+
 import org.apache.fop.fo.Constants;
 import org.apache.fop.traits.WritingModeTraitsGetter;
-
-import java.util.List;
 
 /**
  * The span-reference-area.
@@ -195,9 +196,15 @@ public class Span extends Area {
         switch ( wmtg.getColumnProgressionDirection().getEnumValue() ) {
         case Constants.EN_RL:
             setBidiLevel(1);
+            for ( Iterator<NormalFlow> it = flowAreas.iterator(); it.hasNext();) {
+                it.next().setBidiLevel(1);
+            }
             break;
         default:
             resetBidiLevel();
+            for ( Iterator<NormalFlow> it = flowAreas.iterator(); it.hasNext();) {
+                it.next().resetBidiLevel();
+            }
             break;
         }
     }

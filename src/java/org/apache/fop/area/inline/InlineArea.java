@@ -309,4 +309,31 @@ public class InlineArea extends Area {
         return runs;
     }
 
+    /**
+     * Determine if inline area IA is an ancestor inline area or same as this area.
+     * @param ia inline area to test
+     * @return true if specified inline area is an ancestor or same as this area
+     */
+    public boolean isAncestorOrSelf ( InlineArea ia ) {
+        return ( ia == this ) || isAncestor ( ia );
+    }
+
+    /**
+     * Determine if inline area IA is an ancestor inline area of this area.
+     * @param ia inline area to test
+     * @return true if specified inline area is an ancestor of this area
+     */
+    public boolean isAncestor ( InlineArea ia ) {
+        for ( Area p = getParentArea(); p != null;) {
+            if ( p == ia ) {
+                return true;
+            } else if ( p instanceof InlineArea ) {
+                p = ( (InlineArea) p ).getParentArea();
+            } else {
+                p = null;
+            }
+        }
+        return false;
+    }
+
 }

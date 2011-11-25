@@ -752,6 +752,9 @@ public class FOText extends FONode implements CharSequence {
             for ( int i = start, n = end; i < n; i++ ) {
                 bidiLevels [ i ] = level;
             }
+            if ( parent != null ) {
+                ( (FObj) parent ).setBidiLevel ( level );
+            }
         } else {
             assert start < end;
         }

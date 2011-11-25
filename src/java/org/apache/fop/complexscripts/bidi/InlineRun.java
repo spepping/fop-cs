@@ -39,6 +39,7 @@ import org.apache.fop.util.CharUtilities;
 
 // CSOFF: EmptyForIteratorPadCheck
 // CSOFF: InnerAssignmentCheck
+// CSOFF: NoWhitespaceAfterCheck
 // CSOFF: SimplifyBooleanReturnCheck
 
 /**
@@ -59,11 +60,19 @@ public class InlineRun {
      * @param levels levels array
      */
     public InlineRun ( InlineArea inline, int[] levels ) {
+        assert inline != null;
+        assert levels != null;
         this.inline = inline;
         this.levels = levels;
         setMinMax ( levels );
     }
-    private InlineRun ( InlineArea inline, int level, int count ) {
+    /**
+     * Alternate constructor.
+     * @param inline which generated this inline run
+     * @param level for each index
+     * @param count of indices
+     */
+    public InlineRun ( InlineArea inline, int level, int count ) {
         this ( inline, makeLevels ( level, count ) );
     }
     /**
@@ -171,10 +180,13 @@ public class InlineRun {
     public void maybeReverseWord ( boolean mirror ) {
         if ( inline instanceof WordArea ) {
             WordArea w = (WordArea) inline;
-            if ( ( reversals & 1 ) != 0 ) {
-                w.reverse ( mirror );
-            } else if ( mirror && maybeNeedsMirroring() ) {
-                w.mirror();
+            // if not already reversed, then reverse now
+            if ( ! w.isReversed() ) {
+                if ( ( reversals & 1 ) != 0 ) {
+                    w.reverse ( mirror );
+                } else if ( mirror && maybeNeedsMirroring() ) {
+                    w.mirror();
+                }
             }
         }
     }
@@ -231,7 +243,7 @@ public class InlineRun {
         } else if ( inline instanceof Leader ) {
             c = 'L';
         } else if ( inline instanceof Space ) {
-            c = 'G'; // 'G' => glue
+            c = 'S';
         } else if ( inline instanceof UnresolvedPageNumber ) {
             c = '#';
             content = ( (UnresolvedPageNumber) inline ) .getText();
