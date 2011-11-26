@@ -133,8 +133,8 @@ public class DelimitedTextRange {
         int [] levels;
         if ( ( levels = UnicodeBidiAlgorithm.resolveLevels ( buffer, paragraphEmbeddingLevel ) ) != null ) {
             assignLevels ( levels );
+            assignBlockLevel ( paragraphEmbeddingLevel );
             assignTextLevels();
-            assignBlockLevel(paragraphEmbeddingLevel);
         }
     }
     /**

@@ -559,18 +559,22 @@ public abstract class FObj extends FONode implements Constants {
     }
 
     /**
-     * Set resolved bidirectional level of FO.
+     * Recursively set resolved bidirectional level of FO (and its ancestors) if
+     * and only if it is non-negative and if either the current value is reset (-1)
+     * or the new value is less than the current value.
      * @param bidiLevel a non-negative bidi embedding level
      */
     public void setBidiLevel(int bidiLevel) {
         assert bidiLevel >= 0;
         if ( bidiLevel >= 0 ) {
-            this.bidiLevel = bidiLevel;
-            if ( parent != null ) {
-                FObj foParent = (FObj) parent;
-                int parentBidiLevel = foParent.getBidiLevel();
-                if ( ( parentBidiLevel < 0 ) || ( bidiLevel < parentBidiLevel ) ) {
-                    foParent.setBidiLevel ( bidiLevel );
+            if ( ( this.bidiLevel < 0 ) || ( bidiLevel < this.bidiLevel ) ) {
+                this.bidiLevel = bidiLevel;
+                if ( parent != null ) {
+                    FObj foParent = (FObj) parent;
+                    int parentBidiLevel = foParent.getBidiLevel();
+                    if ( ( parentBidiLevel < 0 ) || ( bidiLevel < parentBidiLevel ) ) {
+                        foParent.setBidiLevel ( bidiLevel );
+                    }
                 }
             }
         }
