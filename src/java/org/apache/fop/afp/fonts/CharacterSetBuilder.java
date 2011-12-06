@@ -24,17 +24,23 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.WeakHashMap;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
+import org.apache.xmlgraphics.image.loader.util.SoftMapCache;
+
 import org.apache.fop.afp.AFPConstants;
+import org.apache.fop.afp.AFPEventProducer;
 import org.apache.fop.afp.util.ResourceAccessor;
 import org.apache.fop.afp.util.StructuredFieldReader;
 import org.apache.fop.fonts.Typeface;
-import org.apache.xmlgraphics.image.loader.util.SoftMapCache;
 
 /**
  * The CharacterSetBuilder is responsible building the a CharacterSet instance that holds
@@ -56,17 +62,12 @@ import org.apache.xmlgraphics.image.loader.util.SoftMapCache;
  * formatted object. <p/>
  *
  */
-public class CharacterSetBuilder {
+public abstract class CharacterSetBuilder {
 
     /**
      * Static logging instance
      */
     protected static final Log LOG = LogFactory.getLog(CharacterSetBuilder.class);
-
-    /**
-     * Singleton reference
-     */
-    private static CharacterSetBuilder instance;
 
     /**
      * Template used to convert lists to arrays.
@@ -104,8 +105,8 @@ public class CharacterSetBuilder {
     /**
      * The collection of code pages
      */
-    private final Map/*<String, Map<String, String>>*/ codePagesCache
-            = new WeakHashMap/*<String, Map<String, String>>*/();
+    private final Map<String, Map<String, String>> codePagesCache
+            = Collections.synchronizedMap(new WeakHashMap<String, Map<String, String>>());
 
     /**
      * Cache of charactersets
@@ -113,18 +114,15 @@ public class CharacterSetBuilder {
     private final SoftMapCache characterSetsCache = new SoftMapCache(true);
 
     /** Default constructor. */
-    protected CharacterSetBuilder() {
+    private CharacterSetBuilder() {
     }
 
     /**
      * Factory method for the single-byte implementation of AFPFontReader.
      * @return AFPFontReader
      */
-    public static CharacterSetBuilder getInstance() {
-        if (instance == null) {
-            instance = new CharacterSetBuilder();
-        }
-        return instance;
+    public static CharacterSetBuilder getSingleByteInstance() {
+        return SingleByteLoader.getInstance();
     }
 
     /**
@@ -132,7 +130,7 @@ public class CharacterSetBuilder {
      * @return AFPFontReader
      */
     public static CharacterSetBuilder getDoubleByteInstance() {
-        return new DoubleByteLoader();
+        return DoubleByteLoader.getInstance();
     }
 
 
@@ -141,11 +139,13 @@ public class CharacterSetBuilder {
      *
      * * @param accessor the resource accessor
      * @param filename the file name
+     * @param eventProducer for handling AFP related events
      * @return an inputStream
      *
      * @throws IOException in the event that an I/O exception of some sort has occurred
      */
-    protected InputStream openInputStream(ResourceAccessor accessor, String filename)
+    protected InputStream openInputStream(ResourceAccessor accessor, String filename,
+            AFPEventProducer eventProducer)
             throws IOException {
         URI uri;
         try {
@@ -181,17 +181,19 @@ public class CharacterSetBuilder {
     /**
      * Load the font details and metrics into the CharacterSetMetric object, this will use the
      * actual afp code page and character set files to load the object with the necessary metrics.
-     * 
+     *
      * @param characterSetName name of the characterset
      * @param codePageName name of the code page file
      * @param encoding encoding name
      * @param accessor used to load codepage and characterset
+     * @param eventProducer for handling AFP related events
      * @return CharacterSet object
      * @throws IOException if an I/O error occurs
      */
     public CharacterSet build(String characterSetName, String codePageName, String encoding,
-            ResourceAccessor accessor) throws IOException {
-        return processFont(characterSetName, codePageName, encoding, false, accessor);
+            ResourceAccessor accessor, AFPEventProducer eventProducer) throws IOException {
+        return processFont(characterSetName, codePageName, encoding, false, accessor,
+                eventProducer);
     }
 
     /**
@@ -204,35 +206,41 @@ public class CharacterSetBuilder {
      * @param encoding encoding name
      * @param isEDBCS if this is an EBCDIC double byte character set (DBCS)
      * @param accessor used to load codepage and characterset
+     * @param eventProducer for handling AFP related events
      * @return CharacterSet object
      * @throws IOException if an I/O error occurs
      */
     public CharacterSet buildDBCS(String characterSetName, String codePageName, String encoding,
-            boolean isEDBCS, ResourceAccessor accessor) throws IOException {
-        return processFont(characterSetName, codePageName, encoding, isEDBCS, accessor);
+            boolean isEDBCS, ResourceAccessor accessor, AFPEventProducer eventProducer)
+            throws IOException {
+        return processFont(characterSetName, codePageName, encoding, isEDBCS, accessor,
+                eventProducer);
     }
 
     /**
      * Load the font details and metrics into the CharacterSetMetric object, this will use the
      * actual afp code page and character set files to load the object with the necessary metrics.
-     * 
+     *
      * @param characterSetName the CharacterSetMetric object to populate
      * @param codePageName the name of the code page to use
      * @param encoding name of the encoding in use
      * @param typeface base14 font name
+     * @param eventProducer for handling AFP related events
      * @return CharacterSet object
      * @throws IOException if an I/O error occurs
      */
     public CharacterSet build(String characterSetName, String codePageName, String encoding,
-            Typeface typeface) throws IOException {
-        return new FopCharacterSet(codePageName, encoding, characterSetName, typeface);
+            Typeface typeface, AFPEventProducer eventProducer) throws IOException {
+        return new FopCharacterSet(codePageName, encoding, characterSetName, typeface,
+                eventProducer);
     }
 
     private CharacterSet processFont(String characterSetName, String codePageName, String encoding,
-            boolean isEDBCS, ResourceAccessor accessor) throws IOException {
+            boolean isEDBCS, ResourceAccessor accessor, AFPEventProducer eventProducer)
+            throws IOException {
         // check for cached version of the characterset
         String descriptor = characterSetName + "_" + encoding + "_" + codePageName;
-        CharacterSet characterSet = (CharacterSet)characterSetsCache.get(descriptor);
+        CharacterSet characterSet = (CharacterSet) characterSetsCache.get(descriptor);
 
         if (characterSet != null) {
             return characterSet;
@@ -240,7 +248,7 @@ public class CharacterSetBuilder {
 
         // characterset not in the cache, so recreating
         characterSet = new CharacterSet(codePageName, encoding, isEDBCS, characterSetName,
-                accessor);
+                accessor, eventProducer);
 
         InputStream inputStream = null;
 
@@ -251,16 +259,17 @@ public class CharacterSetBuilder {
              * information to map the unicode character id to the graphic
              * chracter global identifier.
              */
+            Map<String, String> codePage;
+            synchronized (codePagesCache) {
+                codePage = codePagesCache.get(codePageName);
 
-            Map/*<String,String>*/ codePage
-                = (Map/*<String,String>*/)codePagesCache.get(codePageName);
-
-            if (codePage == null) {
-                codePage = loadCodePage(codePageName, encoding, accessor);
-                codePagesCache.put(codePageName, codePage);
+                if (codePage == null) {
+                    codePage = loadCodePage(codePageName, encoding, accessor, eventProducer);
+                    codePagesCache.put(codePageName, codePage);
+                }
             }
 
-            inputStream = openInputStream(accessor, characterSetName);
+            inputStream = openInputStream(accessor, characterSetName, eventProducer);
 
             StructuredFieldReader structuredFieldReader = new StructuredFieldReader(inputStream);
 
@@ -315,18 +324,19 @@ public class CharacterSetBuilder {
      * @param encoding
      *            the encoding to use for the character decoding
      * @param accessor the resource accessor
+     * @param eventProducer for handling AFP related events
      * @return a code page mapping (key: GCGID, value: Unicode character)
      * @throws IOException if an I/O exception of some sort has occurred.
      */
-    protected Map/*<String,String>*/ loadCodePage(String codePage, String encoding,
-        ResourceAccessor accessor) throws IOException {
+    protected Map<String, String> loadCodePage(String codePage, String encoding,
+            ResourceAccessor accessor, AFPEventProducer eventProducer) throws IOException {
 
         // Create the HashMap to store code page information
-        Map/*<String,String>*/ codePages = new java.util.HashMap/*<String,String>*/();
+        Map<String, String> codePages = new HashMap<String, String>();
 
         InputStream inputStream = null;
         try {
-            inputStream = openInputStream(accessor, codePage.trim());
+            inputStream = openInputStream(accessor, codePage.trim(), eventProducer);
 
             StructuredFieldReader structuredFieldReader = new StructuredFieldReader(inputStream);
             byte[] data = structuredFieldReader.getNext(CHARACTER_TABLE_SF);
@@ -357,6 +367,8 @@ public class CharacterSetBuilder {
                     position++;
                 }
             }
+        } catch (FileNotFoundException e) {
+            eventProducer.codePageNotFound(this, e);
         } finally {
             closeInputStream(inputStream);
         }
@@ -427,7 +439,7 @@ public class CharacterSetBuilder {
         int position = 0;
         byte[] fnoData = new byte[26];
 
-        List orientations = new java.util.ArrayList();
+        List<CharacterSetOrientation> orientations = new ArrayList<CharacterSetOrientation>();
 
         // Read data, ignoring bytes 0 - 2
         for (int index = 3; index < data.length; index++) {
@@ -527,8 +539,8 @@ public class CharacterSetBuilder {
      * @throws IOException if an I/O exception of some sort has occurred.
      */
     protected void processFontIndex(StructuredFieldReader structuredFieldReader,
-        CharacterSetOrientation cso, Map/*<String,String>*/ codepage,
-        double metricNormalizationFactor)
+            CharacterSetOrientation cso, Map<String, String> codepage,
+            double metricNormalizationFactor)
         throws IOException {
 
         byte[] data = structuredFieldReader.getNext(FONT_INDEX_SF);
@@ -671,20 +683,42 @@ public class CharacterSetBuilder {
         }
     }
 
+    private static final class SingleByteLoader extends CharacterSetBuilder {
+
+        private static final SingleByteLoader INSTANCE = new SingleByteLoader();
+
+        private SingleByteLoader() {
+            super();
+        }
+
+        private static SingleByteLoader getInstance() {
+            return INSTANCE;
+        }
+    }
+
     /**
      * Double-byte (CID Keyed font (Type 0)) implementation of AFPFontReader.
      */
-    private static class DoubleByteLoader extends CharacterSetBuilder {
+    private static final class DoubleByteLoader extends CharacterSetBuilder {
 
-        protected Map/*<String,String>*/ loadCodePage(String codePage, String encoding,
-                ResourceAccessor accessor) throws IOException {
+        private static final DoubleByteLoader INSTANCE = new DoubleByteLoader();
+
+        private DoubleByteLoader() {
+        }
+
+        static DoubleByteLoader getInstance() {
+            return INSTANCE;
+        }
+
+        protected Map<String, String> loadCodePage(String codePage, String encoding,
+                ResourceAccessor accessor, AFPEventProducer eventProducer) throws IOException {
 
             // Create the HashMap to store code page information
-            Map/*<String,String>*/ codePages = new java.util.HashMap/*<String,String>*/();
+            Map<String, String> codePages = new HashMap<String, String>();
 
             InputStream inputStream = null;
             try {
-                inputStream = openInputStream(accessor, codePage.trim());
+                inputStream = openInputStream(accessor, codePage.trim(), eventProducer);
 
                 StructuredFieldReader structuredFieldReader
                     = new StructuredFieldReader(inputStream);
@@ -721,6 +755,8 @@ public class CharacterSetBuilder {
                         }
                     }
                 }
+            } catch (FileNotFoundException e) {
+                eventProducer.codePageNotFound(this, e);
             } finally {
                 closeInputStream(inputStream);
             }

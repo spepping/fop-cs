@@ -38,21 +38,21 @@ public class TTFFontLoaderTestCase {
 
     @Test
     public void testUseKerning() throws IOException {
-        File file = new File("test/resources/fonts/DejaVuLGCSerif.ttf");
+        boolean useComplexScriptFeatures = false;
+        File file = new File("test/resources/fonts/ttf/DejaVuLGCSerif.ttf");
         String absoluteFilePath = file.toURI().toURL().toExternalForm();
-        boolean useAdvanced = false;
-        FontResolver resolver = FontManager.createMinimalFontResolver(useAdvanced);
+        FontResolver resolver = FontManager.createMinimalFontResolver(useComplexScriptFeatures);
         String fontName = "Deja Vu";
         boolean embedded = false;
         boolean useKerning = true;
 
         TTFFontLoader fontLoader = new TTFFontLoader(absoluteFilePath, fontName, embedded,
-                EncodingMode.AUTO, useKerning, useAdvanced, resolver);
+                EncodingMode.AUTO, useKerning, useComplexScriptFeatures, resolver);
         assertTrue(fontLoader.getFont().hasKerningInfo());
         useKerning = false;
 
         fontLoader = new TTFFontLoader(absoluteFilePath, fontName, embedded, EncodingMode.AUTO,
-                useKerning, useAdvanced, resolver);
+                useKerning, useComplexScriptFeatures, resolver);
         assertFalse(fontLoader.getFont().hasKerningInfo());
     }
 }
