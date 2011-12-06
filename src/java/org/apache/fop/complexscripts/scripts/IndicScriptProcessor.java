@@ -126,6 +126,12 @@ public class IndicScriptProcessor extends DefaultScriptProcessor {
         case CharScript.SCRIPT_DEVANAGARI:
         case CharScript.SCRIPT_DEVANAGARI_2:
             return new DevanagariScriptProcessor ( script );
+        case CharScript.SCRIPT_GUJARATI:
+        case CharScript.SCRIPT_GUJARATI_2:
+            return new GujaratiScriptProcessor ( script );
+        case CharScript.SCRIPT_GURMUKHI:
+        case CharScript.SCRIPT_GURMUKHI_2:
+            return new GurmukhiScriptProcessor ( script );
         // [TBD] implement other script processors
         default:
             return new IndicScriptProcessor ( script );

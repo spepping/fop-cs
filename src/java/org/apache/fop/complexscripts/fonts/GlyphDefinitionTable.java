@@ -67,11 +67,11 @@ public class GlyphDefinitionTable extends GlyphTable {
     /** singleton glyph class table */
     private GlyphClassSubtable gct;
     /** singleton attachment point table */
-    // private AttachmentPointSubtable apt;
+    // private AttachmentPointSubtable apt; // NOT YET USED
     /** singleton ligature caret table */
-    // private LigatureCaretSubtable lct;
+    // private LigatureCaretSubtable lct;   // NOT YET USED
     /** singleton mark attachment table */
-    // private MarkAttachmentSubtable mat;
+    private MarkAttachmentSubtable mat;
 
     /**
      * Instantiate a <code>GlyphDefinitionTable</code> object using the specified subtables.
@@ -121,8 +121,7 @@ public class GlyphDefinitionTable extends GlyphTable {
             // TODO - not yet used
             // this.lct = (LigatureCaretSubtable) subtable;
         } else if ( subtable instanceof MarkAttachmentSubtable ) {
-            // TODO - not yet used
-            // this.mat = (MarkAttachmentSubtable) subtable;
+            this.mat = (MarkAttachmentSubtable) subtable;
         } else {
             throw new UnsupportedOperationException ( "unsupported glyph definition subtable type: " + subtable );
         }
@@ -150,6 +149,33 @@ public class GlyphDefinitionTable extends GlyphTable {
     public int getGlyphClass ( int gid ) {
         if ( gct != null ) {
             return gct.getGlyphClass ( gid );
+        } else {
+            return -1;
+        }
+    }
+
+    /**
+     * Determine if glyph belongs to (font specific) mark attachment class.
+     * @param gid a glyph identifier (index)
+     * @param mac a (font specific) mark attachment class
+     * @return true if glyph belongs to specified mark attachment class
+     */
+    public boolean isMarkAttachClass ( int gid, int mac ) {
+        if ( mat != null ) {
+            return mat.isMarkAttachClass ( gid, mac );
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * Determine mark attachment class.
+     * @param gid a glyph identifier (index)
+     * @return a non-negative mark attachment class, or -1 if no class defined
+     */
+    public int getMarkAttachClass ( int gid ) {
+        if ( mat != null ) {
+            return mat.getMarkAttachClass ( gid );
         } else {
             return -1;
         }
@@ -368,6 +394,19 @@ public class GlyphDefinitionTable extends GlyphTable {
         public int getType() {
             return GDEF_LOOKUP_TYPE_MARK_ATTACHMENT;
         }
+        /**
+         * Determine if glyph belongs to (font specific) mark attachment class.
+         * @param gid a glyph identifier (index)
+         * @param mac a (font specific) mark attachment class
+         * @return true if glyph belongs to specified mark attachment class
+         */
+        public abstract boolean isMarkAttachClass ( int gid, int mac );
+        /**
+         * Determine mark attachment class.
+         * @param gid a glyph identifier (index)
+         * @return a non-negative mark attachment class, or -1 if no class defined
+         */
+        public abstract int getMarkAttachClass ( int gid );
         static GlyphDefinitionSubtable create ( String id, int sequence, int flags, int format, GlyphMappingTable mapping, List entries ) {
             if ( format == 1 ) {
                 return new MarkAttachmentSubtableFormat1 ( id, sequence, flags, format, mapping, entries );
@@ -388,6 +427,24 @@ public class GlyphDefinitionTable extends GlyphTable {
         /** {@inheritDoc} */
         public boolean isCompatible ( GlyphSubtable subtable ) {
             return subtable instanceof MarkAttachmentSubtable;
+        }
+        /** {@inheritDoc} */
+        public boolean isMarkAttachClass ( int gid, int mac ) {
+            GlyphClassMapping cm = getClasses();
+            if ( cm != null ) {
+                return cm.getClassIndex ( gid, 0 ) == mac;
+            } else {
+                return false;
+            }
+        }
+        /** {@inheritDoc} */
+        public int getMarkAttachClass ( int gid ) {
+            GlyphClassMapping cm = getClasses();
+            if ( cm != null ) {
+                return cm.getClassIndex ( gid, 0 );
+            } else {
+                return -1;
+            }
         }
     }
 

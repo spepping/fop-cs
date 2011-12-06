@@ -75,28 +75,28 @@ public class ArabicScriptProcessor extends DefaultScriptProcessor {
         private static Map/*<String,GlyphContextTester>*/ testerMap = new HashMap/*<String,GlyphContextTester>*/();
         static {
             testerMap.put ( "fina", new GlyphContextTester() {
-                    public boolean test ( String script, String language, String feature, GlyphSequence gs, int index ) {
-                        return inFinalContext ( script, language, feature, gs, index );
+                    public boolean test ( String script, String language, String feature, GlyphSequence gs, int index, int flags ) {
+                        return inFinalContext ( script, language, feature, gs, index, flags );
                     }
                 } );
             testerMap.put ( "init", new GlyphContextTester() {
-                    public boolean test ( String script, String language, String feature, GlyphSequence gs, int index ) {
-                        return inInitialContext ( script, language, feature, gs, index );
+                    public boolean test ( String script, String language, String feature, GlyphSequence gs, int index, int flags ) {
+                        return inInitialContext ( script, language, feature, gs, index, flags );
                     }
                 } );
             testerMap.put ( "isol", new GlyphContextTester() {
-                    public boolean test ( String script, String language, String feature, GlyphSequence gs, int index ) {
-                        return inIsolateContext ( script, language, feature, gs, index );
+                    public boolean test ( String script, String language, String feature, GlyphSequence gs, int index, int flags ) {
+                        return inIsolateContext ( script, language, feature, gs, index, flags );
                     }
                 } );
             testerMap.put ( "liga", new GlyphContextTester() {
-                    public boolean test ( String script, String language, String feature, GlyphSequence gs, int index ) {
-                        return inLigatureContext ( script, language, feature, gs, index );
+                    public boolean test ( String script, String language, String feature, GlyphSequence gs, int index, int flags ) {
+                        return inLigatureContext ( script, language, feature, gs, index, flags );
                     }
                 } );
             testerMap.put ( "medi", new GlyphContextTester() {
-                    public boolean test ( String script, String language, String feature, GlyphSequence gs, int index ) {
-                        return inMedialContext ( script, language, feature, gs, index );
+                    public boolean test ( String script, String language, String feature, GlyphSequence gs, int index, int flags ) {
+                        return inMedialContext ( script, language, feature, gs, index, flags );
                     }
                 } );
         }
@@ -149,7 +149,7 @@ public class ArabicScriptProcessor extends DefaultScriptProcessor {
         return gs;
     }
 
-    private static boolean inFinalContext ( String script, String language, String feature, GlyphSequence gs, int index ) {
+    private static boolean inFinalContext ( String script, String language, String feature, GlyphSequence gs, int index, int flags ) {
         GlyphSequence.CharAssociation a = gs.getAssociation ( index );
         int[] ca = gs.getCharacterArray ( false );
         int   nc = gs.getCharacterCount();
@@ -170,7 +170,7 @@ public class ArabicScriptProcessor extends DefaultScriptProcessor {
         }
     }
 
-    private static boolean inInitialContext ( String script, String language, String feature, GlyphSequence gs, int index ) {
+    private static boolean inInitialContext ( String script, String language, String feature, GlyphSequence gs, int index, int flags ) {
         GlyphSequence.CharAssociation a = gs.getAssociation ( index );
         int[] ca = gs.getCharacterArray ( false );
         int   nc = gs.getCharacterCount();
@@ -189,7 +189,7 @@ public class ArabicScriptProcessor extends DefaultScriptProcessor {
         }
     }
 
-    private static boolean inIsolateContext ( String script, String language, String feature, GlyphSequence gs, int index ) {
+    private static boolean inIsolateContext ( String script, String language, String feature, GlyphSequence gs, int index, int flags ) {
         GlyphSequence.CharAssociation a = gs.getAssociation ( index );
         int   nc = gs.getCharacterCount();
         if ( nc == 0 ) {
@@ -201,7 +201,7 @@ public class ArabicScriptProcessor extends DefaultScriptProcessor {
         }
     }
 
-    private static boolean inLigatureContext ( String script, String language, String feature, GlyphSequence gs, int index ) {
+    private static boolean inLigatureContext ( String script, String language, String feature, GlyphSequence gs, int index, int flags ) {
         GlyphSequence.CharAssociation a = gs.getAssociation ( index );
         int[] ca = gs.getCharacterArray ( false );
         int   nc = gs.getCharacterCount();
@@ -220,7 +220,7 @@ public class ArabicScriptProcessor extends DefaultScriptProcessor {
         }
     }
 
-    private static boolean inMedialContext ( String script, String language, String feature, GlyphSequence gs, int index ) {
+    private static boolean inMedialContext ( String script, String language, String feature, GlyphSequence gs, int index, int flags ) {
         GlyphSequence.CharAssociation a = gs.getAssociation ( index );
         int[] ca = gs.getCharacterArray ( false );
         int   nc = gs.getCharacterCount();

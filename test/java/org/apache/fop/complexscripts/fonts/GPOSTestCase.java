@@ -450,7 +450,7 @@ public class GPOSTestCase implements ScriptContextTester, GlyphContextTester {
     }
 
     @Override
-    public boolean test ( String script, String language, String feature, GlyphSequence gs, int index ) {
+    public boolean test ( String script, String language, String feature, GlyphSequence gs, int index, int flags ) {
         return true;
     }
 

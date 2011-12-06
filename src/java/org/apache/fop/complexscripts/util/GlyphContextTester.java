@@ -19,6 +19,8 @@
 
 package org.apache.fop.complexscripts.util;
 
+// CSOFF: LineLengthCheck
+
 /**
  * Interface for testing the originating (source) character context of a glyph sequence.
  * @author Glenn Adams
@@ -32,8 +34,9 @@ public interface GlyphContextTester {
      * @param feature governing feature
      * @param gs glyph sequence to test
      * @param index index into glyph sequence to test
+     * @param flags that apply to lookup in scope
      * @return true if test is satisfied
      */
-    boolean test ( String script, String language, String feature, GlyphSequence gs, int index );
+    boolean test ( String script, String language, String feature, GlyphSequence gs, int index, int flags );
 
 }

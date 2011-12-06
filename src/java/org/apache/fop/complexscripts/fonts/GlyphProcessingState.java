@@ -56,7 +56,7 @@ public class GlyphProcessingState {
     /** consumed, updated after each successful subtable application */
     protected int consumed;
     /** lookup flags */
-    protected int flags;
+    protected int lookupFlags;
     /** class match set */
     protected int classMatchSet;
     /** script specific context tester or null */
@@ -88,9 +88,9 @@ public class GlyphProcessingState {
         this.indexLast = gs.getGlyphCount();
         this.sct = sct;
         this.gct = ( sct != null ) ? sct.getTester ( feature ) : null;
-        this.ignoreBase = new GlyphTester() { public boolean test(int gi) { return isBase(gi); } };
-        this.ignoreLigature = new GlyphTester() { public boolean test(int gi) { return isLigature(gi); } };
-        this.ignoreMark = new GlyphTester() { public boolean test(int gi) { return isMark(gi); } };
+        this.ignoreBase = new GlyphTester() { public boolean test(int gi, int flags) { return isIgnoredBase(gi, flags); } };
+        this.ignoreLigature = new GlyphTester() { public boolean test(int gi, int flags) { return isIgnoredLigature(gi, flags); } };
+        this.ignoreMark = new GlyphTester() { public boolean test(int gi, int flags) { return isIgnoredMark(gi, flags); } };
     }
 
     /**
@@ -127,11 +127,11 @@ public class GlyphProcessingState {
      * Set governing lookup flags
      * @param flags lookup flags (or zero, to unset)
      */
-    public void setFlags ( int flags ) {
-        if ( this.flags == 0 ) {
-            this.flags = flags;
+    public void setLookupFlags ( int flags ) {
+        if ( this.lookupFlags == 0 ) {
+            this.lookupFlags = flags;
         } else if ( flags == 0 ) {
-            this.flags = 0;
+            this.lookupFlags = 0;
         }
     }
 
@@ -139,8 +139,8 @@ public class GlyphProcessingState {
      * Obtain governing lookup  flags.
      * @return lookup flags (zero may indicate unset or no flags)
      */
-    public int getFlags() {
-        return flags;
+    public int getLookupFlags() {
+        return lookupFlags;
     }
 
     /**
@@ -181,8 +181,8 @@ public class GlyphProcessingState {
      */
     public void updateSubtableState ( GlyphSubtable st ) {
         setGDEF ( st.getGDEF() );
-        setFlags ( st.getFlags() );
-        setIgnoreDefault ( getIgnoreTester ( flags ) );
+        setLookupFlags ( st.getFlags() );
+        setIgnoreDefault ( getIgnoreTester ( getLookupFlags() ) );
     }
 
     /**
@@ -190,7 +190,7 @@ public class GlyphProcessingState {
      */
     public void resetSubtableState() {
         setGDEF ( null );
-        setFlags ( 0 );
+        setLookupFlags ( 0 );
         setIgnoreDefault ( null );
     }
 
@@ -450,7 +450,7 @@ public class GlyphProcessingState {
             if ( gi == 65535 ) {
                 ignored++;
             } else {
-                if ( ( ignoreTester == null ) || ! ignoreTester.test ( gi ) ) {
+                if ( ( ignoreTester == null ) || ! ignoreTester.test ( gi, getLookupFlags() ) ) {
                     if ( k < count ) {
                         glyphs [ k++ ] = gi; counted++;
                     } else {
@@ -476,7 +476,7 @@ public class GlyphProcessingState {
             if ( gi == 65535 ) {
                 ignored++;
             } else {
-                if ( ( ignoreTester == null ) || ! ignoreTester.test ( gi ) ) {
+                if ( ( ignoreTester == null ) || ! ignoreTester.test ( gi, getLookupFlags() ) ) {
                     if ( k < count ) {
                         glyphs [ k++ ] = gi; counted++;
                     } else {
@@ -586,7 +586,7 @@ public class GlyphProcessingState {
                 if ( gi == 65535 ) {
                     ignored++;
                 } else {
-                    if ( ignoreTester.test ( gi ) ) {
+                    if ( ignoreTester.test ( gi, getLookupFlags() ) ) {
                         ignored++;
                     } else {
                         counted++;
@@ -608,7 +608,7 @@ public class GlyphProcessingState {
                 if ( gi == 65535 ) {
                     ignored++;
                 } else {
-                    if ( ignoreTester.test ( gi ) ) {
+                    if ( ignoreTester.test ( gi, getLookupFlags() ) ) {
                         ignored++;
                     } else {
                         counted++;
@@ -696,7 +696,7 @@ public class GlyphProcessingState {
             if ( gi == 65535 ) {
                 ignored++;
             } else {
-                if ( ( ignoreTester == null ) || ! ignoreTester.test ( gi ) ) {
+                if ( ( ignoreTester == null ) || ! ignoreTester.test ( gi, getLookupFlags() ) ) {
                     if ( k < count ) {
                         associations [ k++ ] = getAssociation ( i - index ); counted++;
                     } else {
@@ -723,7 +723,7 @@ public class GlyphProcessingState {
             if ( gi == 65535 ) {
                 ignored++;
             } else {
-                if ( ( ignoreTester == null ) || ! ignoreTester.test ( gi ) ) {
+                if ( ( ignoreTester == null ) || ! ignoreTester.test ( gi, getLookupFlags() ) ) {
                     if ( k < count ) {
                         associations [ k++ ] = getAssociation ( i - index ); counted++;
                     } else {
@@ -899,7 +899,7 @@ public class GlyphProcessingState {
         if ( gct == null ) {
             return true;
         } else {
-            return gct.test ( script, language, feature, igs, index );
+            return gct.test ( script, language, feature, igs, index, getLookupFlags() );
         }
     }
 
@@ -925,7 +925,18 @@ public class GlyphProcessingState {
     }
 
     /**
-     * Determine if specified glyph is a ligature glyph according to the governing
+     * Determine if specified glyph is an ignored base glyph according to the governing
+     * glyph definition table.
+     * @param gi glyph index to test
+     * @param flags that apply to lookup in scope
+     * @return true if glyph definition table records glyph as a base glyph; otherwise, false
+     */
+    public boolean isIgnoredBase ( int gi, int flags ) {
+        return ( ( flags & GlyphSubtable.LF_IGNORE_BASE ) != 0 ) && isBase ( gi );
+    }
+
+    /**
+     * Determine if specified glyph is an ligature glyph according to the governing
      * glyph definition table.
      * @param gi glyph index to test
      * @return true if glyph definition table records glyph as a ligature glyph; otherwise, false
@@ -939,6 +950,17 @@ public class GlyphProcessingState {
     }
 
     /**
+     * Determine if specified glyph is an ignored ligature glyph according to the governing
+     * glyph definition table.
+     * @param gi glyph index to test
+     * @param flags that apply to lookup in scope
+     * @return true if glyph definition table records glyph as a ligature glyph; otherwise, false
+     */
+    public boolean isIgnoredLigature ( int gi, int flags ) {
+        return ( ( flags & GlyphSubtable.LF_IGNORE_LIGATURE ) != 0 ) && isLigature ( gi );
+    }
+
+    /**
      * Determine if specified glyph is a mark glyph according to the governing
      * glyph definition table.
      * @param gi glyph index to test
@@ -947,6 +969,25 @@ public class GlyphProcessingState {
     public boolean isMark ( int gi ) {
         if ( gdef != null ) {
             return gdef.isGlyphClass ( gi, GlyphDefinitionTable.GLYPH_CLASS_MARK );
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * Determine if specified glyph is an ignored ligature glyph according to the governing
+     * glyph definition table.
+     * @param gi glyph index to test
+     * @param flags that apply to lookup in scope
+     * @return true if glyph definition table records glyph as a ligature glyph; otherwise, false
+     */
+    public boolean isIgnoredMark ( int gi, int flags ) {
+        if ( ( flags & GlyphSubtable.LF_IGNORE_MARK ) != 0 ) {
+            return isMark ( gi );
+        } else if ( ( flags & GlyphSubtable.LF_MARK_ATTACHMENT_TYPE ) != 0 ) {
+            int lac = ( flags & GlyphSubtable.LF_MARK_ATTACHMENT_TYPE ) >> 8;
+            int gac = gdef.getMarkAttachClass ( gi );
+            return ( gac != lac );
         } else {
             return false;
         }
@@ -1039,11 +1080,11 @@ public class GlyphProcessingState {
             this.ngt = ngt;
         }
         /** {@inheritDoc} */
-        public boolean test ( int gi ) {
+        public boolean test ( int gi, int flags ) {
             for ( int i = 0, n = ngt; i < n; i++ ) {
                 GlyphTester gt = gta [ i ];
                 if ( gt != null ) {
-                    if ( gt.test ( gi ) ) {
+                    if ( gt.test ( gi, flags ) ) {
                         return true;
                     }
                 }
@@ -1061,11 +1102,11 @@ public class GlyphProcessingState {
             this.ngt = ngt;
         }
         /** {@inheritDoc} */
-        public boolean test ( int gi ) {
+        public boolean test ( int gi, int flags ) {
             for ( int i = 0, n = ngt; i < n; i++ ) {
                 GlyphTester gt = gta [ i ];
                 if ( gt != null ) {
-                    if ( ! gt.test ( gi ) ) {
+                    if ( ! gt.test ( gi, flags ) ) {
                         return false;
                     }
                 }
@@ -1081,9 +1122,9 @@ public class GlyphProcessingState {
             this.gt = gt;
         }
         /** {@inheritDoc} */
-        public boolean test ( int gi ) {
+        public boolean test ( int gi, int flags ) {
             if ( gt != null ) {
-                if ( gt.test ( gi ) ) {
+                if ( gt.test ( gi, flags ) ) {
                     return false;
                 }
             }
