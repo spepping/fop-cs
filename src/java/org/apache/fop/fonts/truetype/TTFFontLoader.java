@@ -108,11 +108,6 @@ public class TTFFontLoader extends FontLoader {
 
 
     private void buildFont(TTFFile ttf, String ttcFontName) {
-        if (ttf.isCFF()) {
-            throw new UnsupportedOperationException(
-                    "OpenType fonts with CFF data are not supported, yet");
-        }
-
         boolean isCid = this.embedded;
         if (this.encodingMode == EncodingMode.SINGLE_BYTE) {
             isCid = false;

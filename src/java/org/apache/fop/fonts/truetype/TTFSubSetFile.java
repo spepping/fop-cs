@@ -43,6 +43,7 @@ public class TTFSubSetFile extends TTFFile {
      * Offsets in name table to be filled out by table.
      * The offsets are to the checkSum field
      */
+    private int cffDirOffset = 0;
     private int cvtDirOffset = 0;
     private int fpgmDirOffset = 0;
     private int glyfDirOffset = 0;
@@ -56,24 +57,9 @@ public class TTFSubSetFile extends TTFFile {
     private int checkSumAdjustmentOffset = 0;
     private int locaOffset = 0;
 
-    /**
-     * Initalize the output array
-     */
-    private void init(int size) {
-        output = new byte[size];
-        realSize = 0;
-        currentPos = 0;
-
-        // createDirectory()
-    }
-
     private int determineTableCount() {
         int numTables = 4; //4 req'd tables: head,hhea,hmtx,maxp
         if (isCFF()) {
-            throw new UnsupportedOperationException(
-                    "OpenType fonts with CFF glyphs are not supported");
-        } else {
-            numTables += 2; //1 req'd table: glyf,loca
             if (hasCvt()) {
                 numTables++;
             }
@@ -83,6 +69,9 @@ public class TTFSubSetFile extends TTFFile {
             if (hasPrep()) {
                 numTables++;
             }
+            numTables += 2; //1 req'd table: loca,glyf
+        } else {
+            numTables += 1; //1 req'd table: CFF
         }
         return numTables;
     }
@@ -93,10 +82,17 @@ public class TTFSubSetFile extends TTFFile {
     private void createDirectory() {
         int numTables = determineTableCount();
         // Create the TrueType header
-        writeByte((byte)0);
-        writeByte((byte)1);
-        writeByte((byte)0);
-        writeByte((byte)0);
+        if (!isCFF() ) {
+            writeByte((byte)'O');
+            writeByte((byte)'T');
+            writeByte((byte)'T');
+            writeByte((byte)'O');
+        } else {
+            writeByte((byte)0);
+            writeByte((byte)1);
+            writeByte((byte)0);
+            writeByte((byte)0);
+        }
         realSize += 4;
 
         writeUShort(numTables);
@@ -115,24 +111,6 @@ public class TTFSubSetFile extends TTFFile {
         realSize += 2;
 
         // Create space for the table entries
-        if (hasCvt()) {
-            writeString("cvt ");
-            cvtDirOffset = currentPos;
-            currentPos += 12;
-            realSize += 16;
-        }
-
-        if (hasFpgm()) {
-            writeString("fpgm");
-            fpgmDirOffset = currentPos;
-            currentPos += 12;
-            realSize += 16;
-        }
-
-        writeString("glyf");
-        glyfDirOffset = currentPos;
-        currentPos += 12;
-        realSize += 16;
 
         writeString("head");
         headDirOffset = currentPos;
@@ -149,15 +127,24 @@ public class TTFSubSetFile extends TTFFile {
         currentPos += 12;
         realSize += 16;
 
-        writeString("loca");
-        locaDirOffset = currentPos;
-        currentPos += 12;
-        realSize += 16;
-
         writeString("maxp");
         maxpDirOffset = currentPos;
         currentPos += 12;
         realSize += 16;
+
+        if (hasCvt()) {
+            writeString("cvt ");
+            cvtDirOffset = currentPos;
+            currentPos += 12;
+            realSize += 16;
+        }
+
+        if (hasFpgm()) {
+            writeString("fpgm");
+            fpgmDirOffset = currentPos;
+            currentPos += 12;
+            realSize += 16;
+        }
 
         if (hasPrep()) {
             writeString("prep");
@@ -165,6 +152,24 @@ public class TTFSubSetFile extends TTFFile {
             currentPos += 12;
             realSize += 16;
         }
+
+        if (!isCFF()) {
+            writeString("loca");
+            locaDirOffset = currentPos;
+            currentPos += 12;
+            realSize += 16;
+
+            writeString("glyf");
+            glyfDirOffset = currentPos;
+            currentPos += 12;
+            realSize += 16;
+        } else {
+            writeString("CFF ");
+            cffDirOffset = currentPos;
+            currentPos += 12;
+            realSize += 16;
+        }
+
     }
 
 
@@ -425,6 +430,35 @@ public class TTFSubSetFile extends TTFFile {
         }
     }
 
+    /**
+     * Create the CFF table
+     */
+    private void createCff(FontFileReader in, Map glyphs) throws IOException {
+        TTFDirTabEntry entry = (TTFDirTabEntry) dirTabs.get("CFF ");
+        int size = 0;
+        int start = 0;
+        if ( entry != null ) {
+            pad4();
+            start = currentPos;
+
+            byte[] cffData = CFFUtil.extractGlyphSubset ( in, entry, glyphs );
+            int cffDataLength = cffData.length;
+            System.arraycopy ( cffData, 0, output, currentPos, cffDataLength );
+            currentPos += cffDataLength;
+            realSize += cffDataLength;
+            size = currentPos - start;
+
+            int checksum = getCheckSum(start, size);
+            writeULong(cffDirOffset, checksum);
+            writeULong(cffDirOffset + 4, start);
+            writeULong(cffDirOffset + 8, size);
+            currentPos += 12;
+            realSize += 12;
+
+        } else {
+            throw new IOException("Can't find CFF table");
+        }
+    }
 
     /**
      * Create the hmtx table by copying metrics from original
@@ -493,9 +527,10 @@ public class TTFSubSetFile extends TTFFile {
         getNumGlyphs(in);
         readHorizontalHeader(in);
         readHorizontalMetrics(in);
-        readIndexToLocation(in);
-
-        scanGlyphs(in, subsetGlyphs);
+        if (!isCFF()) {
+            readIndexToLocation(in);
+            scanGlyphs(in, subsetGlyphs);
+        }
 
         createDirectory();                // Create the TrueType header and directory
 
@@ -523,8 +558,12 @@ public class TTFSubSetFile extends TTFFile {
             log.debug("TrueType: prep table not present. Skipped.");
         }
 
-        createLoca(subsetGlyphs.size());    // create empty loca table
-        createGlyf(in, subsetGlyphs);       //create glyf table and update loca table
+        if (!isCFF()) {
+            createLoca(subsetGlyphs.size());    // create empty loca table
+            createGlyf(in, subsetGlyphs);       //create glyf table and update loca table
+        } else {
+            createCff(in, subsetGlyphs);
+        }
 
         pad4();
         createCheckSumAdjustment();
