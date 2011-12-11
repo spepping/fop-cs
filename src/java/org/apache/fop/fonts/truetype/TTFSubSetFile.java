@@ -60,6 +60,8 @@ public class TTFSubSetFile extends TTFFile {
     private int determineTableCount() {
         int numTables = 4; //4 req'd tables: head,hhea,hmtx,maxp
         if (isCFF()) {
+            numTables += 1; //1 req'd table: CFF
+        } else {
             if (hasCvt()) {
                 numTables++;
             }
@@ -70,8 +72,6 @@ public class TTFSubSetFile extends TTFFile {
                 numTables++;
             }
             numTables += 2; //1 req'd table: loca,glyf
-        } else {
-            numTables += 1; //1 req'd table: CFF
         }
         return numTables;
     }
@@ -153,7 +153,12 @@ public class TTFSubSetFile extends TTFFile {
             realSize += 16;
         }
 
-        if (!isCFF()) {
+        if (isCFF()) {
+            writeString("CFF ");
+            cffDirOffset = currentPos;
+            currentPos += 12;
+            realSize += 16;
+        } else {
             writeString("loca");
             locaDirOffset = currentPos;
             currentPos += 12;
@@ -161,11 +166,6 @@ public class TTFSubSetFile extends TTFFile {
 
             writeString("glyf");
             glyfDirOffset = currentPos;
-            currentPos += 12;
-            realSize += 16;
-        } else {
-            writeString("CFF ");
-            cffDirOffset = currentPos;
             currentPos += 12;
             realSize += 16;
         }
@@ -558,11 +558,11 @@ public class TTFSubSetFile extends TTFFile {
             log.debug("TrueType: prep table not present. Skipped.");
         }
 
-        if (!isCFF()) {
+        if (isCFF()) {
+            createCff(in, subsetGlyphs);
+        } else {
             createLoca(subsetGlyphs.size());    // create empty loca table
             createGlyf(in, subsetGlyphs);       //create glyf table and update loca table
-        } else {
-            createCff(in, subsetGlyphs);
         }
 
         pad4();
