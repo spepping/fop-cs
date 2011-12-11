@@ -82,7 +82,7 @@ public class TTFSubSetFile extends TTFFile {
     private void createDirectory() {
         int numTables = determineTableCount();
         // Create the TrueType header
-        if (!isCFF() ) {
+        if (isCFF() ) {
             writeByte((byte)'O');
             writeByte((byte)'T');
             writeByte((byte)'T');
