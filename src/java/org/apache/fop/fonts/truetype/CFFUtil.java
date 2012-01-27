@@ -54,6 +54,115 @@ final class CFFUtil {
         // 3. return a BLOB containing a well-formed CFF font according to the Adobe
         //    spec and constrained as needed by http://www.microsoft.com/typography/otspec/cff.htm
 
+        long cffOffset = entry.getOffset();
+
+        // HEADER
+
+        in.seekSet ( cffOffset );
+        int major = in.readTTFUByte();
+        int minor = in.readTTFUByte();
+        int hdrSize = in.readTTFUByte();
+        int hdrOffSize = in.readTTFUByte();
+
+        // Name INDEX
+
+        in.seekSet ( cffOffset + hdrSize );
+        int nameIndexCount = in.readTTFUShort();
+        if ( nameIndexCount > 0 ) {
+            int nameIndexOffsetSize = in.readTTFUByte();
+            long nameIndexOffsets[] = new long [ nameIndexCount + 1 ];
+            if ( nameIndexOffsetSize == 1 ) {
+                for ( int i = 0, n = nameIndexCount + 1; i < n; i++ ) {
+                    nameIndexOffsets [ i ] = in.readTTFUByte();
+                }
+            } else if ( nameIndexOffsetSize == 2 ) {
+                for ( int i = 0, n = nameIndexCount + 1; i < n; i++ ) {
+                    nameIndexOffsets [ i ] = in.readTTFUShort();
+                }
+            } else if ( nameIndexOffsetSize == 4 ) {
+                for ( int i = 0, n = nameIndexCount + 1; i < n; i++ ) {
+                    nameIndexOffsets [ i ] = in.readTTFULong();
+                }
+            } else {
+                throw new RuntimeException ( "invalid offset size, got " + nameIndexOffsetSize + ", expected 1, 2, or 4" );
+            }
+            int nameIndexDataOffset = in.getCurrentPos() - 1;
+            String[] names = new String [ nameIndexCount ];
+            for ( int i = 0, n = names.length, nOffsets = nameIndexOffsets.length; i < n; i++ ) {
+                assert ( i + 1 ) < nOffsets;
+                long offCurrent = nameIndexOffsets [ i ];
+                long offNext = nameIndexOffsets [ i + 1 ];
+                long numBytes = offNext - offCurrent;
+                String name;
+                if ( numBytes > 0 ) {
+                    if ( numBytes < Integer.MAX_VALUE ) {
+                        long nameOffset = nameIndexDataOffset + offCurrent;
+                        if ( nameOffset < Integer.MAX_VALUE ) {
+                            byte[] nameBytes = in.getBytes ( (int) nameOffset, (int) numBytes );
+                            name = new String ( nameBytes, 0, (int) numBytes, "US-ASCII" );
+                        } else {
+                            throw new UnsupportedOperationException ( "unsupported index offset value, got " + nameOffset + ", expected less than " + Integer.MAX_VALUE );
+                        }
+                    } else {
+                        throw new UnsupportedOperationException ( "unsupported indexed data length, got " + numBytes + ", expected less than " + Integer.MAX_VALUE );
+                    }
+                } else {
+                    name = "";
+                }
+                names [ i ] = name;
+            }
+            in.seekSet ( nameIndexDataOffset + nameIndexOffsets [ nameIndexCount ] );
+        }
+
+        // Top Dict INDEX
+
+        int topDictIndexCount = in.readTTFUShort();
+        if ( topDictIndexCount > 0 ) {
+            int topDictIndexOffsetSize = in.readTTFUByte();
+            long topDictIndexOffsets[] = new long [ topDictIndexCount + 1 ];
+            if ( topDictIndexOffsetSize == 1 ) {
+                for ( int i = 0, n = topDictIndexCount + 1; i < n; i++ ) {
+                    topDictIndexOffsets [ i ] = in.readTTFUByte();
+                }
+            } else if ( topDictIndexOffsetSize == 2 ) {
+                for ( int i = 0, n = topDictIndexCount + 1; i < n; i++ ) {
+                    topDictIndexOffsets [ i ] = in.readTTFUShort();
+                }
+            } else if ( topDictIndexOffsetSize == 4 ) {
+                for ( int i = 0, n = topDictIndexCount + 1; i < n; i++ ) {
+                    topDictIndexOffsets [ i ] = in.readTTFULong();
+                }
+            } else {
+                throw new RuntimeException ( "invalid offset size, got " + topDictIndexOffsetSize + ", expected 1, 2, or 4" );
+            }
+            int topDictIndexDataOffset = in.getCurrentPos() - 1;
+            byte[][] topDicts = new byte [ topDictIndexCount ][];
+            for ( int i = 0, n = topDicts.length, nOffsets = topDictIndexOffsets.length; i < n; i++ ) {
+                assert ( i + 1 ) < nOffsets;
+                long offCurrent = topDictIndexOffsets [ i ];
+                long offNext = topDictIndexOffsets [ i + 1 ];
+                long numBytes = offNext - offCurrent;
+                byte[] topDict;
+                if ( numBytes > 0 ) {
+                    if ( numBytes < Integer.MAX_VALUE ) {
+                        long topDictOffset = topDictIndexDataOffset + offCurrent;
+                        if ( topDictOffset < Integer.MAX_VALUE ) {
+                            byte[] topDictBytes = in.getBytes ( (int) topDictOffset, (int) numBytes );
+                            topDict = topDictBytes;
+                        } else {
+                            throw new UnsupportedOperationException ( "unsupported index offset value, got " + topDictOffset + ", expected less than " + Integer.MAX_VALUE );
+                        }
+                    } else {
+                        throw new UnsupportedOperationException ( "unsupported indexed data length, got " + numBytes + ", expected less than " + Integer.MAX_VALUE );
+                    }
+                } else {
+                    topDict = new byte [ 0 ];
+                }
+                topDicts [ i ] = topDict;
+            }
+            in.seekSet ( topDictIndexDataOffset + topDictIndexOffsets [ topDictIndexCount ] );
+        }
+
         return new byte[] {};
     }
 
