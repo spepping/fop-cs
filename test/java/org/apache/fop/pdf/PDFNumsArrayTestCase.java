@@ -19,32 +19,36 @@
 
 package org.apache.fop.pdf;
 
+import org.junit.Before;
+import org.junit.Test;
+
 import java.io.IOException;
-import java.io.OutputStream;
 
 /**
- * Class representing a PDF name object.
+ * Test case for {@link PDFNumsArray}.
  */
-public final class PDFNull implements PDFWritable {
+public class PDFNumsArrayTestCase extends PDFObjectTestCase {
+    private PDFNumsArray numsArray;
+    private String expectedString = "[0 /Test#20name 1 10]";
 
-    /** Instance for the "null" object. */
-    public static final PDFNull INSTANCE = new PDFNull();
+    @Before
+    public void setUp() {
+        numsArray = new PDFNumsArray(parent);
+        numsArray.put(0, new PDFName("Test name"));
+        PDFNumber num = new PDFNumber();
+        num.setNumber(10);
+        numsArray.put(1, num);
+        numsArray.setDocument(doc);
+
+        pdfObjectUnderTest = numsArray;
+    }
 
     /**
-     * Creates a new PDF name object.
+     * Test output() - ensure that this object is properly outputted to the PDF document.
+     * @throws IOException if an I/O error occurs
      */
-    private PDFNull() {
+    @Test
+    public void testOutput() throws IOException {
+        testOutputStreams(expectedString, numsArray);
     }
-
-    /** {@inheritDoc} */
-    @Override
-    public String toString() {
-        return "null";
-    }
-
-    /** {@inheritDoc} */
-    public void outputInline(OutputStream out, StringBuilder textBuffer) throws IOException {
-        textBuffer.append(toString());
-    }
-
 }

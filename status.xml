@@ -61,6 +61,18 @@
       documents. Example: the fix of marks layering will be such a case when it's done.
     -->
     <release version="FOP Trunk" date="TBD">
+      <action context="Code" dev="CB" type="add" fixes-bug="52416" due-to="Luis Bernardo">
+        Suppress unnecessary "font not found warnings" when generating AFP with raster fonts 
+      </action>
+      <action context="Code" dev="CB" type="add" fixes-bug="51209" due-to="Luis Bernardo">
+        SVG text in AFP creates miscoded GOCA text
+      </action>
+      <action context="Code" dev="CB" type="add" fixes-bug="50391" due-to="Peter Hancock">
+        Add support for different flow-name of fo:region-body in FOP
+      </action>
+      <action context="Code" dev="CB" type="add" fixes-bug="51664" due-to="Mehdi Houshmand">
+        Tagged PDF performance improvement plus tests
+      </action>	
       <action context="Code" dev="MH" type="add" fixes-bug="52197">
         Improved AdobeStandardEncoding support in AFM files for type1 fonts
       </action>

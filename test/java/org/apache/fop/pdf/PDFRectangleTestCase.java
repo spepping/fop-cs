@@ -19,32 +19,34 @@
 
 package org.apache.fop.pdf;
 
+import static org.junit.Assert.assertEquals;
+
+import org.junit.Test;
+
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 
 /**
- * Class representing a PDF name object.
+ * Test case for {@link PDFRectangle}.
  */
-public final class PDFNull implements PDFWritable {
-
-    /** Instance for the "null" object. */
-    public static final PDFNull INSTANCE = new PDFNull();
+public class PDFRectangleTestCase {
 
     /**
-     * Creates a new PDF name object.
+     * Test outputInline() - ensure properly formatted co-ords are printed to the output stream.
+     * @throws IOException if an I/O error occurs
      */
-    private PDFNull() {
-    }
+    @Test
+    public void testOutputInline() throws IOException {
+        OutputStream out = new ByteArrayOutputStream();
+        // These are arbitrary values thus have no meaning
+        PDFRectangle rect = new PDFRectangle(1, 2, 3, 4);
 
-    /** {@inheritDoc} */
-    @Override
-    public String toString() {
-        return "null";
-    }
+        StringBuilder textBuffer = new StringBuilder();
+        // Ensure text before the outputInline() is maintained
+        textBuffer.append("Test ");
 
-    /** {@inheritDoc} */
-    public void outputInline(OutputStream out, StringBuilder textBuffer) throws IOException {
-        textBuffer.append(toString());
+        rect.outputInline(out, textBuffer);
+        assertEquals("Test [1 2 3 4]", textBuffer.toString());
     }
-
 }

@@ -19,32 +19,31 @@
 
 package org.apache.fop.pdf;
 
+import static org.junit.Assert.assertEquals;
+
+import org.junit.Test;
+
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 
 /**
- * Class representing a PDF name object.
+ * Test case for {@link PDFNull}.
  */
-public final class PDFNull implements PDFWritable {
-
-    /** Instance for the "null" object. */
-    public static final PDFNull INSTANCE = new PDFNull();
+public class PDFNullTestCase extends PDFObjectTestCase {
 
     /**
-     * Creates a new PDF name object.
+     * Test outputInline() - test that "null" is printed to the output stream.
      */
-    private PDFNull() {
-    }
+    @Test
+    public void testOutputInline() throws IOException {
+        PDFNull obj = PDFNull.INSTANCE;
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        StringBuilder text = new StringBuilder();
+        obj.outputInline(out, text);
+        assertEquals("null", text.toString());
 
-    /** {@inheritDoc} */
-    @Override
-    public String toString() {
-        return "null";
+        // Ensure previously written text is not discarded
+        obj.outputInline(out, text);
+        assertEquals("nullnull", text.toString());
     }
-
-    /** {@inheritDoc} */
-    public void outputInline(OutputStream out, StringBuilder textBuffer) throws IOException {
-        textBuffer.append(toString());
-    }
-
 }

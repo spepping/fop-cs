@@ -17,18 +17,29 @@
 
 /* $Id$ */
 
-package org.apache.fop.util;
+package org.apache.fop.pdf;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
-import org.apache.fop.pdf.PDFNumber;
+import org.junit.Before;
 import org.junit.Test;
+
+import java.io.IOException;
 
 /**
  * This test tests PDFNumber's doubleOut() methods.
  */
-public class PDFNumberTestCase {
+public class PDFNumberTestCase extends PDFObjectTestCase {
+    /**
+     * Sets up the local variables, most of these are inherited from PDFObjectTestCase
+     */
+    @Before
+    public void setUp() {
+        pdfObjectUnderTest = new PDFNumber();
+        pdfObjectUnderTest.setParent(parent);
+        pdfObjectUnderTest.setDocument(doc);
+    }
 
     /**
      * Tests PDFNumber.doubleOut().
@@ -54,7 +65,6 @@ public class PDFNumberTestCase {
      * Tests PDFNumber.doubleOut().
      * @throws Exception if the test fails
      */
-    @Test
     public void testDoubleOut2() throws Exception {
         //4 decimal digits in this case
         assertEquals("0", PDFNumber.doubleOut(0.0f, 4));
@@ -70,7 +80,6 @@ public class PDFNumberTestCase {
      * Tests PDFNumber.doubleOut().
      * @throws Exception if the test fails
      */
-    @Test
     public void testDoubleOut3() throws Exception {
         //0 decimal digits in this case
         assertEquals("0", PDFNumber.doubleOut(0.0f, 0));
@@ -84,7 +93,6 @@ public class PDFNumberTestCase {
      * Tests PDFNumber.doubleOut(). Special cases (former bugs).
      * @throws Exception if the test fails
      */
-    @Test
     public void testDoubleOut4() throws Exception {
         double d = Double.parseDouble("5.7220458984375E-6");
         assertEquals("0.000006", PDFNumber.doubleOut(d));
@@ -96,7 +104,6 @@ public class PDFNumberTestCase {
      * Tests PDFNumber.doubleOut(). Tests for wrong parameters.
      * @throws Exception if the test fails
      */
-    @Test
     public void testDoubleOutWrongParameters() throws Exception {
         try {
             PDFNumber.doubleOut(0.1f, -1);
@@ -116,6 +123,40 @@ public class PDFNumberTestCase {
         } catch (IllegalArgumentException iae) {
             //we want that
         }
+        try {
+            PDFNumber.doubleOut(null);
+            fail("NullPointer expected!");
+        } catch (NullPointerException e) {
+            // PASS
+        }
     }
 
+    /**
+     * Tests both getNumber() and setNumber() - basic getter/setter methods... Why there isn't a
+     * constructor is beyond me...
+     */
+    public void testGetSetNumber() {
+        PDFNumber pdfNum = new PDFNumber();
+        // Check with a floating point number
+        pdfNum.setNumber(1.111f);
+        assertEquals(1.111f, pdfNum.getNumber());
+        // try with an int
+        pdfNum.setNumber(2);
+        assertEquals(2, pdfNum.getNumber());
+        // See what happens with a null... make sure it doesn't explode
+        pdfNum.setNumber(null);
+        assertEquals(null, pdfNum.getNumber());
+    }
+
+    /**
+     * Tests toPDFString() - this serializes PDFNumber to PDF format.
+     * @throws IOException error caused by I/O
+     */
+    public void testToPDFString() throws IOException {
+        PDFNumber testSubject = new PDFNumber();
+        testSubject.setNumber(1.0001);
+        testOutputStreams("1.0001", testSubject);
+        testSubject.setNumber(999);
+        testOutputStreams("999", testSubject);
+    }
 }

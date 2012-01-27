@@ -17,34 +17,19 @@
 
 /* $Id$ */
 
-package org.apache.fop.pdf;
+package org.apache.fop.fo.pagination;
 
-import java.io.IOException;
-import java.io.OutputStream;
+import org.junit.runners.Suite;
+import org.junit.runner.RunWith;
 
 /**
- * Class representing a PDF name object.
+ * All test to be added in FOTreeTestSuite
+ *
  */
-public final class PDFNull implements PDFWritable {
+@RunWith(Suite.class)
+@Suite.SuiteClasses({ PageSequenceMasterTestCase.class,
+        RepeatablePageMasterAlternativesTestCase.class})
 
-    /** Instance for the "null" object. */
-    public static final PDFNull INSTANCE = new PDFNull();
-
-    /**
-     * Creates a new PDF name object.
-     */
-    private PDFNull() {
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public String toString() {
-        return "null";
-    }
-
-    /** {@inheritDoc} */
-    public void outputInline(OutputStream out, StringBuilder textBuffer) throws IOException {
-        textBuffer.append(toString());
-    }
+public final class AllTests {
 
 }

@@ -55,7 +55,7 @@ public class PageSequence extends AbstractPageSequence implements WritingModeTra
     // the set of flows includes StaticContent flows also
 
     /** Map of flows to their flow name (flow-name, Flow) */
-    private Map<String, Flow> flowMap;
+    private Map<String, FONode> flowMap;
 
     /**
      * The currentSimplePageMaster is either the page master for the
@@ -104,7 +104,7 @@ public class PageSequence extends AbstractPageSequence implements WritingModeTra
     /** {@inheritDoc} */
     protected void startOfNode() throws FOPException {
         super.startOfNode();
-        flowMap = new java.util.HashMap<String, Flow>();
+        flowMap = new java.util.HashMap<String, FONode>();
 
         this.simplePageMaster
             = getRoot().getLayoutMasterSet().getSimplePageMaster(masterReference);
@@ -247,7 +247,7 @@ public class PageSequence extends AbstractPageSequence implements WritingModeTra
     }
 
     /** @return the flow map for this page-sequence */
-    public Map<String, Flow> getFlowMap() {
+    public Map<String, FONode> getFlowMap() {
         return this.flowMap;
     }
 
@@ -278,7 +278,7 @@ public class PageSequence extends AbstractPageSequence implements WritingModeTra
                     + " isBlank=" + isBlank + ")");
         }
         return pageSequenceMaster.getNextSimplePageMaster(isOddPage,
-            isFirstPage, isLastPage, isBlank);
+            isFirstPage, isLastPage, isBlank, getMainFlow().getFlowName());
     }
 
     /**
